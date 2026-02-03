@@ -1,0 +1,58 @@
+package com.cosmetovigilance.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.util.List;
+
+@Entity
+@Table(name = "personne_exposee")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PersonneExposee {
+
+    @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(length = 36)
+    private String id;
+
+    @Column(nullable = false, length = 50)
+    private String type;
+
+    @Column(nullable = false)
+    private String nom;
+
+    @Column(nullable = false)
+    private String prenom;
+
+    @Column(nullable = false)
+    private Integer age;
+
+    @Column(nullable = false)
+    private Boolean grossesse = false;
+
+    @Column(name = "mois_grossesse")
+    private Integer moisGrossesse;
+
+    private String email;
+
+    @Column(length = 50)
+    private String tel;
+
+    @Column(nullable = false, length = 1)
+    private String sexe;
+
+    @OneToMany(mappedBy = "personneExposeeId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AllergiesConnues> allergies;
+
+    @OneToMany(mappedBy = "personneExposeeId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AntecedentsMedical> antecedents;
+
+    @OneToMany(mappedBy = "personneExposeeId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MedicamentProduitSimultanement> medicaments;
+}
