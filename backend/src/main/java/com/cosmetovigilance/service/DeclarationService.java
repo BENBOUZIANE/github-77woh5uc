@@ -27,6 +27,7 @@ public class DeclarationService {
     private final UtilisateurRepository utilisateurRepository;
     private final ProfessionnelSanteRepository professionnelSanteRepository;
     private final RepresentantLegalRepository representantLegalRepository;
+    private final EmailService emailService;
 
     @Transactional
     public DeclarationResponse createDeclaration(DeclarationRequest request, String userEmail) {
@@ -334,8 +335,30 @@ public class DeclarationService {
                 .produitsSuspectes(produitsDto)
                 .prisesChargeMedicales(prisesDto)
                 .commentaire(declaration.getCommentaire())
+                .commentaireAnmps(declaration.getCommentaireAnmps())
                 .userId(declaration.getUserId())
                 .createdAt(declaration.getCreatedAt())
                 .build();
+    }
+
+    @Transactional
+    public DeclarationResponse updateCommentaireAnmps(String id, String commentaireAnmps) {
+        Declaration declaration = declarationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Declaration not found"));
+
+        Declarant declarant = declarantRepository.findById(declaration.getDeclarantId())
+                .orElseThrow(() -> new RuntimeException("Declarant not found"));
+
+        declaration.setCommentaireAnmps(commentaireAnmps);
+        declaration = declarationRepository.save(declaration);
+
+        emailService.sendCommentaireAnmpsEmail(
+            declarant.getEmail(),
+            declaration.getId(),
+            commentaireAnmps,
+            declaration.getStatut()
+        );
+
+        return mapToResponse(declaration);
     }
 }

@@ -106,6 +106,16 @@ class ApiService {
     return this.handleResponse(response);
   }
 
+  async updateCommentaireAnmps(id: string, commentaireAnmps: string) {
+    const response = await fetch(`${API_URL}/declarations/${id}/commentaire-anmps`, {
+      method: 'PATCH',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ commentaireAnmps })
+    });
+
+    return this.handleResponse(response);
+  }
+
   async createDeclaration(data: any) {
     const response = await fetch(`${API_URL}/declarations`, {
       method: 'POST',

@@ -3,6 +3,7 @@ package com.cosmetovigilance.controller;
 import com.cosmetovigilance.dto.ApiResponse;
 import com.cosmetovigilance.dto.DeclarationRequest;
 import com.cosmetovigilance.dto.DeclarationResponse;
+import com.cosmetovigilance.dto.UpdateCommentaireAnmpsRequest;
 import com.cosmetovigilance.dto.UpdateDeclarationStatusRequest;
 import com.cosmetovigilance.service.DeclarationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,6 +90,20 @@ public class DeclarationController {
         try {
             List<DeclarationResponse> declarations = declarationService.getAllDeclarations();
             return ResponseEntity.ok(ApiResponse.success(declarations));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{id}/commentaire-anmps")
+    @Operation(summary = "Update declaration commentaire ANMPS and send email")
+    public ResponseEntity<ApiResponse<DeclarationResponse>> updateCommentaireAnmps(
+            @PathVariable String id,
+            @Valid @RequestBody UpdateCommentaireAnmpsRequest request) {
+        try {
+            DeclarationResponse response = declarationService.updateCommentaireAnmps(id, request.getCommentaireAnmps());
+            return ResponseEntity.ok(ApiResponse.success("Commentaire ANMPS mis à jour et email envoyé", response));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error(e.getMessage()));

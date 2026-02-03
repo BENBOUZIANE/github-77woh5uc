@@ -26,6 +26,7 @@ public class DeclarationResponse {
     private List<ProduitSuspecteDto> produitsSuspectes;
     private List<PriseChargeMedicaleDto> prisesChargeMedicales;
     private String commentaire;
+    private String commentaireAnmps;
     private String userId;
     private LocalDateTime createdAt;
 }

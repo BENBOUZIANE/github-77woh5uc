@@ -34,6 +34,9 @@ public class Declaration {
     @Column(columnDefinition = "TEXT")
     private String commentaire;
 
+    @Column(name = "commentaire_anmps", columnDefinition = "TEXT")
+    private String commentaireAnmps;
+
     @Enumerated(EnumType.STRING)
     @Column(
             name = "statut",

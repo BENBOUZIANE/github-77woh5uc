@@ -27,6 +27,7 @@ interface DeclarationDetail {
   created_at: string;
   statut: DeclarationStatus;
   commentaire: string;
+  commentaire_anmps: string;
   declarant: {
     nom?: string;
     prenom?: string;
@@ -102,6 +103,8 @@ export default function DeclarationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [statusSaving, setStatusSaving] = useState(false);
+  const [commentaireAnmps, setCommentaireAnmps] = useState('');
+  const [commentaireSaving, setCommentaireSaving] = useState(false);
 
   const getFileType = (filename: string): 'image' | 'pdf' | 'other' => {
     const ext = filename.toLowerCase().split('.').pop();
@@ -127,6 +130,7 @@ export default function DeclarationDetailPage() {
           created_at: apiData.createdAt ?? new Date().toISOString(),
           statut: (apiData.statut ?? 'nouveau') as DeclarationStatus,
           commentaire: apiData.commentaire ?? '',
+          commentaire_anmps: apiData.commentaireAnmps ?? '',
           declarant: {
             nom: apiData.declarant?.nom,
             prenom: apiData.declarant?.prenom,
@@ -199,6 +203,7 @@ export default function DeclarationDetailPage() {
         };
 
         setDeclaration(declarationMapped);
+        setCommentaireAnmps(declarationMapped.commentaire_anmps);
       } catch (err: any) {
         setError(err.message || 'Erreur lors du chargement de la déclaration');
       } finally {
@@ -223,6 +228,22 @@ export default function DeclarationDetailPage() {
       setError(e?.message || 'Erreur lors de la mise à jour du statut');
     } finally {
       setStatusSaving(false);
+    }
+  };
+
+  const onSaveCommentaireAnmps = async () => {
+    if (!declaration || commentaireSaving) return;
+    const previous = declaration.commentaire_anmps;
+    try {
+      setCommentaireSaving(true);
+      const updated: any = await api.updateCommentaireAnmps(declaration.id, commentaireAnmps);
+      setDeclaration((curr) => (curr ? { ...curr, commentaire_anmps: updated?.commentaireAnmps ?? commentaireAnmps } : curr));
+      alert('Commentaire ANMPS sauvegardé et email envoyé au déclarant!');
+    } catch (e: any) {
+      setCommentaireAnmps(previous);
+      alert('Erreur lors de la sauvegarde du commentaire: ' + (e?.message || 'Erreur inconnue'));
+    } finally {
+      setCommentaireSaving(false);
     }
   };
 
@@ -698,9 +719,32 @@ export default function DeclarationDetailPage() {
                 <h2 className="text-2xl font-bold text-slate-900">Commentaires et Pièces Jointes</h2>
               </div>
                 <div className="bg-slate-50 rounded-lg p-6 space-y-6">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-slate-500">Commentaire ANMPS</p>
+                      <button
+                        onClick={onSaveCommentaireAnmps}
+                        disabled={commentaireSaving}
+                        className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {commentaireSaving ? 'Envoi en cours...' : 'Sauvegarder et envoyer email'}
+                      </button>
+                    </div>
+                    <textarea
+                      value={commentaireAnmps}
+                      onChange={(e) => setCommentaireAnmps(e.target.value)}
+                      rows={4}
+                      placeholder="Ajoutez un commentaire ANMPS qui sera envoyé au déclarant par email..."
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      En sauvegardant, un email sera automatiquement envoyé au déclarant avec ce commentaire et le statut actuel de la déclaration.
+                    </p>
+                  </div>
+
                   {declaration.commentaire && (
                     <div>
-                      <p className="text-sm font-medium text-slate-500 mb-2">Commentaires</p>
+                      <p className="text-sm font-medium text-slate-500 mb-2">Commentaires du déclarant</p>
                       <p className="text-slate-900 whitespace-pre-wrap">{declaration.commentaire}</p>
                     </div>
                   )}
