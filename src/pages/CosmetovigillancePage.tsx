@@ -139,6 +139,9 @@ export default function CosmetovigillancePage() {
         if (!formData.declarant.prenom.trim()) errors.declarantPrenom = 'Le prénom est obligatoire';
         if (!formData.declarant.email.trim()) errors.declarantEmail = 'L\'email est obligatoire';
         if (!formData.declarant.tel.trim()) errors.declarantTel = 'Le téléphone est obligatoire';
+        if (formData.utilisateurType === 'autre' && !formData.utilisateurTypeAutre?.trim()) {
+          errors.utilisateurTypeAutre = 'Veuillez préciser le type de notificateur';
+        }
         break;
 
       case 1: // Professionnel de Santé ou Représentant Légal
@@ -152,12 +155,16 @@ export default function CosmetovigillancePage() {
           if (!formData.representantLegal?.numeroDeclarationEtablissement.trim()) errors.numeroDeclaration = 'Le numéro de déclaration est obligatoire';
           if (!formData.representantLegal?.numeroDocumentEnregistrementProduit.trim()) errors.numeroDocument = 'Le numéro du document est obligatoire';
           if (!formData.representantLegal?.dateReceptionNotification) errors.dateReception = 'La date de réception est obligatoire';
+          if (!documentEnregistrement) errors.documentEnregistrement = 'Le document d\'enregistrement est obligatoire';
         }
         break;
 
       case 2: // Personne Exposée
         if (!formData.personneExposee.nomPrenom.trim()) errors.nomPrenom = 'Le nom et prénom sont obligatoires';
         if (!formData.personneExposee.ville) errors.personneVille = 'La ville est obligatoire';
+        if (!formData.personneExposee.dateNaissance && !formData.personneExposee.age) {
+          errors.dateNaissanceOuAge = 'La date de naissance ou l\'âge est obligatoire';
+        }
         break;
 
       case 4: // Effet Indésirable
@@ -166,10 +173,21 @@ export default function CosmetovigillancePage() {
         if (!formData.effetIndesirable.dateApparition) errors.dateApparition = 'La date d\'apparition est obligatoire';
         if (!formData.effetIndesirable.delaiSurvenue.trim()) errors.delaiSurvenue = 'Le délai de survenue est obligatoire';
         if (!formData.effetIndesirable.evolutionEffet) errors.evolutionEffet = 'L\'évolution de l\'effet est obligatoire';
+        if (formData.effetIndesirable.gravite && formData.effetIndesirable.criteresGravite.length === 0) {
+          errors.criteresGravite = 'Veuillez sélectionner au moins un critère de gravité';
+        }
+        break;
+
+      case 5: // Prise en Charge
+        if (formData.priseChargeMedicale?.mesuresPriseType === 'autre' && !formData.priseChargeMedicale.mesuresPriseAutre?.trim()) {
+          errors.mesuresPriseAutre = 'Veuillez préciser les autres mesures';
+        }
         break;
 
       case 6: // Cosmétique Suspect
         if (!formData.produitSuspecte.nomCommercial.trim()) errors.nomCommercial = 'Le nom commercial est obligatoire';
+        if (!formData.produitSuspecte.marque.trim()) errors.marque = 'La marque est obligatoire';
+        if (!formData.produitSuspecte.numeroLot.trim()) errors.numeroLot = 'Le numéro de lot est obligatoire';
         if (!formData.produitSuspecte.typeProduit) errors.typeProduit = 'Le type de produit est obligatoire';
         if (!formData.produitSuspecte.zoneApplication.trim()) errors.zoneApplication = 'La zone d\'application est obligatoire';
         if (!formData.produitSuspecte.frequenceUtilisation.trim()) errors.frequenceUtilisation = 'La fréquence d\'utilisation est obligatoire';
@@ -457,9 +475,10 @@ export default function CosmetovigillancePage() {
                   value={formData.utilisateurTypeAutre || ''}
                   onChange={(e) => setFormData({ ...formData, utilisateurTypeAutre: e.target.value })}
                   placeholder="Veuillez préciser votre type d'utilisateur..."
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${validationErrors.utilisateurTypeAutre ? 'border-red-500' : 'border-slate-300'}`}
                   required
                 />
+                <ErrorMessage error={validationErrors.utilisateurTypeAutre} />
               </div>
             )}
           </div>
@@ -647,10 +666,10 @@ export default function CosmetovigillancePage() {
 
               <div className="mt-6">
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Document d'Enregistrement (PDF)
+                  Document d'Enregistrement (PDF)*
                 </label>
                 <div className="space-y-4">
-                  <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer bg-white hover:bg-slate-50 transition-colors">
+                  <label className={`flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer bg-white hover:bg-slate-50 transition-colors ${validationErrors.documentEnregistrement ? 'border-red-500' : 'border-slate-300'}`}>
                     <div className="text-center">
                       <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                       <p className="text-sm text-slate-600">
@@ -667,6 +686,9 @@ export default function CosmetovigillancePage() {
                       className="hidden"
                     />
                   </label>
+                  {validationErrors.documentEnregistrement && (
+                    <p className="text-sm text-red-600">{validationErrors.documentEnregistrement}</p>
+                  )}
 
                   {documentEnregistrement && (
                     <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg p-3">
@@ -858,6 +880,9 @@ export default function CosmetovigillancePage() {
                   <option value="Heure">Heure</option>
                 </select>
               </div>
+              {validationErrors.dateNaissanceOuAge && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.dateNaissanceOuAge}</p>
+              )}
             </div>
 
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
@@ -1123,6 +1148,9 @@ export default function CosmetovigillancePage() {
                     </label>
                   ))}
                 </div>
+                {validationErrors.criteresGravite && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.criteresGravite}</p>
+                )}
               </div>
             )}
 
@@ -1204,13 +1232,18 @@ export default function CosmetovigillancePage() {
                 </label>
 
                 {formData.priseChargeMedicale.mesuresPriseType === 'autre' && (
-                  <textarea
-                    value={formData.priseChargeMedicale.mesuresPriseAutre}
-                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseAutre: e.target.value } })}
-                    rows={3}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    placeholder="Précisez les autres mesures prises..."
-                  />
+                  <div>
+                    <textarea
+                      value={formData.priseChargeMedicale.mesuresPriseAutre}
+                      onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseAutre: e.target.value } })}
+                      rows={3}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="Précisez les autres mesures prises..."
+                    />
+                    {validationErrors.mesuresPriseAutre && (
+                      <p className="mt-1 text-sm text-red-600">{validationErrors.mesuresPriseAutre}</p>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -1255,6 +1288,9 @@ export default function CosmetovigillancePage() {
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, marque: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
+                {validationErrors.marque && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.marque}</p>
+                )}
               </div>
 
               <div>
@@ -1288,6 +1324,9 @@ export default function CosmetovigillancePage() {
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, numeroLot: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
+                {validationErrors.numeroLot && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.numeroLot}</p>
+                )}
               </div>
 
               <div>
