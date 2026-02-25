@@ -524,6 +524,7 @@ export default function CosmetovigillancePage() {
                   <input
                     type="date"
                     value={formData.representantLegal?.dateReceptionNotification || ''}
+                    max={new Date().toISOString().split('T')[0]}
                     onChange={(e) => setFormData({
                       ...formData,
                       representantLegal: {
