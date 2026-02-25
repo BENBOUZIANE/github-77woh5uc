@@ -43,8 +43,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-end mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex justify-end mb-4">
           {user ? (
             <button
               onClick={() => navigate('/dashboard')}
@@ -63,12 +63,12 @@ export default function HomePage() {
             </button>
           )}
         </div>
-        <div className="text-center mb-16">
-          <div className="flex justify-center mb-6">
+        <div className="text-center mb-10">
+          <div className="flex justify-center mb-4">
             <img
               src="/Designer_(2)_(1).png"
               alt="Logo Cosmétovigilance"
-              className="w-48 h-48 object-contain"
+              className="w-64 h-64 object-contain"
             />
           </div>
           <h1 className="text-5xl font-bold text-slate-900 mb-4">
