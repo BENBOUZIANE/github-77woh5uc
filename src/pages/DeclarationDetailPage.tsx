@@ -44,6 +44,7 @@ interface DeclarationDetail {
     tel?: string;
     grossesse?: boolean;
     mois_grossesse?: number;
+    allaitement?: boolean;
   };
   effet_indesirable?: {
     localisation?: string;
@@ -147,6 +148,7 @@ export default function DeclarationDetailPage() {
             tel: apiData.personneExposee?.tel,
             grossesse: apiData.personneExposee?.grossesse,
             mois_grossesse: apiData.personneExposee?.moisGrossesse,
+            allaitement: apiData.personneExposee?.allaitement,
           },
           effet_indesirable: apiData.effetsIndesirables && apiData.effetsIndesirables.length > 0
             ? {
@@ -515,6 +517,12 @@ export default function DeclarationDetailPage() {
                       <p className="text-slate-900">
                         Oui{declaration.personne_exposee.mois_grossesse ? ` (${declaration.personne_exposee.mois_grossesse} mois)` : ''}
                       </p>
+                    </div>
+                  )}
+                  {declaration.personne_exposee.allaitement && (
+                    <div>
+                      <p className="text-sm font-medium text-slate-500">Allaitement</p>
+                      <p className="text-slate-900">Oui</p>
                     </div>
                   )}
                 </div>

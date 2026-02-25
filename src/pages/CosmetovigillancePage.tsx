@@ -31,6 +31,7 @@ interface FormData {
     age: number;
     grossesse: boolean;
     moisGrossesse?: number;
+    allaitement: boolean;
     email: string;
     tel: string;
     sexe: string;
@@ -43,7 +44,7 @@ interface FormData {
     dateApparition: string;
     dateFin: string;
     gravite: boolean;
-    criteresGravite: string;
+    criteresGravite: string[];
     evolutionEffet: string;
     priseChargeMedicale: boolean;
   };
@@ -76,11 +77,11 @@ export default function CosmetovigillancePage() {
   const [formData, setFormData] = useState<FormData>({
     utilisateurType: 'professionnel',
     declarant: { nom: '', prenom: '', email: '', tel: '' },
-    personneExposee: { type: 'patient', nom: '', prenom: '', age: 0, grossesse: false, email: '', tel: '', sexe: 'F' },
+    personneExposee: { type: 'patient', nom: '', prenom: '', age: 0, grossesse: false, allaitement: false, email: '', tel: '', sexe: 'F' },
     allergiesConnues: [],
     antecedentsMedicaux: [],
     medicamentsSimultanes: [],
-    effetIndesirable: { localisation: '', dateApparition: '', dateFin: '', gravite: false, criteresGravite: '', evolutionEffet: '', priseChargeMedicale: false },
+    effetIndesirable: { localisation: '', dateApparition: '', dateFin: '', gravite: false, criteresGravite: [], evolutionEffet: '', priseChargeMedicale: false },
     priseChargeMedicale: { diagnostic: '', mesuresPrise: '', examensRealise: '' },
     produitSuspecte: { nomCommercial: '', marque: '', fabricant: '', typeProduit: '', numeroLot: '', frequenceUtilisation: '', dateDebutUtilisation: '', arretUtilisation: '', reexpositionProduit: false, reapparitionEffetIndesirable: false },
     commentaire: ''
@@ -243,7 +244,7 @@ export default function CosmetovigillancePage() {
               dateApparition: formData.effetIndesirable.dateApparition,
               dateFin: formData.effetIndesirable.dateFin || null,
               gravite: formData.effetIndesirable.gravite,
-              criteresGravite: formData.effetIndesirable.criteresGravite,
+              criteresGravite: formData.effetIndesirable.criteresGravite.join(', '),
               evolutionEffet: formData.effetIndesirable.evolutionEffet,
             }]
           : [],
@@ -666,28 +667,40 @@ export default function CosmetovigillancePage() {
             </div>
 
             {formData.personneExposee.sexe === 'F' && (
-              <div className="flex items-center space-x-4">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-4">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.personneExposee.grossesse}
+                      onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, grossesse: e.target.checked } })}
+                      className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                    />
+                    <span className="ml-2 text-sm text-slate-700">Grossesse</span>
+                  </label>
+
+                  {formData.personneExposee.grossesse && (
+                    <div>
+                      <input
+                        type="number"
+                        placeholder="Mois de grossesse"
+                        value={formData.personneExposee.moisGrossesse || ''}
+                        onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, moisGrossesse: parseInt(e.target.value) || undefined } })}
+                        className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={formData.personneExposee.grossesse}
-                    onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, grossesse: e.target.checked } })}
+                    checked={formData.personneExposee.allaitement}
+                    onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, allaitement: e.target.checked } })}
                     className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
                   />
-                  <span className="ml-2 text-sm text-slate-700">Grossesse</span>
+                  <span className="ml-2 text-sm text-slate-700">Allaitement</span>
                 </label>
-
-                {formData.personneExposee.grossesse && (
-                  <div>
-                    <input
-                      type="number"
-                      placeholder="Mois de grossesse"
-                      value={formData.personneExposee.moisGrossesse || ''}
-                      onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, moisGrossesse: parseInt(e.target.value) || undefined } })}
-                      className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    />
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -853,13 +866,31 @@ export default function CosmetovigillancePage() {
 
             {formData.effetIndesirable.gravite && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Critères de Gravité</label>
-                <textarea
-                  value={formData.effetIndesirable.criteresGravite}
-                  onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, criteresGravite: e.target.value } })}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
+                <label className="block text-sm font-medium text-slate-700 mb-2">Critères de Gravité*</label>
+                <div className="space-y-2">
+                  {[
+                    'Incapacité fonctionnelle temporaire ou permanente',
+                    'Handicap',
+                    'Risque vital immédiat',
+                    'Hospitalisation',
+                    'Décès'
+                  ].map((critere) => (
+                    <label key={critere} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.effetIndesirable.criteresGravite.includes(critere)}
+                        onChange={(e) => {
+                          const newCriteres = e.target.checked
+                            ? [...formData.effetIndesirable.criteresGravite, critere]
+                            : formData.effetIndesirable.criteresGravite.filter(c => c !== critere);
+                          setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, criteresGravite: newCriteres } });
+                        }}
+                        className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                      />
+                      <span className="ml-2 text-sm text-slate-700">{critere}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -872,9 +903,9 @@ export default function CosmetovigillancePage() {
               >
                 <option value="">Sélectionner</option>
                 <option value="guerison">Guérison</option>
-                <option value="amelioration">Amélioration</option>
-                <option value="persistance">Persistance</option>
-                <option value="aggravation">Aggravation</option>
+                <option value="amelioration_en_cours">Amélioration en cours</option>
+                <option value="sequelles">Séquelles</option>
+                <option value="persistance">Persistance de l'effet</option>
                 <option value="inconnue">Inconnue</option>
               </select>
             </div>

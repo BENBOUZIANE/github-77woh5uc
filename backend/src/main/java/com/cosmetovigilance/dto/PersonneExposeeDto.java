@@ -28,6 +28,7 @@ public class PersonneExposeeDto {
 
     private Boolean grossesse = false;
     private Integer moisGrossesse;
+    private Boolean allaitement = false;
     private String email;
     private String tel;
 

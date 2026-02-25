@@ -93,6 +93,7 @@ public class DeclarationService {
         personneExposee.setAge(request.getPersonneExposee().getAge());
         personneExposee.setGrossesse(request.getPersonneExposee().getGrossesse());
         personneExposee.setMoisGrossesse(request.getPersonneExposee().getMoisGrossesse());
+        personneExposee.setAllaitement(request.getPersonneExposee().getAllaitement() != null ? request.getPersonneExposee().getAllaitement() : false);
         personneExposee.setEmail(request.getPersonneExposee().getEmail());
         personneExposee.setTel(request.getPersonneExposee().getTel());
         personneExposee.setSexe(request.getPersonneExposee().getSexe());
@@ -238,6 +239,7 @@ public class DeclarationService {
         personneExposeeDto.setAge(personneExposee.getAge());
         personneExposeeDto.setGrossesse(personneExposee.getGrossesse());
         personneExposeeDto.setMoisGrossesse(personneExposee.getMoisGrossesse());
+        personneExposeeDto.setAllaitement(personneExposee.getAllaitement());
         personneExposeeDto.setEmail(personneExposee.getEmail());
         personneExposeeDto.setTel(personneExposee.getTel());
         personneExposeeDto.setSexe(personneExposee.getSexe());

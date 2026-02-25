@@ -39,6 +39,9 @@ public class PersonneExposee {
     @Column(name = "mois_grossesse")
     private Integer moisGrossesse;
 
+    @Column(nullable = false)
+    private Boolean allaitement = false;
+
     private String email;
 
     @Column(length = 50)
