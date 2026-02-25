@@ -153,14 +153,10 @@ export default function CosmetovigillancePage() {
     caseNumber = 5;
     adjustedIndex--;
 
-    // Case 5: Prise en Charge (conditionnel)
-    if (formData.effetIndesirable.priseChargeMedicale) {
-      if (adjustedIndex === 0) return 5;
-      caseNumber = 6;
-      adjustedIndex--;
-    } else {
-      caseNumber = 6;
-    }
+    // Case 5: Prise en Charge (toujours présent)
+    if (adjustedIndex === 0) return 5;
+    caseNumber = 6;
+    adjustedIndex--;
 
     // Case 6: Produit Suspecté (toujours présent)
     if (adjustedIndex === 0) return 6;
@@ -860,6 +856,7 @@ export default function CosmetovigillancePage() {
                   type="date"
                   value={formData.effetIndesirable.dateApparition}
                   onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, dateApparition: e.target.value } })}
+                  max={new Date().toISOString().split('T')[0]}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   required
                 />
