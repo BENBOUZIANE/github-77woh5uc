@@ -147,8 +147,6 @@ export default function CosmetovigillancePage() {
           if (formData.professionnelSante?.profession === 'autre' && !formData.professionnelSante.professionAutre?.trim()) {
             errors.professionAutre = 'Veuillez préciser la profession';
           }
-          if (!formData.professionnelSante?.structure.trim()) errors.structure = 'La structure est obligatoire';
-          if (!formData.professionnelSante?.ville) errors.professionnelVille = 'La ville est obligatoire';
         } else if (formData.utilisateurType === 'representant_legal') {
           if (!formData.representantLegal?.nomEtablissement.trim()) errors.nomEtablissement = 'Le nom de l\'établissement est obligatoire';
           if (!formData.representantLegal?.numeroDeclarationEtablissement.trim()) errors.numeroDeclaration = 'Le numéro de déclaration est obligatoire';
@@ -571,6 +569,9 @@ export default function CosmetovigillancePage() {
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     required
                   />
+                  {validationErrors.nomEtablissement && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.nomEtablissement}</p>
+                  )}
                 </div>
 
                 <div>
@@ -591,6 +592,9 @@ export default function CosmetovigillancePage() {
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     required
                   />
+                  {validationErrors.numeroDeclaration && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.numeroDeclaration}</p>
+                  )}
                 </div>
 
                 <div>
@@ -611,6 +615,9 @@ export default function CosmetovigillancePage() {
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     required
                   />
+                  {validationErrors.numeroDocument && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.numeroDocument}</p>
+                  )}
                 </div>
 
                 <div>
@@ -632,6 +639,9 @@ export default function CosmetovigillancePage() {
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     required
                   />
+                  {validationErrors.dateReception && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.dateReception}</p>
+                  )}
                 </div>
               </div>
 
@@ -743,6 +753,9 @@ export default function CosmetovigillancePage() {
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   required
                 />
+                {validationErrors.nomPrenom && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.nomPrenom}</p>
+                )}
               </div>
 
               <div>
@@ -758,6 +771,9 @@ export default function CosmetovigillancePage() {
                     <option key={ville} value={ville}>{ville}</option>
                   ))}
                 </select>
+                {validationErrors.personneVille && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.personneVille}</p>
+                )}
               </div>
             </div>
 
@@ -1016,6 +1032,9 @@ export default function CosmetovigillancePage() {
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 required
               />
+              {validationErrors.localisation && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.localisation}</p>
+              )}
             </div>
 
             <div>
@@ -1028,6 +1047,9 @@ export default function CosmetovigillancePage() {
                 placeholder="Décrivez les symptômes observés..."
                 required
               />
+              {validationErrors.descriptionSymptomes && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.descriptionSymptomes}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1041,6 +1063,9 @@ export default function CosmetovigillancePage() {
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   required
                 />
+                {validationErrors.dateApparition && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.dateApparition}</p>
+                )}
               </div>
 
               <div>
@@ -1053,6 +1078,9 @@ export default function CosmetovigillancePage() {
                   placeholder="Ex: 2 heures, 3 jours..."
                   required
                 />
+                {validationErrors.delaiSurvenue && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.delaiSurvenue}</p>
+                )}
               </div>
             </div>
 
@@ -1113,6 +1141,9 @@ export default function CosmetovigillancePage() {
                 <option value="persistance">Persistance de l'effet</option>
                 <option value="inconnue">Inconnue</option>
               </select>
+              {validationErrors.evolutionEffet && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.evolutionEffet}</p>
+              )}
             </div>
           </div>
         );
@@ -1211,6 +1242,9 @@ export default function CosmetovigillancePage() {
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, nomCommercial: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
+                {validationErrors.nomCommercial && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.nomCommercial}</p>
+                )}
               </div>
 
               <div>
@@ -1241,6 +1275,9 @@ export default function CosmetovigillancePage() {
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, typeProduit: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
+                {validationErrors.typeProduit && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.typeProduit}</p>
+                )}
               </div>
 
               <div>
@@ -1262,6 +1299,9 @@ export default function CosmetovigillancePage() {
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   placeholder="Ex: Visage, Corps, Cheveux..."
                 />
+                {validationErrors.zoneApplication && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.zoneApplication}</p>
+                )}
               </div>
 
               <div>
@@ -1272,6 +1312,9 @@ export default function CosmetovigillancePage() {
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, frequenceUtilisation: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
+                {validationErrors.frequenceUtilisation && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.frequenceUtilisation}</p>
+                )}
               </div>
 
               <div>
@@ -1283,10 +1326,13 @@ export default function CosmetovigillancePage() {
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, dateDebutUtilisation: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
+                {validationErrors.dateDebutUtilisation && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.dateDebutUtilisation}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Arrêt d'Utilisation</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Arrêt d'Utilisation*</label>
                 <input
                   type="date"
                   value={formData.produitSuspecte.arretUtilisation}
@@ -1294,6 +1340,9 @@ export default function CosmetovigillancePage() {
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, arretUtilisation: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
+                {validationErrors.arretUtilisation && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.arretUtilisation}</p>
+                )}
               </div>
             </div>
 
