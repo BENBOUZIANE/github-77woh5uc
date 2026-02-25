@@ -436,15 +436,21 @@ export default function CosmetovigillancePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Ville</label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.professionnelSante?.ville || ''}
                     onChange={(e) => setFormData({
                       ...formData,
                       professionnelSante: { ...formData.professionnelSante!, ville: e.target.value, profession: formData.professionnelSante?.profession || '', structure: formData.professionnelSante?.structure || '' }
                     })}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  />
+                  >
+                    <option value="">Sélectionnez une ville</option>
+                    {villesMaroc.map((ville) => (
+                      <option key={ville} value={ville}>
+                        {ville}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
