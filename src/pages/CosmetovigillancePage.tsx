@@ -165,6 +165,9 @@ export default function CosmetovigillancePage() {
         if (!formData.personneExposee.dateNaissance && !formData.personneExposee.age) {
           errors.dateNaissanceOuAge = 'La date de naissance ou l\'âge est obligatoire';
         }
+        if (formData.personneExposee.grossesse && !formData.personneExposee.moisGrossesse) {
+          errors.moisGrossesse = 'Le mois de grossesse est obligatoire';
+        }
         break;
 
       case 4: // Effet Indésirable
@@ -909,13 +912,16 @@ export default function CosmetovigillancePage() {
                       <select
                         value={formData.personneExposee.moisGrossesse || ''}
                         onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, moisGrossesse: parseInt(e.target.value) || undefined } })}
-                        className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${validationErrors.moisGrossesse ? 'border-red-500' : 'border-slate-300'}`}
                       >
                         <option value="">Mois de grossesse</option>
                         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((mois) => (
                           <option key={mois} value={mois}>{mois} {mois === 0 || mois === 1 ? 'mois' : 'mois'}</option>
                         ))}
                       </select>
+                      {validationErrors.moisGrossesse && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.moisGrossesse}</p>
+                      )}
                     </div>
                   )}
                 </div>

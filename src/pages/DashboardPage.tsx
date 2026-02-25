@@ -54,7 +54,7 @@ export default function DashboardPage() {
             <img
               src="/Designer_(2)_(1).png"
               alt="Logo"
-              className="w-16 h-16 object-contain mr-4"
+              className="w-20 h-20 object-contain mr-4"
             />
             <div>
               <h1 className="text-4xl font-bold text-slate-900 mb-2">Tableau de bord</h1>

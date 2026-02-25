@@ -42,7 +42,7 @@ export default function LoginPage() {
             <img
               src="/Designer_(2)_(1).png"
               alt="Logo Cosmétovigilance"
-              className="w-24 h-24 object-contain"
+              className="w-32 h-32 object-contain"
             />
           </div>
 
