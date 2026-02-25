@@ -50,11 +50,18 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex justify-between items-start mb-12">
-          <div>
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">Tableau de bord</h1>
-            <p className="text-lg text-slate-600">
-              Bienvenue, <span className="font-medium">{user?.email}</span>
-            </p>
+          <div className="flex items-center">
+            <img
+              src="/Designer_(2)_(1).png"
+              alt="Logo"
+              className="w-16 h-16 object-contain mr-4"
+            />
+            <div>
+              <h1 className="text-4xl font-bold text-slate-900 mb-2">Tableau de bord</h1>
+              <p className="text-lg text-slate-600">
+                Bienvenue, <span className="font-medium">{user?.email}</span>
+              </p>
+            </div>
           </div>
           <button
             onClick={handleSignOut}

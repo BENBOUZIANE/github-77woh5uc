@@ -66,7 +66,11 @@ export default function HomePage() {
         <div className="text-center mb-16">
           <div className="flex justify-center mb-6">
             <div className="p-4 bg-white rounded-2xl shadow-lg">
-              <Shield className="w-16 h-16 text-slate-700" />
+              <img
+                src="/Designer_(2)_(1).png"
+                alt="Logo Cosmétovigilance"
+                className="w-32 h-32 object-contain"
+              />
             </div>
           </div>
           <h1 className="text-5xl font-bold text-slate-900 mb-4">

@@ -39,9 +39,11 @@ export default function LoginPage() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="flex items-center justify-center mb-6">
-            <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl">
-              <LogIn className="w-8 h-8 text-white" />
-            </div>
+            <img
+              src="/Designer_(2)_(1).png"
+              alt="Logo Cosmétovigilance"
+              className="w-24 h-24 object-contain"
+            />
           </div>
 
           <h1 className="text-3xl font-bold text-slate-900 text-center mb-2">
