@@ -350,7 +350,7 @@ export default function CosmetovigillancePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Type d'utilisateur*</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Type de notificateur*</label>
               <select
                 value={formData.utilisateurType}
                 onChange={(e) => setFormData({ ...formData, utilisateurType: e.target.value })}
@@ -365,7 +365,7 @@ export default function CosmetovigillancePage() {
 
             {formData.utilisateurType === 'autre' && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Précisez le type d'utilisateur*</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Précisez le type de notificateur*</label>
                 <input
                   type="text"
                   value={formData.utilisateurTypeAutre || ''}
