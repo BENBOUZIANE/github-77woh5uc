@@ -40,7 +40,7 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="flex items-center justify-center mb-6">
             <img
-              src="/Designer_(2)_(1).png"
+              src="/Designer_(2)_(1)_(1).png"
               alt="Logo Cosmétovigilance"
               className="w-32 h-32 object-contain"
             />
