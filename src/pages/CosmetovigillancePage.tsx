@@ -61,6 +61,7 @@ interface FormData {
     fabricant: string;
     typeProduit: string;
     numeroLot: string;
+    zoneApplication: string;
     frequenceUtilisation: string;
     dateDebutUtilisation: string;
     arretUtilisation: string;
@@ -85,7 +86,7 @@ export default function CosmetovigillancePage() {
     medicamentsSimultanes: [],
     effetIndesirable: { localisation: '', descriptionSymptomes: '', dateApparition: '', delaiSurvenue: '', gravite: false, criteresGravite: [], evolutionEffet: '' },
     priseChargeMedicale: { consultationMedicale: false, diagnosticMedecin: '', mesuresPriseType: '', mesuresPriseAutre: '', examensRealise: '' },
-    produitSuspecte: { nomCommercial: '', marque: '', fabricant: '', typeProduit: '', numeroLot: '', frequenceUtilisation: '', dateDebutUtilisation: '', arretUtilisation: '', reexpositionProduit: false, reapparitionEffetIndesirable: false },
+    produitSuspecte: { nomCommercial: '', marque: '', fabricant: '', typeProduit: '', numeroLot: '', zoneApplication: '', frequenceUtilisation: '', dateDebutUtilisation: '', arretUtilisation: '', reexpositionProduit: false, reapparitionEffetIndesirable: false },
     commentaire: ''
   });
 
@@ -248,6 +249,7 @@ export default function CosmetovigillancePage() {
               fabricant: formData.produitSuspecte.fabricant,
               typeProduit: formData.produitSuspecte.typeProduit,
               numeroLot: formData.produitSuspecte.numeroLot,
+              zoneApplication: formData.produitSuspecte.zoneApplication,
               frequenceUtilisation: formData.produitSuspecte.frequenceUtilisation,
               dateDebutUtilisation: formData.produitSuspecte.dateDebutUtilisation,
               arretUtilisation: formData.produitSuspecte.arretUtilisation || null,
@@ -1076,6 +1078,17 @@ export default function CosmetovigillancePage() {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Zone d'Application*</label>
+                <input
+                  type="text"
+                  value={formData.produitSuspecte.zoneApplication}
+                  onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, zoneApplication: e.target.value } })}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Ex: Visage, Corps, Cheveux..."
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Fréquence d'Utilisation*</label>
                 <input
                   type="text"
@@ -1090,6 +1103,7 @@ export default function CosmetovigillancePage() {
                 <input
                   type="date"
                   value={formData.produitSuspecte.dateDebutUtilisation}
+                  max={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, dateDebutUtilisation: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
@@ -1100,6 +1114,7 @@ export default function CosmetovigillancePage() {
                 <input
                   type="date"
                   value={formData.produitSuspecte.arretUtilisation}
+                  max={formData.produitSuspecte.dateDebutUtilisation || new Date().toISOString().split('T')[0]}
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, arretUtilisation: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />

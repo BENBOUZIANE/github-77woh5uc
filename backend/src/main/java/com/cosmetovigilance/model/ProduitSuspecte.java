@@ -37,6 +37,9 @@ public class ProduitSuspecte {
     @Column(name = "numero_lot", nullable = false)
     private String numeroLot;
 
+    @Column(name = "zone_application", nullable = false)
+    private String zoneApplication;
+
     @Column(name = "frequence_utilisation", nullable = false)
     private String frequenceUtilisation;
 

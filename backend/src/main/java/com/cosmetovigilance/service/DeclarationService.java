@@ -157,6 +157,7 @@ public class DeclarationService {
                 produit.setFabricant(produitDto.getFabricant());
                 produit.setTypeProduit(produitDto.getTypeProduit());
                 produit.setNumeroLot(produitDto.getNumeroLot());
+                produit.setZoneApplication(produitDto.getZoneApplication());
                 produit.setFrequenceUtilisation(produitDto.getFrequenceUtilisation());
                 produit.setDateDebutUtilisation(produitDto.getDateDebutUtilisation());
                 produit.setArretUtilisation(produitDto.getArretUtilisation());
@@ -273,6 +274,7 @@ public class DeclarationService {
             dto.setFabricant(produit.getFabricant());
             dto.setTypeProduit(produit.getTypeProduit());
             dto.setNumeroLot(produit.getNumeroLot());
+            dto.setZoneApplication(produit.getZoneApplication());
             dto.setFrequenceUtilisation(produit.getFrequenceUtilisation());
             dto.setDateDebutUtilisation(produit.getDateDebutUtilisation());
             dto.setArretUtilisation(produit.getArretUtilisation());

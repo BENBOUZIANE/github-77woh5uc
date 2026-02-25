@@ -23,6 +23,9 @@ public class ProduitSuspecteDto {
     @NotBlank(message = "Numero lot is required")
     private String numeroLot;
 
+    @NotBlank(message = "Zone application is required")
+    private String zoneApplication;
+
     @NotBlank(message = "Frequence utilisation is required")
     private String frequenceUtilisation;
 
