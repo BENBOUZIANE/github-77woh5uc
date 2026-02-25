@@ -9,6 +9,7 @@ interface FormData {
   utilisateurTypeAutre?: string;
   professionnelSante?: {
     profession: string;
+    professionAutre?: string;
     structure: string;
     ville: string;
   };
@@ -357,8 +358,8 @@ export default function CosmetovigillancePage() {
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="professionnel">Professionnel de santé</option>
-                <option value="representant_legal">Représentant légal</option>
-                <option value="particulier">Particulier</option>
+                <option value="representant_legal">Représentant légal de l'établissement</option>
+                <option value="particulier">Utilisateur</option>
                 <option value="autre">Autre</option>
               </select>
             </div>
@@ -388,16 +389,41 @@ export default function CosmetovigillancePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Profession*</label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.professionnelSante?.profession || ''}
                     onChange={(e) => setFormData({
                       ...formData,
                       professionnelSante: { ...formData.professionnelSante!, profession: e.target.value, structure: formData.professionnelSante?.structure || '', ville: formData.professionnelSante?.ville || '' }
                     })}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  />
+                  >
+                    <option value="">Sélectionnez une profession</option>
+                    <option value="Médecin">Médecin</option>
+                    <option value="Pharmacien">Pharmacien</option>
+                    <option value="Infirmier">Infirmier</option>
+                    <option value="Autre">Autre</option>
+                  </select>
                 </div>
+
+                {formData.professionnelSante?.profession === 'Autre' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Précisez la profession*</label>
+                    <input
+                      type="text"
+                      value={formData.professionnelSante?.professionAutre || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        professionnelSante: {
+                          ...formData.professionnelSante!,
+                          professionAutre: e.target.value
+                        }
+                      })}
+                      placeholder="Veuillez préciser votre profession..."
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Structure</label>
