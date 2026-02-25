@@ -18,10 +18,13 @@ public class PersonneExposeeDto {
     @NotBlank(message = "Nom/Prenom is required")
     private String nomPrenom;
 
-    @NotNull(message = "Age is required")
+    private String dateNaissance;
+
     @Min(value = 0, message = "Age must be at least 0")
     @Max(value = 150, message = "Age must be less than 150")
     private Integer age;
+
+    private String ageUnite;
 
     private Boolean grossesse = false;
 

@@ -86,15 +86,28 @@ public class DeclarationService {
         }
         declarant = declarantRepository.save(declarant);
 
+        PersonneExposeeDto personneExposeeDto = request.getPersonneExposee();
+
+        boolean hasDateNaissance = personneExposeeDto.getDateNaissance() != null &&
+                                   !personneExposeeDto.getDateNaissance().trim().isEmpty() &&
+                                   personneExposeeDto.getDateNaissance().split("-").length == 3;
+        boolean hasAge = personneExposeeDto.getAge() != null && personneExposeeDto.getAge() > 0;
+
+        if (!hasDateNaissance && !hasAge) {
+            throw new RuntimeException("Au moins un des champs suivants doit être rempli: Date de naissance ou Âge");
+        }
+
         PersonneExposee personneExposee = new PersonneExposee();
-        personneExposee.setType(request.getPersonneExposee().getType());
-        personneExposee.setNomPrenom(request.getPersonneExposee().getNomPrenom());
-        personneExposee.setAge(request.getPersonneExposee().getAge());
-        personneExposee.setGrossesse(request.getPersonneExposee().getGrossesse());
-        personneExposee.setMoisGrossesse(request.getPersonneExposee().getMoisGrossesse());
-        personneExposee.setAllaitement(request.getPersonneExposee().getAllaitement() != null ? request.getPersonneExposee().getAllaitement() : false);
-        personneExposee.setSexe(request.getPersonneExposee().getSexe());
-        personneExposee.setVille(request.getPersonneExposee().getVille());
+        personneExposee.setType(personneExposeeDto.getType());
+        personneExposee.setNomPrenom(personneExposeeDto.getNomPrenom());
+        personneExposee.setDateNaissance(personneExposeeDto.getDateNaissance());
+        personneExposee.setAge(personneExposeeDto.getAge());
+        personneExposee.setAgeUnite(personneExposeeDto.getAgeUnite());
+        personneExposee.setGrossesse(personneExposeeDto.getGrossesse());
+        personneExposee.setMoisGrossesse(personneExposeeDto.getMoisGrossesse());
+        personneExposee.setAllaitement(personneExposeeDto.getAllaitement() != null ? personneExposeeDto.getAllaitement() : false);
+        personneExposee.setSexe(personneExposeeDto.getSexe());
+        personneExposee.setVille(personneExposeeDto.getVille());
         personneExposee = personneExposeeRepository.save(personneExposee);
 
         if (request.getPersonneExposee().getAllergies() != null) {

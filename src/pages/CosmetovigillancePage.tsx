@@ -29,7 +29,9 @@ interface FormData {
   personneExposee: {
     type: string;
     nomPrenom: string;
-    age: number;
+    dateNaissance?: string;
+    age?: number;
+    ageUnite?: string;
     grossesse: boolean;
     moisGrossesse?: number;
     allaitement: boolean;
@@ -80,7 +82,7 @@ export default function CosmetovigillancePage() {
   const [formData, setFormData] = useState<FormData>({
     utilisateurType: 'professionnel',
     declarant: { nom: '', prenom: '', email: '', tel: '' },
-    personneExposee: { type: 'patient', nomPrenom: '', age: 0, grossesse: false, allaitement: false, sexe: 'F', ville: '' },
+    personneExposee: { type: 'patient', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: 'Année', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
     allergiesConnues: [],
     antecedentsMedicaux: [],
     medicamentsSimultanes: [],
@@ -216,6 +218,15 @@ export default function CosmetovigillancePage() {
   };
 
   const handleSubmit = async () => {
+    const hasDateNaissance = formData.personneExposee.dateNaissance &&
+                             formData.personneExposee.dateNaissance.split('-').filter(p => p).length === 3;
+    const hasAge = formData.personneExposee.age !== undefined && formData.personneExposee.age > 0;
+
+    if (!hasDateNaissance && !hasAge) {
+      alert('Veuillez remplir au moins un des champs: Date de naissance ou Âge');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const declarationPayload = {
@@ -654,17 +665,6 @@ export default function CosmetovigillancePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Âge*</label>
-                <input
-                  type="number"
-                  value={formData.personneExposee.age}
-                  onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, age: parseInt(e.target.value) || 0 } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Ville*</label>
                 <select
                   value={formData.personneExposee.ville}
@@ -680,8 +680,103 @@ export default function CosmetovigillancePage() {
               </div>
             </div>
 
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-amber-800">
+                Au moins un des champs suivants doit être rempli: Date de naissance, L'âge au moment de l'apparition de l'effet indésirable
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Date de naissance</label>
+                <div className="grid grid-cols-3 gap-2">
+                  <input
+                    type="number"
+                    placeholder="jj"
+                    min="1"
+                    max="31"
+                    value={formData.personneExposee.dateNaissance?.split('-')[2] || ''}
+                    onChange={(e) => {
+                      const parts = formData.personneExposee.dateNaissance?.split('-') || ['', '', ''];
+                      const day = e.target.value.padStart(2, '0');
+                      const newDate = `${parts[0] || ''}-${parts[1] || ''}-${day}`.replace(/^-+|-+$/g, '');
+                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: newDate } });
+                    }}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                  <select
+                    value={formData.personneExposee.dateNaissance?.split('-')[1] || ''}
+                    onChange={(e) => {
+                      const parts = formData.personneExposee.dateNaissance?.split('-') || ['', '', ''];
+                      const newDate = `${parts[0] || ''}-${e.target.value}-${parts[2] || ''}`.replace(/^-+|-+$/g, '');
+                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: newDate } });
+                    }}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  >
+                    <option value="">mois</option>
+                    <option value="01">Janvier</option>
+                    <option value="02">Février</option>
+                    <option value="03">Mars</option>
+                    <option value="04">Avril</option>
+                    <option value="05">Mai</option>
+                    <option value="06">Juin</option>
+                    <option value="07">Juillet</option>
+                    <option value="08">Août</option>
+                    <option value="09">Septembre</option>
+                    <option value="10">Octobre</option>
+                    <option value="11">Novembre</option>
+                    <option value="12">Décembre</option>
+                  </select>
+                  <input
+                    type="number"
+                    placeholder="aaaa"
+                    min="1900"
+                    max={new Date().getFullYear()}
+                    value={formData.personneExposee.dateNaissance?.split('-')[0] || ''}
+                    onChange={(e) => {
+                      const parts = formData.personneExposee.dateNaissance?.split('-') || ['', '', ''];
+                      const newDate = `${e.target.value}-${parts[1] || ''}-${parts[2] || ''}`.replace(/^-+|-+$/g, '');
+                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: newDate } });
+                    }}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-700 mb-2">L'âge au moment de l'apparition de l'effet indésirable</label>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Entrez l'âge"
+                  value={formData.personneExposee.age || ''}
+                  onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, age: parseInt(e.target.value) || undefined } })}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                />
+                <select
+                  value={formData.personneExposee.ageUnite || 'Année'}
+                  onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, ageUnite: e.target.value } })}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                >
+                  <option value="Année">Année</option>
+                  <option value="Mois">Mois</option>
+                  <option value="Semaine">Semaine</option>
+                  <option value="Jour">Jour</option>
+                  <option value="Heure">Heure</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+              <p className="text-sm text-slate-600 mb-2">
+                <span className="font-medium">Note:</span> La date de naissance complète ou l'âge doivent être saisis
+              </p>
+            </div>
+
             {formData.personneExposee.sexe === 'F' && (
-              <div className="space-y-3">
+              <div className="space-y-3 mt-4">
                 <div className="flex items-center space-x-4">
                   <label className="flex items-center">
                     <input

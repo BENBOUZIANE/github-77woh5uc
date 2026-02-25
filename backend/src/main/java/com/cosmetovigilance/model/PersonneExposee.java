@@ -27,8 +27,14 @@ public class PersonneExposee {
     @Column(nullable = false, name = "nom_prenom")
     private String nomPrenom;
 
-    @Column(nullable = false)
+    @Column(name = "date_naissance")
+    private String dateNaissance;
+
+    @Column
     private Integer age;
+
+    @Column(name = "age_unite", length = 20)
+    private String ageUnite;
 
     @Column(nullable = false)
     private Boolean grossesse = false;
