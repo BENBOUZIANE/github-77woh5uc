@@ -49,9 +49,10 @@ interface FormData {
     evolutionEffet: string;
   };
   priseChargeMedicale: {
-    priseEnCharge: boolean;
-    diagnostic: string;
-    mesuresPrise: string;
+    consultationMedicale: boolean;
+    diagnosticMedecin: string;
+    mesuresPriseType: string;
+    mesuresPriseAutre: string;
     examensRealise: string;
   };
   produitSuspecte: {
@@ -83,7 +84,7 @@ export default function CosmetovigillancePage() {
     antecedentsMedicaux: [],
     medicamentsSimultanes: [],
     effetIndesirable: { localisation: '', descriptionSymptomes: '', dateApparition: '', delaiSurvenue: '', gravite: false, criteresGravite: [], evolutionEffet: '' },
-    priseChargeMedicale: { priseEnCharge: false, diagnostic: '', mesuresPrise: '', examensRealise: '' },
+    priseChargeMedicale: { consultationMedicale: false, diagnosticMedecin: '', mesuresPriseType: '', mesuresPriseAutre: '', examensRealise: '' },
     produitSuspecte: { nomCommercial: '', marque: '', fabricant: '', typeProduit: '', numeroLot: '', frequenceUtilisation: '', dateDebutUtilisation: '', arretUtilisation: '', reexpositionProduit: false, reapparitionEffetIndesirable: false },
     commentaire: ''
   });
@@ -254,10 +255,12 @@ export default function CosmetovigillancePage() {
               reapparitionEffetIndesirable: formData.produitSuspecte.reapparitionEffetIndesirable,
             }]
           : [],
-        prisesChargeMedicales: formData.priseChargeMedicale.priseEnCharge
+        prisesChargeMedicales: formData.priseChargeMedicale.consultationMedicale
           ? [{
-              diagnostic: formData.priseChargeMedicale.diagnostic,
-              mesuresPrise: formData.priseChargeMedicale.mesuresPrise,
+              diagnostic: formData.priseChargeMedicale.diagnosticMedecin,
+              mesuresPrise: formData.priseChargeMedicale.mesuresPriseType === 'traitement_symptomatique'
+                ? 'Traitement symptomatique'
+                : formData.priseChargeMedicale.mesuresPriseAutre,
               examensRealise: formData.priseChargeMedicale.examensRealise,
             }]
           : [],
@@ -945,50 +948,74 @@ export default function CosmetovigillancePage() {
               <label className="flex items-center mb-4">
                 <input
                   type="checkbox"
-                  checked={formData.priseChargeMedicale.priseEnCharge}
-                  onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, priseEnCharge: e.target.checked } })}
+                  checked={formData.priseChargeMedicale.consultationMedicale}
+                  onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, consultationMedicale: e.target.checked } })}
                   className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
                 />
-                <span className="ml-2 text-sm font-medium text-slate-700">Prise en charge médicale</span>
+                <span className="ml-2 text-sm font-medium text-slate-700">Consultation médicale effectuée</span>
               </label>
             </div>
 
-            {formData.priseChargeMedicale.priseEnCharge && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Diagnostic</label>
-                  <textarea
-                    value={formData.priseChargeMedicale.diagnostic}
-                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, diagnostic: e.target.value } })}
-                    rows={3}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    placeholder="Décrivez le diagnostic médical..."
-                  />
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Diagnostic du médecin</label>
+              <textarea
+                value={formData.priseChargeMedicale.diagnosticMedecin}
+                onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, diagnosticMedecin: e.target.value } })}
+                rows={3}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="Décrivez le diagnostic médical..."
+              />
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Mesures Prises</label>
-                  <textarea
-                    value={formData.priseChargeMedicale.mesuresPrise}
-                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPrise: e.target.value } })}
-                    rows={3}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    placeholder="Décrivez les mesures prises..."
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Mesures prises</label>
+              <div className="space-y-3">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="mesuresPriseType"
+                    value="traitement_symptomatique"
+                    checked={formData.priseChargeMedicale.mesuresPriseType === 'traitement_symptomatique'}
+                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseType: e.target.value, mesuresPriseAutre: '' } })}
+                    className="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500"
                   />
-                </div>
+                  <span className="ml-2 text-sm text-slate-700">Traitement symptomatique</span>
+                </label>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Examens Réalisés</label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="mesuresPriseType"
+                    value="autre"
+                    checked={formData.priseChargeMedicale.mesuresPriseType === 'autre'}
+                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseType: e.target.value } })}
+                    className="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500"
+                  />
+                  <span className="ml-2 text-sm text-slate-700">Autre à préciser</span>
+                </label>
+
+                {formData.priseChargeMedicale.mesuresPriseType === 'autre' && (
                   <textarea
-                    value={formData.priseChargeMedicale.examensRealise}
-                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, examensRealise: e.target.value } })}
+                    value={formData.priseChargeMedicale.mesuresPriseAutre}
+                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseAutre: e.target.value } })}
                     rows={3}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    placeholder="Décrivez les examens réalisés..."
+                    placeholder="Précisez les autres mesures prises..."
                   />
-                </div>
-              </>
-            )}
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Examens réalisés</label>
+              <textarea
+                value={formData.priseChargeMedicale.examensRealise}
+                onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, examensRealise: e.target.value } })}
+                rows={3}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="Décrivez les examens réalisés..."
+              />
+            </div>
           </div>
         );
 
