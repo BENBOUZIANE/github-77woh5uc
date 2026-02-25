@@ -88,15 +88,13 @@ public class DeclarationService {
 
         PersonneExposee personneExposee = new PersonneExposee();
         personneExposee.setType(request.getPersonneExposee().getType());
-        personneExposee.setNom(request.getPersonneExposee().getNom());
-        personneExposee.setPrenom(request.getPersonneExposee().getPrenom());
+        personneExposee.setNomPrenom(request.getPersonneExposee().getNomPrenom());
         personneExposee.setAge(request.getPersonneExposee().getAge());
         personneExposee.setGrossesse(request.getPersonneExposee().getGrossesse());
         personneExposee.setMoisGrossesse(request.getPersonneExposee().getMoisGrossesse());
         personneExposee.setAllaitement(request.getPersonneExposee().getAllaitement() != null ? request.getPersonneExposee().getAllaitement() : false);
-        personneExposee.setEmail(request.getPersonneExposee().getEmail());
-        personneExposee.setTel(request.getPersonneExposee().getTel());
         personneExposee.setSexe(request.getPersonneExposee().getSexe());
+        personneExposee.setVille(request.getPersonneExposee().getVille());
         personneExposee = personneExposeeRepository.save(personneExposee);
 
         if (request.getPersonneExposee().getAllergies() != null) {
@@ -234,15 +232,13 @@ public class DeclarationService {
         PersonneExposeeDto personneExposeeDto = new PersonneExposeeDto();
         personneExposeeDto.setId(personneExposee.getId());
         personneExposeeDto.setType(personneExposee.getType());
-        personneExposeeDto.setNom(personneExposee.getNom());
-        personneExposeeDto.setPrenom(personneExposee.getPrenom());
+        personneExposeeDto.setNomPrenom(personneExposee.getNomPrenom());
         personneExposeeDto.setAge(personneExposee.getAge());
         personneExposeeDto.setGrossesse(personneExposee.getGrossesse());
         personneExposeeDto.setMoisGrossesse(personneExposee.getMoisGrossesse());
         personneExposeeDto.setAllaitement(personneExposee.getAllaitement());
-        personneExposeeDto.setEmail(personneExposee.getEmail());
-        personneExposeeDto.setTel(personneExposee.getTel());
         personneExposeeDto.setSexe(personneExposee.getSexe());
+        personneExposeeDto.setVille(personneExposee.getVille());
 
         List<AllergiesConnues> allergies = allergiesConnuesRepository.findByPersonneExposeeId(personneExposee.getId());
         personneExposeeDto.setAllergies(allergies.stream().map(AllergiesConnues::getLabel).collect(Collectors.toList()));

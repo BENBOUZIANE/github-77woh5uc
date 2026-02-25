@@ -24,11 +24,8 @@ public class PersonneExposee {
     @Column(nullable = false, length = 50)
     private String type;
 
-    @Column(nullable = false)
-    private String nom;
-
-    @Column(nullable = false)
-    private String prenom;
+    @Column(nullable = false, name = "nom_prenom")
+    private String nomPrenom;
 
     @Column(nullable = false)
     private Integer age;
@@ -42,13 +39,11 @@ public class PersonneExposee {
     @Column(nullable = false)
     private Boolean allaitement = false;
 
-    private String email;
-
-    @Column(length = 50)
-    private String tel;
-
     @Column(nullable = false, length = 1)
     private String sexe;
+
+    @Column(nullable = false, length = 100)
+    private String ville;
 
     @OneToMany(mappedBy = "personneExposeeId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AllergiesConnues> allergies;

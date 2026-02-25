@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Save, Plus, X, Upload, Image as ImageIcon, File } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { villesMaroc } from '../data/villesMaroc';
 
 interface FormData {
   utilisateurType: string;
@@ -27,15 +28,13 @@ interface FormData {
   };
   personneExposee: {
     type: string;
-    nom: string;
-    prenom: string;
+    nomPrenom: string;
     age: number;
     grossesse: boolean;
     moisGrossesse?: number;
     allaitement: boolean;
-    email: string;
-    tel: string;
     sexe: string;
+    ville: string;
   };
   allergiesConnues: string[];
   antecedentsMedicaux: string[];
@@ -78,7 +77,7 @@ export default function CosmetovigillancePage() {
   const [formData, setFormData] = useState<FormData>({
     utilisateurType: 'professionnel',
     declarant: { nom: '', prenom: '', email: '', tel: '' },
-    personneExposee: { type: 'patient', nom: '', prenom: '', age: 0, grossesse: false, allaitement: false, email: '', tel: '', sexe: 'F' },
+    personneExposee: { type: 'patient', nomPrenom: '', age: 0, grossesse: false, allaitement: false, sexe: 'F', ville: '' },
     allergiesConnues: [],
     antecedentsMedicaux: [],
     medicamentsSimultanes: [],
@@ -637,27 +636,17 @@ export default function CosmetovigillancePage() {
                 >
                   <option value="F">Féminin</option>
                   <option value="M">Masculin</option>
-                  <option value="A">Autre</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Nom*</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nom / Prénom (ou initiales)*</label>
                 <input
                   type="text"
-                  value={formData.personneExposee.nom}
-                  onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, nom: e.target.value } })}
+                  value={formData.personneExposee.nomPrenom}
+                  onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, nomPrenom: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Prénom*</label>
-                <input
-                  type="text"
-                  value={formData.personneExposee.prenom}
-                  onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, prenom: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  required
                 />
               </div>
 
@@ -668,27 +657,23 @@ export default function CosmetovigillancePage() {
                   value={formData.personneExposee.age}
                   onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, age: parseInt(e.target.value) || 0 } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={formData.personneExposee.email}
-                  onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, email: e.target.value } })}
+                <label className="block text-sm font-medium text-slate-700 mb-2">Ville*</label>
+                <select
+                  value={formData.personneExposee.ville}
+                  onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, ville: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Téléphone</label>
-                <input
-                  type="tel"
-                  value={formData.personneExposee.tel}
-                  onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, tel: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
+                  required
+                >
+                  <option value="">Sélectionner une ville</option>
+                  {villesMaroc.map((ville) => (
+                    <option key={ville} value={ville}>{ville}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -707,13 +692,16 @@ export default function CosmetovigillancePage() {
 
                   {formData.personneExposee.grossesse && (
                     <div>
-                      <input
-                        type="number"
-                        placeholder="Mois de grossesse"
+                      <select
                         value={formData.personneExposee.moisGrossesse || ''}
                         onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, moisGrossesse: parseInt(e.target.value) || undefined } })}
                         className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      />
+                      >
+                        <option value="">Mois de grossesse</option>
+                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((mois) => (
+                          <option key={mois} value={mois}>{mois} {mois === 0 || mois === 1 ? 'mois' : 'mois'}</option>
+                        ))}
+                      </select>
                     </div>
                   )}
                 </div>
@@ -1189,7 +1177,7 @@ export default function CosmetovigillancePage() {
               <h3 className="text-lg font-semibold text-slate-900 mb-3">Récapitulatif de la Déclaration</h3>
               <div className="space-y-2 text-sm text-slate-700">
                 <p><strong>Déclarant:</strong> {formData.declarant.prenom} {formData.declarant.nom}</p>
-                <p><strong>Personne exposée:</strong> {formData.personneExposee.prenom} {formData.personneExposee.nom}</p>
+                <p><strong>Personne exposée:</strong> {formData.personneExposee.nomPrenom}</p>
                 <p><strong>Produit:</strong> {formData.produitSuspecte.nomCommercial || 'Non renseigné'}</p>
                 <p><strong>Effet indésirable:</strong> {formData.effetIndesirable.localisation || 'Non renseigné'}</p>
               </div>

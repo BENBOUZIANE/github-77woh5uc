@@ -15,11 +15,8 @@ public class PersonneExposeeDto {
     @NotBlank(message = "Type is required")
     private String type;
 
-    @NotBlank(message = "Nom is required")
-    private String nom;
-
-    @NotBlank(message = "Prenom is required")
-    private String prenom;
+    @NotBlank(message = "Nom/Prenom is required")
+    private String nomPrenom;
 
     @NotNull(message = "Age is required")
     @Min(value = 0, message = "Age must be at least 0")
@@ -27,13 +24,18 @@ public class PersonneExposeeDto {
     private Integer age;
 
     private Boolean grossesse = false;
+
+    @Min(value = 0, message = "Mois de grossesse must be at least 0")
+    @Max(value = 10, message = "Mois de grossesse must be at most 10")
     private Integer moisGrossesse;
+
     private Boolean allaitement = false;
-    private String email;
-    private String tel;
 
     @NotBlank(message = "Sexe is required")
     private String sexe;
+
+    @NotBlank(message = "Ville is required")
+    private String ville;
 
     private List<String> allergies;
     private List<String> antecedents;

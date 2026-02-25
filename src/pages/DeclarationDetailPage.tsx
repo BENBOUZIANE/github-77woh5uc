@@ -139,13 +139,11 @@ export default function DeclarationDetailPage() {
             tel: apiData.declarant?.tel,
           },
           personne_exposee: {
-            nom: apiData.personneExposee?.nom,
-            prenom: apiData.personneExposee?.prenom,
+            nomPrenom: apiData.personneExposee?.nomPrenom,
             age: apiData.personneExposee?.age,
             sexe: apiData.personneExposee?.sexe,
             type: apiData.personneExposee?.type,
-            email: apiData.personneExposee?.email,
-            tel: apiData.personneExposee?.tel,
+            ville: apiData.personneExposee?.ville,
             grossesse: apiData.personneExposee?.grossesse,
             mois_grossesse: apiData.personneExposee?.moisGrossesse,
             allaitement: apiData.personneExposee?.allaitement,
@@ -482,8 +480,8 @@ export default function DeclarationDetailPage() {
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm font-medium text-slate-500">Nom complet</p>
-                    <p className="text-slate-900">{declaration.personne_exposee.prenom} {declaration.personne_exposee.nom}</p>
+                    <p className="text-sm font-medium text-slate-500">Nom / Prénom</p>
+                    <p className="text-slate-900">{declaration.personne_exposee.nomPrenom}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-500">Type</p>
@@ -496,21 +494,13 @@ export default function DeclarationDetailPage() {
                   <div>
                     <p className="text-sm font-medium text-slate-500">Sexe</p>
                     <p className="text-slate-900">
-                      {declaration.personne_exposee.sexe === 'F' ? 'Féminin' : declaration.personne_exposee.sexe === 'M' ? 'Masculin' : 'Autre'}
+                      {declaration.personne_exposee.sexe === 'F' ? 'Féminin' : 'Masculin'}
                     </p>
                   </div>
-                  {declaration.personne_exposee.email && (
-                    <div>
-                      <p className="text-sm font-medium text-slate-500">Email</p>
-                      <p className="text-slate-900">{declaration.personne_exposee.email}</p>
-                    </div>
-                  )}
-                  {declaration.personne_exposee.tel && (
-                    <div>
-                      <p className="text-sm font-medium text-slate-500">Téléphone</p>
-                      <p className="text-slate-900">{declaration.personne_exposee.tel}</p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-sm font-medium text-slate-500">Ville</p>
+                    <p className="text-slate-900">{declaration.personne_exposee.ville}</p>
+                  </div>
                   {declaration.personne_exposee.grossesse && (
                     <div>
                       <p className="text-sm font-medium text-slate-500">Grossesse</p>
