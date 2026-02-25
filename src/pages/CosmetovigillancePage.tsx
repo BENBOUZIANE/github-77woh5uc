@@ -142,18 +142,18 @@ export default function CosmetovigillancePage() {
         break;
 
       case 1: // Professionnel de Santé ou Représentant Légal
-        if (formData.utilisateurType === 'professionnel' && formData.professionnelSante) {
-          if (!formData.professionnelSante.profession) errors.profession = 'La profession est obligatoire';
-          if (formData.professionnelSante.profession === 'autre' && !formData.professionnelSante.professionAutre?.trim()) {
+        if (formData.utilisateurType === 'professionnel') {
+          if (!formData.professionnelSante?.profession) errors.profession = 'La profession est obligatoire';
+          if (formData.professionnelSante?.profession === 'autre' && !formData.professionnelSante.professionAutre?.trim()) {
             errors.professionAutre = 'Veuillez préciser la profession';
           }
-          if (!formData.professionnelSante.structure.trim()) errors.structure = 'La structure est obligatoire';
-          if (!formData.professionnelSante.ville) errors.professionnelVille = 'La ville est obligatoire';
-        } else if (formData.utilisateurType === 'representant_legal' && formData.representantLegal) {
-          if (!formData.representantLegal.nomEtablissement.trim()) errors.nomEtablissement = 'Le nom de l\'établissement est obligatoire';
-          if (!formData.representantLegal.numeroDeclarationEtablissement.trim()) errors.numeroDeclaration = 'Le numéro de déclaration est obligatoire';
-          if (!formData.representantLegal.numeroDocumentEnregistrementProduit.trim()) errors.numeroDocument = 'Le numéro du document est obligatoire';
-          if (!formData.representantLegal.dateReceptionNotification) errors.dateReception = 'La date de réception est obligatoire';
+          if (!formData.professionnelSante?.structure.trim()) errors.structure = 'La structure est obligatoire';
+          if (!formData.professionnelSante?.ville) errors.professionnelVille = 'La ville est obligatoire';
+        } else if (formData.utilisateurType === 'representant_legal') {
+          if (!formData.representantLegal?.nomEtablissement.trim()) errors.nomEtablissement = 'Le nom de l\'établissement est obligatoire';
+          if (!formData.representantLegal?.numeroDeclarationEtablissement.trim()) errors.numeroDeclaration = 'Le numéro de déclaration est obligatoire';
+          if (!formData.representantLegal?.numeroDocumentEnregistrementProduit.trim()) errors.numeroDocument = 'Le numéro du document est obligatoire';
+          if (!formData.representantLegal?.dateReceptionNotification) errors.dateReception = 'La date de réception est obligatoire';
         }
         break;
 
