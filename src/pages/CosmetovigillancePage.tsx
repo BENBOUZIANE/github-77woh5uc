@@ -328,13 +328,12 @@ export default function CosmetovigillancePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Email*</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
                 <input
                   type="email"
                   value={formData.declarant.email}
                   onChange={(e) => setFormData({ ...formData, declarant: { ...formData.declarant, email: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  required
                 />
               </div>
 
@@ -401,7 +400,7 @@ export default function CosmetovigillancePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Structure*</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Structure</label>
                   <input
                     type="text"
                     value={formData.professionnelSante?.structure || ''}
@@ -414,7 +413,7 @@ export default function CosmetovigillancePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Ville*</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Ville</label>
                   <input
                     type="text"
                     value={formData.professionnelSante?.ville || ''}
@@ -940,7 +939,7 @@ export default function CosmetovigillancePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Mesures Prises*</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Mesures Prises</label>
               <textarea
                 value={formData.priseChargeMedicale.mesuresPrise}
                 onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPrise: e.target.value } })}
@@ -950,7 +949,7 @@ export default function CosmetovigillancePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Examens Réalisés*</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Examens Réalisés</label>
               <textarea
                 value={formData.priseChargeMedicale.examensRealise}
                 onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, examensRealise: e.target.value } })}
@@ -988,7 +987,7 @@ export default function CosmetovigillancePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Fabricant*</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Fabricant</label>
                 <input
                   type="text"
                   value={formData.produitSuspecte.fabricant}
