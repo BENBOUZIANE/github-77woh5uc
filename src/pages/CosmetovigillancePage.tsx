@@ -680,12 +680,6 @@ export default function CosmetovigillancePage() {
               </div>
             </div>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-              <p className="text-sm text-amber-800">
-                Au moins un des champs suivants doit être rempli: Date de naissance, L'âge au moment de l'apparition de l'effet indésirable
-              </p>
-            </div>
-
             <div className="grid grid-cols-1 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Date de naissance</label>
