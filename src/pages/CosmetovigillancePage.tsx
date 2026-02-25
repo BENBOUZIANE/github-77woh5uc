@@ -41,14 +41,15 @@ interface FormData {
   medicamentsSimultanes: string[];
   effetIndesirable: {
     localisation: string;
+    descriptionSymptomes: string;
     dateApparition: string;
-    dateFin: string;
+    delaiSurvenue: string;
     gravite: boolean;
     criteresGravite: string[];
     evolutionEffet: string;
-    priseChargeMedicale: boolean;
   };
   priseChargeMedicale: {
+    priseEnCharge: boolean;
     diagnostic: string;
     mesuresPrise: string;
     examensRealise: string;
@@ -81,8 +82,8 @@ export default function CosmetovigillancePage() {
     allergiesConnues: [],
     antecedentsMedicaux: [],
     medicamentsSimultanes: [],
-    effetIndesirable: { localisation: '', dateApparition: '', dateFin: '', gravite: false, criteresGravite: [], evolutionEffet: '', priseChargeMedicale: false },
-    priseChargeMedicale: { diagnostic: '', mesuresPrise: '', examensRealise: '' },
+    effetIndesirable: { localisation: '', descriptionSymptomes: '', dateApparition: '', delaiSurvenue: '', gravite: false, criteresGravite: [], evolutionEffet: '' },
+    priseChargeMedicale: { priseEnCharge: false, diagnostic: '', mesuresPrise: '', examensRealise: '' },
     produitSuspecte: { nomCommercial: '', marque: '', fabricant: '', typeProduit: '', numeroLot: '', frequenceUtilisation: '', dateDebutUtilisation: '', arretUtilisation: '', reexpositionProduit: false, reapparitionEffetIndesirable: false },
     commentaire: ''
   });
@@ -105,14 +106,8 @@ export default function CosmetovigillancePage() {
     baseSections.push(
       { title: 'Personne Exposée', icon: '🧑' },
       { title: 'Antécédents Médicaux', icon: '📋' },
-      { title: 'Effet Indésirable', icon: '⚠️' }
-    );
-
-    if (formData.effetIndesirable.priseChargeMedicale) {
-      baseSections.push({ title: 'Prise en Charge', icon: '🏥' });
-    }
-
-    baseSections.push(
+      { title: 'Effet Indésirable', icon: '⚠️' },
+      { title: 'Prise en Charge', icon: '🏥' },
       { title: 'Produit Suspecté', icon: '🧴' },
       { title: 'Commentaires', icon: '💬' }
     );
@@ -241,8 +236,9 @@ export default function CosmetovigillancePage() {
         effetsIndesirables: formData.effetIndesirable
           ? [{
               localisation: formData.effetIndesirable.localisation,
+              descriptionSymptomes: formData.effetIndesirable.descriptionSymptomes,
               dateApparition: formData.effetIndesirable.dateApparition,
-              dateFin: formData.effetIndesirable.dateFin || null,
+              delaiSurvenue: formData.effetIndesirable.delaiSurvenue,
               gravite: formData.effetIndesirable.gravite,
               criteresGravite: formData.effetIndesirable.criteresGravite.join(', '),
               evolutionEffet: formData.effetIndesirable.evolutionEffet,
@@ -262,7 +258,7 @@ export default function CosmetovigillancePage() {
               reapparitionEffetIndesirable: formData.produitSuspecte.reapparitionEffetIndesirable,
             }]
           : [],
-        prisesChargeMedicales: formData.effetIndesirable.priseChargeMedicale
+        prisesChargeMedicales: formData.priseChargeMedicale.priseEnCharge
           ? [{
               diagnostic: formData.priseChargeMedicale.diagnostic,
               mesuresPrise: formData.priseChargeMedicale.mesuresPrise,
@@ -841,6 +837,19 @@ export default function CosmetovigillancePage() {
                 value={formData.effetIndesirable.localisation}
                 onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, localisation: e.target.value } })}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Description des symptômes observés*</label>
+              <textarea
+                value={formData.effetIndesirable.descriptionSymptomes}
+                onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, descriptionSymptomes: e.target.value } })}
+                rows={4}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="Décrivez les symptômes observés..."
+                required
               />
             </div>
 
@@ -852,16 +861,19 @@ export default function CosmetovigillancePage() {
                   value={formData.effetIndesirable.dateApparition}
                   onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, dateApparition: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Date de Fin</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Délai de survenue*</label>
                 <input
-                  type="date"
-                  value={formData.effetIndesirable.dateFin}
-                  onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, dateFin: e.target.value } })}
+                  type="text"
+                  value={formData.effetIndesirable.delaiSurvenue}
+                  onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, delaiSurvenue: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Ex: 2 heures, 3 jours..."
+                  required
                 />
               </div>
             </div>
@@ -914,6 +926,7 @@ export default function CosmetovigillancePage() {
                 value={formData.effetIndesirable.evolutionEffet}
                 onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, evolutionEffet: e.target.value } })}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                required
               >
                 <option value="">Sélectionner</option>
                 <option value="guerison">Guérison</option>
@@ -922,18 +935,6 @@ export default function CosmetovigillancePage() {
                 <option value="persistance">Persistance de l'effet</option>
                 <option value="inconnue">Inconnue</option>
               </select>
-            </div>
-
-            <div>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.effetIndesirable.priseChargeMedicale}
-                  onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, priseChargeMedicale: e.target.checked } })}
-                  className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
-                />
-                <span className="ml-2 text-sm font-medium text-slate-700">Prise en charge médicale</span>
-              </label>
             </div>
           </div>
         );
@@ -944,34 +945,53 @@ export default function CosmetovigillancePage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Prise en Charge Médicale</h2>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Diagnostic*</label>
-              <textarea
-                value={formData.priseChargeMedicale.diagnostic}
-                onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, diagnostic: e.target.value } })}
-                rows={3}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              />
+              <label className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  checked={formData.priseChargeMedicale.priseEnCharge}
+                  onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, priseEnCharge: e.target.checked } })}
+                  className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                />
+                <span className="ml-2 text-sm font-medium text-slate-700">Prise en charge médicale</span>
+              </label>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Mesures Prises</label>
-              <textarea
-                value={formData.priseChargeMedicale.mesuresPrise}
-                onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPrise: e.target.value } })}
-                rows={3}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              />
-            </div>
+            {formData.priseChargeMedicale.priseEnCharge && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Diagnostic</label>
+                  <textarea
+                    value={formData.priseChargeMedicale.diagnostic}
+                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, diagnostic: e.target.value } })}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Décrivez le diagnostic médical..."
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Examens Réalisés</label>
-              <textarea
-                value={formData.priseChargeMedicale.examensRealise}
-                onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, examensRealise: e.target.value } })}
-                rows={3}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              />
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Mesures Prises</label>
+                  <textarea
+                    value={formData.priseChargeMedicale.mesuresPrise}
+                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPrise: e.target.value } })}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Décrivez les mesures prises..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Examens Réalisés</label>
+                  <textarea
+                    value={formData.priseChargeMedicale.examensRealise}
+                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, examensRealise: e.target.value } })}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Décrivez les examens réalisés..."
+                  />
+                </div>
+              </>
+            )}
           </div>
         );
 

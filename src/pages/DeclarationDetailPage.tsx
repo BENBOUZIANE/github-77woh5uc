@@ -48,8 +48,9 @@ interface DeclarationDetail {
   };
   effet_indesirable?: {
     localisation?: string;
+    description_symptomes?: string;
     date_apparition?: string;
-    date_fin?: string;
+    delai_survenue?: string;
     gravite?: boolean;
     criteres_gravite?: string;
     evolution_effet?: string;
@@ -151,8 +152,9 @@ export default function DeclarationDetailPage() {
           effet_indesirable: apiData.effetsIndesirables && apiData.effetsIndesirables.length > 0
             ? {
                 localisation: apiData.effetsIndesirables[0].localisation,
+                description_symptomes: apiData.effetsIndesirables[0].descriptionSymptomes,
                 date_apparition: apiData.effetsIndesirables[0].dateApparition,
-                date_fin: apiData.effetsIndesirables[0].dateFin,
+                delai_survenue: apiData.effetsIndesirables[0].delaiSurvenue,
                 gravite: apiData.effetsIndesirables[0].gravite,
                 criteres_gravite: apiData.effetsIndesirables[0].criteresGravite,
                 evolution_effet: apiData.effetsIndesirables[0].evolutionEffet,
@@ -592,20 +594,22 @@ export default function DeclarationDetailPage() {
                         )}
                       </p>
                     </div>
+                    {declaration.effet_indesirable.description_symptomes && (
+                      <div className="md:col-span-2">
+                        <p className="text-sm font-medium text-slate-500">Description des symptômes</p>
+                        <p className="text-slate-900">{declaration.effet_indesirable.description_symptomes}</p>
+                      </div>
+                    )}
                     <div>
                       <p className="text-sm font-medium text-slate-500">Date d'apparition</p>
                       <p className="text-slate-900">
                         {new Date(declaration.effet_indesirable.date_apparition).toLocaleDateString('fr-FR')}
                       </p>
                     </div>
-                    {declaration.effet_indesirable.date_fin && (
-                      <div>
-                        <p className="text-sm font-medium text-slate-500">Date de fin</p>
-                        <p className="text-slate-900">
-                          {new Date(declaration.effet_indesirable.date_fin).toLocaleDateString('fr-FR')}
-                        </p>
-                      </div>
-                    )}
+                    <div>
+                      <p className="text-sm font-medium text-slate-500">Délai de survenue</p>
+                      <p className="text-slate-900">{declaration.effet_indesirable.delai_survenue}</p>
+                    </div>
                     <div>
                       <p className="text-sm font-medium text-slate-500">Évolution</p>
                       <p className="text-slate-900 capitalize">{declaration.effet_indesirable.evolution_effet}</p>

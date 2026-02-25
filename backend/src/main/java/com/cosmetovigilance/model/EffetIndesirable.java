@@ -27,11 +27,14 @@ public class EffetIndesirable {
     @Column(nullable = false)
     private String localisation;
 
+    @Column(name = "description_symptomes", nullable = false, columnDefinition = "TEXT")
+    private String descriptionSymptomes;
+
     @Column(name = "date_apparition", nullable = false)
     private LocalDate dateApparition;
 
-    @Column(name = "date_fin")
-    private LocalDate dateFin;
+    @Column(name = "delai_survenue", nullable = false)
+    private String delaiSurvenue;
 
     @Column(nullable = false)
     private Boolean gravite = false;

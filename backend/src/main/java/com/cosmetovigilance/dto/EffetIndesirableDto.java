@@ -13,10 +13,14 @@ public class EffetIndesirableDto {
     @NotBlank(message = "Localisation is required")
     private String localisation;
 
+    @NotBlank(message = "Description symptomes is required")
+    private String descriptionSymptomes;
+
     @NotNull(message = "Date apparition is required")
     private LocalDate dateApparition;
 
-    private LocalDate dateFin;
+    @NotBlank(message = "Delai survenue is required")
+    private String delaiSurvenue;
 
     @NotNull(message = "Gravite is required")
     private Boolean gravite = false;

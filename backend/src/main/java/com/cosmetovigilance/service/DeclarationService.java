@@ -138,8 +138,9 @@ public class DeclarationService {
                 EffetIndesirable effet = new EffetIndesirable();
                 effet.setDeclarationId(declaration.getId());
                 effet.setLocalisation(effetDto.getLocalisation());
+                effet.setDescriptionSymptomes(effetDto.getDescriptionSymptomes());
                 effet.setDateApparition(effetDto.getDateApparition());
-                effet.setDateFin(effetDto.getDateFin());
+                effet.setDelaiSurvenue(effetDto.getDelaiSurvenue());
                 effet.setGravite(effetDto.getGravite());
                 effet.setCriteresGravite(effetDto.getCriteresGravite());
                 effet.setEvolutionEffet(effetDto.getEvolutionEffet());
@@ -254,8 +255,9 @@ public class DeclarationService {
             EffetIndesirableDto dto = new EffetIndesirableDto();
             dto.setId(effet.getId());
             dto.setLocalisation(effet.getLocalisation());
+            dto.setDescriptionSymptomes(effet.getDescriptionSymptomes());
             dto.setDateApparition(effet.getDateApparition());
-            dto.setDateFin(effet.getDateFin());
+            dto.setDelaiSurvenue(effet.getDelaiSurvenue());
             dto.setGravite(effet.getGravite());
             dto.setCriteresGravite(effet.getCriteresGravite());
             dto.setEvolutionEffet(effet.getEvolutionEffet());
