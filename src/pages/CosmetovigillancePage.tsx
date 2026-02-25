@@ -97,6 +97,7 @@ export default function CosmetovigillancePage() {
   const [newMedicament, setNewMedicament] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [documentEnregistrement, setDocumentEnregistrement] = useState<File | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const getSections = () => {
     const baseSections = [{ title: 'Déclarant', icon: '👤' }];
@@ -120,6 +121,80 @@ export default function CosmetovigillancePage() {
   };
 
   const sections = getSections();
+
+  const ErrorMessage = ({ error }: { error?: string }) => {
+    if (!error) return null;
+    return (
+      <p className="mt-1 text-sm text-red-600">{error}</p>
+    );
+  };
+
+  const validateSection = (sectionIndex: number): boolean => {
+    const errors: Record<string, string> = {};
+    const caseNumber = getSectionCaseNumber(sectionIndex);
+
+    switch (caseNumber) {
+      case 0: // Déclarant
+        if (!formData.declarant.nom.trim()) errors.declarantNom = 'Le nom est obligatoire';
+        if (!formData.declarant.prenom.trim()) errors.declarantPrenom = 'Le prénom est obligatoire';
+        if (!formData.declarant.email.trim()) errors.declarantEmail = 'L\'email est obligatoire';
+        if (!formData.declarant.tel.trim()) errors.declarantTel = 'Le téléphone est obligatoire';
+        break;
+
+      case 1: // Professionnel de Santé ou Représentant Légal
+        if (formData.utilisateurType === 'professionnel' && formData.professionnelSante) {
+          if (!formData.professionnelSante.profession) errors.profession = 'La profession est obligatoire';
+          if (formData.professionnelSante.profession === 'autre' && !formData.professionnelSante.professionAutre?.trim()) {
+            errors.professionAutre = 'Veuillez préciser la profession';
+          }
+          if (!formData.professionnelSante.structure.trim()) errors.structure = 'La structure est obligatoire';
+          if (!formData.professionnelSante.ville) errors.professionnelVille = 'La ville est obligatoire';
+        } else if (formData.utilisateurType === 'representant_legal' && formData.representantLegal) {
+          if (!formData.representantLegal.nomEtablissement.trim()) errors.nomEtablissement = 'Le nom de l\'établissement est obligatoire';
+          if (!formData.representantLegal.numeroDeclarationEtablissement.trim()) errors.numeroDeclaration = 'Le numéro de déclaration est obligatoire';
+          if (!formData.representantLegal.numeroDocumentEnregistrementProduit.trim()) errors.numeroDocument = 'Le numéro du document est obligatoire';
+          if (!formData.representantLegal.dateReceptionNotification) errors.dateReception = 'La date de réception est obligatoire';
+        }
+        break;
+
+      case 2: // Personne Exposée
+        if (!formData.personneExposee.nomPrenom.trim()) errors.nomPrenom = 'Le nom et prénom sont obligatoires';
+        if (!formData.personneExposee.ville) errors.personneVille = 'La ville est obligatoire';
+        break;
+
+      case 4: // Effet Indésirable
+        if (!formData.effetIndesirable.localisation.trim()) errors.localisation = 'La localisation est obligatoire';
+        if (!formData.effetIndesirable.descriptionSymptomes.trim()) errors.descriptionSymptomes = 'La description est obligatoire';
+        if (!formData.effetIndesirable.dateApparition) errors.dateApparition = 'La date d\'apparition est obligatoire';
+        if (!formData.effetIndesirable.delaiSurvenue.trim()) errors.delaiSurvenue = 'Le délai de survenue est obligatoire';
+        if (!formData.effetIndesirable.evolutionEffet) errors.evolutionEffet = 'L\'évolution de l\'effet est obligatoire';
+        break;
+
+      case 6: // Produit Suspecté
+        if (!formData.produitSuspecte.nomCommercial.trim()) errors.nomCommercial = 'Le nom commercial est obligatoire';
+        if (!formData.produitSuspecte.typeProduit) errors.typeProduit = 'Le type de produit est obligatoire';
+        if (!formData.produitSuspecte.zoneApplication.trim()) errors.zoneApplication = 'La zone d\'application est obligatoire';
+        if (!formData.produitSuspecte.frequenceUtilisation.trim()) errors.frequenceUtilisation = 'La fréquence d\'utilisation est obligatoire';
+        if (!formData.produitSuspecte.dateDebutUtilisation) errors.dateDebutUtilisation = 'La date de début est obligatoire';
+        if (!formData.produitSuspecte.arretUtilisation) errors.arretUtilisation = 'Ce champ est obligatoire';
+        break;
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleNextSection = () => {
+    if (validateSection(currentSection)) {
+      setCurrentSection(prev => Math.min(prev + 1, sections.length - 1));
+      setValidationErrors({});
+    }
+  };
+
+  const handlePrevSection = () => {
+    setCurrentSection(prev => Math.max(prev - 1, 0));
+    setValidationErrors({});
+  };
 
   const getSectionCaseNumber = (sectionIndex: number): number => {
     let caseNumber = 0;
@@ -319,9 +394,10 @@ export default function CosmetovigillancePage() {
                   type="text"
                   value={formData.declarant.nom}
                   onChange={(e) => setFormData({ ...formData, declarant: { ...formData.declarant, nom: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${validationErrors.declarantNom ? 'border-red-500' : 'border-slate-300'}`}
                   required
                 />
+                <ErrorMessage error={validationErrors.declarantNom} />
               </div>
 
               <div>
@@ -330,19 +406,22 @@ export default function CosmetovigillancePage() {
                   type="text"
                   value={formData.declarant.prenom}
                   onChange={(e) => setFormData({ ...formData, declarant: { ...formData.declarant, prenom: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${validationErrors.declarantPrenom ? 'border-red-500' : 'border-slate-300'}`}
                   required
                 />
+                <ErrorMessage error={validationErrors.declarantPrenom} />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Email*</label>
                 <input
                   type="email"
                   value={formData.declarant.email}
                   onChange={(e) => setFormData({ ...formData, declarant: { ...formData.declarant, email: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${validationErrors.declarantEmail ? 'border-red-500' : 'border-slate-300'}`}
+                  required
                 />
+                <ErrorMessage error={validationErrors.declarantEmail} />
               </div>
 
               <div>
@@ -351,9 +430,10 @@ export default function CosmetovigillancePage() {
                   type="tel"
                   value={formData.declarant.tel}
                   onChange={(e) => setFormData({ ...formData, declarant: { ...formData.declarant, tel: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${validationErrors.declarantTel ? 'border-red-500' : 'border-slate-300'}`}
                   required
                 />
+                <ErrorMessage error={validationErrors.declarantTel} />
               </div>
             </div>
 
@@ -402,7 +482,7 @@ export default function CosmetovigillancePage() {
                       ...formData,
                       professionnelSante: { ...formData.professionnelSante!, profession: e.target.value, structure: formData.professionnelSante?.structure || '', ville: formData.professionnelSante?.ville || '' }
                     })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${validationErrors.profession ? 'border-red-500' : 'border-slate-300'}`}
                   >
                     <option value="">Sélectionnez une profession</option>
                     <option value="Médecin">Médecin</option>
@@ -410,6 +490,7 @@ export default function CosmetovigillancePage() {
                     <option value="Infirmier">Infirmier</option>
                     <option value="Autre">Autre</option>
                   </select>
+                  <ErrorMessage error={validationErrors.profession} />
                 </div>
 
                 {formData.professionnelSante?.profession === 'Autre' && (
@@ -1395,7 +1476,7 @@ export default function CosmetovigillancePage() {
 
           <div className="px-8 py-6 bg-slate-50 border-t border-slate-200 flex justify-between">
             <button
-              onClick={() => setCurrentSection(Math.max(0, currentSection - 1))}
+              onClick={handlePrevSection}
               disabled={currentSection === 0}
               className="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
@@ -1404,7 +1485,7 @@ export default function CosmetovigillancePage() {
 
             {currentSection < sections.length - 1 ? (
               <button
-                onClick={() => setCurrentSection(Math.min(sections.length - 1, currentSection + 1))}
+                onClick={handleNextSection}
                 className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
               >
                 Suivant
