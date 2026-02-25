@@ -100,7 +100,7 @@ export default function CosmetovigillancePage() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const getSections = () => {
-    const baseSections = [{ title: 'Déclarant', icon: '👤' }];
+    const baseSections = [{ title: 'Notificateur', icon: '👤' }];
 
     if (formData.utilisateurType === 'professionnel') {
       baseSections.push({ title: 'Professionnel de Santé', icon: '⚕️' });
@@ -113,7 +113,7 @@ export default function CosmetovigillancePage() {
       { title: 'Antécédents Médicaux', icon: '📋' },
       { title: 'Effet Indésirable', icon: '⚠️' },
       { title: 'Prise en Charge', icon: '🏥' },
-      { title: 'Produit Suspecté', icon: '🧴' },
+      { title: 'Cosmétique Suspect', icon: '🧴' },
       { title: 'Commentaires', icon: '💬' }
     );
 
@@ -134,7 +134,7 @@ export default function CosmetovigillancePage() {
     const caseNumber = getSectionCaseNumber(sectionIndex);
 
     switch (caseNumber) {
-      case 0: // Déclarant
+      case 0: // Notificateur
         if (!formData.declarant.nom.trim()) errors.declarantNom = 'Le nom est obligatoire';
         if (!formData.declarant.prenom.trim()) errors.declarantPrenom = 'Le prénom est obligatoire';
         if (!formData.declarant.email.trim()) errors.declarantEmail = 'L\'email est obligatoire';
@@ -170,7 +170,7 @@ export default function CosmetovigillancePage() {
         if (!formData.effetIndesirable.evolutionEffet) errors.evolutionEffet = 'L\'évolution de l\'effet est obligatoire';
         break;
 
-      case 6: // Produit Suspecté
+      case 6: // Cosmétique Suspect
         if (!formData.produitSuspecte.nomCommercial.trim()) errors.nomCommercial = 'Le nom commercial est obligatoire';
         if (!formData.produitSuspecte.typeProduit) errors.typeProduit = 'Le type de produit est obligatoire';
         if (!formData.produitSuspecte.zoneApplication.trim()) errors.zoneApplication = 'La zone d\'application est obligatoire';
@@ -203,7 +203,7 @@ export default function CosmetovigillancePage() {
     // Compte les sections conditionnelles avant l'index actuel
     const sectionTitles = sections.map(s => s.title);
 
-    // Case 0: Déclarant (toujours présent)
+    // Case 0: Notificateur (toujours présent)
     if (adjustedIndex === 0) return 0;
     caseNumber = 1;
     adjustedIndex--;
@@ -237,7 +237,7 @@ export default function CosmetovigillancePage() {
     caseNumber = 6;
     adjustedIndex--;
 
-    // Case 6: Produit Suspecté (toujours présent)
+    // Case 6: Cosmétique Suspect (toujours présent)
     if (adjustedIndex === 0) return 6;
     caseNumber = 7;
     adjustedIndex--;
@@ -385,7 +385,7 @@ export default function CosmetovigillancePage() {
       case 0:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations du Déclarant</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations du Notificateur</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -1200,7 +1200,7 @@ export default function CosmetovigillancePage() {
       case 6:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Produit Suspecté</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Cosmétique Suspect</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

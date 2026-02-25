@@ -328,7 +328,7 @@ export default function DeclarationDetailPage() {
             <section>
               <div className="flex items-center mb-4">
                 <User className="w-6 h-6 text-emerald-600 mr-2" />
-                <h2 className="text-2xl font-bold text-slate-900">Déclarant</h2>
+                <h2 className="text-2xl font-bold text-slate-900">Notificateur</h2>
               </div>
               <div className="bg-slate-50 rounded-lg p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -652,7 +652,7 @@ export default function DeclarationDetailPage() {
               <section>
                 <div className="flex items-center mb-4">
                   <Package className="w-6 h-6 text-amber-600 mr-2" />
-                  <h2 className="text-2xl font-bold text-slate-900">Produit Suspecté</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">Cosmétique Suspect</h2>
                 </div>
                 <div className="bg-slate-50 rounded-lg p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
