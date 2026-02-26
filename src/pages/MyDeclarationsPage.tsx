@@ -26,8 +26,7 @@ interface Declaration {
   id: string;
   created_at: string;
   statut: DeclarationStatus;
-  patient_nom?: string;
-  patient_prenom?: string;
+  patient_nom_prenom?: string;
   produit_nom_commercial?: string;
   effet_localisation?: string;
 }
@@ -77,8 +76,7 @@ export default function MyDeclarationsPage() {
               id: d.id,
               created_at: d.createdAt ?? new Date().toISOString(),
               statut: (d.statut ?? 'nouveau') as DeclarationStatus,
-              patient_nom: d.personneExposee?.nom,
-              patient_prenom: d.personneExposee?.prenom,
+              patient_nom_prenom: d.personneExposee?.nomPrenom,
               produit_nom_commercial: d.produitsSuspectes?.[0]?.nomCommercial,
               effet_localisation: d.effetsIndesirables?.[0]?.localisation,
             }))
@@ -192,9 +190,7 @@ export default function MyDeclarationsPage() {
                         #{declaration.id.slice(0, 8)}
                       </td>
                       <td className="py-4 px-4 text-slate-700">
-                        {declaration.patient_nom && declaration.patient_prenom
-                          ? `${declaration.patient_prenom} ${declaration.patient_nom}`
-                          : '-'}
+                        {declaration.patient_nom_prenom || '-'}
                       </td>
                       <td className="py-4 px-4 text-slate-700">
                         {declaration.produit_nom_commercial || '-'}
