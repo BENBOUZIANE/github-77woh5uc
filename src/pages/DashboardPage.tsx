@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, Sparkles, Beaker, Package, Shield, FileText } from 'lucide-react';
+import { LogOut, Sparkles, Beaker, Package, Shield, FileText, TrendingUp, BarChart3 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { api } from '../services/api';
 
 const declarationTypes = [
   {
@@ -8,6 +10,8 @@ const declarationTypes = [
     title: 'Produits cosmétiques',
     icon: Sparkles,
     color: 'from-emerald-500 to-teal-600',
+    bgColor: 'bg-emerald-50',
+    textColor: 'text-emerald-700',
     path: '/dashboard/cosmetovigilance'
   },
   {
@@ -15,6 +19,8 @@ const declarationTypes = [
     title: 'Dispositifs Médicaux',
     icon: Beaker,
     color: 'from-blue-500 to-cyan-600',
+    bgColor: 'bg-blue-50',
+    textColor: 'text-blue-700',
     path: '/dashboard/dispositifs-medicaux'
   },
   {
@@ -22,6 +28,8 @@ const declarationTypes = [
     title: 'Diagnostic In Vitro',
     icon: Package,
     color: 'from-amber-500 to-orange-600',
+    bgColor: 'bg-amber-50',
+    textColor: 'text-amber-700',
     path: '/dashboard/diagnostic-in-vitro'
   },
   {
@@ -29,13 +37,85 @@ const declarationTypes = [
     title: 'Complément Alimentaire',
     icon: Shield,
     color: 'from-rose-500 to-pink-600',
+    bgColor: 'bg-rose-50',
+    textColor: 'text-rose-700',
     path: '/dashboard/complement-alimentaire'
   }
 ];
 
+interface StatsByStatus {
+  nouveau: number;
+  en_cours: number;
+  traite: number;
+  rejete: number;
+  cloture: number;
+}
+
+interface StatsByType {
+  [key: string]: StatsByStatus;
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const [stats, setStats] = useState<StatsByType>({});
+  const [loading, setLoading] = useState(true);
+  const [totalStats, setTotalStats] = useState<StatsByStatus>({
+    nouveau: 0,
+    en_cours: 0,
+    traite: 0,
+    rejete: 0,
+    cloture: 0
+  });
+
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
+
+  const fetchStatistics = async () => {
+    try {
+      setLoading(true);
+      const data = await api.getDeclarations();
+
+      const statsByType: StatsByType = {};
+      const totals: StatsByStatus = {
+        nouveau: 0,
+        en_cours: 0,
+        traite: 0,
+        rejete: 0,
+        cloture: 0
+      };
+
+      declarationTypes.forEach(type => {
+        statsByType[type.id] = {
+          nouveau: 0,
+          en_cours: 0,
+          traite: 0,
+          rejete: 0,
+          cloture: 0
+        };
+      });
+
+      if (Array.isArray(data)) {
+        data.forEach((decl: any) => {
+          const status = decl.statut?.toLowerCase() || 'nouveau';
+          const type = 'cosmetovigilance';
+
+          if (statsByType[type] && status in statsByType[type]) {
+            statsByType[type][status as keyof StatsByStatus]++;
+            totals[status as keyof StatsByStatus]++;
+          }
+        });
+      }
+
+      setStats(statsByType);
+      setTotalStats(totals);
+    } catch (error) {
+      console.error('Error fetching statistics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -111,38 +191,157 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">Statistiques</h3>
-              <div className="p-2 bg-emerald-100 rounded-lg">
-                <FileText className="w-5 h-5 text-emerald-600" />
-              </div>
-            </div>
-            <p className="text-3xl font-bold text-slate-900 mb-1">0</p>
-            <p className="text-sm text-slate-600">Déclarations totales</p>
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+          <div className="flex items-center mb-6">
+            <BarChart3 className="w-8 h-8 text-blue-600 mr-3" />
+            <h2 className="text-2xl font-bold text-slate-900">Statistiques globales</h2>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">En cours</h3>
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileText className="w-5 h-5 text-blue-600" />
-              </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
+              <p className="text-sm text-slate-600 mb-1">Total</p>
+              <p className="text-3xl font-bold text-slate-900">
+                {loading ? '...' : Object.values(totalStats).reduce((a, b) => a + b, 0)}
+              </p>
             </div>
-            <p className="text-3xl font-bold text-slate-900 mb-1">0</p>
-            <p className="text-sm text-slate-600">Déclarations en traitement</p>
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+              <p className="text-sm text-blue-700 mb-1">Nouveau</p>
+              <p className="text-3xl font-bold text-blue-900">
+                {loading ? '...' : totalStats.nouveau}
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 border border-amber-200">
+              <p className="text-sm text-amber-700 mb-1">En cours</p>
+              <p className="text-3xl font-bold text-amber-900">
+                {loading ? '...' : totalStats.en_cours}
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+              <p className="text-sm text-green-700 mb-1">Traité</p>
+              <p className="text-3xl font-bold text-green-900">
+                {loading ? '...' : totalStats.traite}
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
+              <p className="text-sm text-slate-600 mb-1">Clôturé</p>
+              <p className="text-3xl font-bold text-slate-900">
+                {loading ? '...' : totalStats.cloture + totalStats.rejete}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="flex items-center mb-6">
+            <TrendingUp className="w-8 h-8 text-emerald-600 mr-3" />
+            <h2 className="text-2xl font-bold text-slate-900">Répartition par type d'activité</h2>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">Traitées</h3>
-              <div className="p-2 bg-green-100 rounded-lg">
-                <FileText className="w-5 h-5 text-green-600" />
-              </div>
-            </div>
-            <p className="text-3xl font-bold text-slate-900 mb-1">0</p>
-            <p className="text-sm text-slate-600">Déclarations complétées</p>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b-2 border-slate-200">
+                  <th className="text-left py-4 px-4 font-semibold text-slate-700">Type d'activité</th>
+                  <th className="text-center py-4 px-4 font-semibold text-blue-700">Nouveau</th>
+                  <th className="text-center py-4 px-4 font-semibold text-amber-700">En cours</th>
+                  <th className="text-center py-4 px-4 font-semibold text-green-700">Traité</th>
+                  <th className="text-center py-4 px-4 font-semibold text-red-700">Rejeté</th>
+                  <th className="text-center py-4 px-4 font-semibold text-slate-700">Clôturé</th>
+                  <th className="text-center py-4 px-4 font-semibold text-slate-900 bg-slate-50">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {declarationTypes.map((type) => {
+                  const Icon = type.icon;
+                  const typeStats = stats[type.id] || {
+                    nouveau: 0,
+                    en_cours: 0,
+                    traite: 0,
+                    rejete: 0,
+                    cloture: 0
+                  };
+                  const total = Object.values(typeStats).reduce((a, b) => a + b, 0);
+
+                  return (
+                    <tr key={type.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center">
+                          <div className={`p-2 ${type.bgColor} rounded-lg mr-3`}>
+                            <Icon className={`w-5 h-5 ${type.textColor}`} />
+                          </div>
+                          <span className="font-medium text-slate-900">{type.title}</span>
+                        </div>
+                      </td>
+                      <td className="text-center py-4 px-4">
+                        <span className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-900 rounded-lg font-semibold">
+                          {loading ? '...' : typeStats.nouveau}
+                        </span>
+                      </td>
+                      <td className="text-center py-4 px-4">
+                        <span className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 text-amber-900 rounded-lg font-semibold">
+                          {loading ? '...' : typeStats.en_cours}
+                        </span>
+                      </td>
+                      <td className="text-center py-4 px-4">
+                        <span className="inline-flex items-center justify-center w-12 h-12 bg-green-100 text-green-900 rounded-lg font-semibold">
+                          {loading ? '...' : typeStats.traite}
+                        </span>
+                      </td>
+                      <td className="text-center py-4 px-4">
+                        <span className="inline-flex items-center justify-center w-12 h-12 bg-red-100 text-red-900 rounded-lg font-semibold">
+                          {loading ? '...' : typeStats.rejete}
+                        </span>
+                      </td>
+                      <td className="text-center py-4 px-4">
+                        <span className="inline-flex items-center justify-center w-12 h-12 bg-slate-100 text-slate-900 rounded-lg font-semibold">
+                          {loading ? '...' : typeStats.cloture}
+                        </span>
+                      </td>
+                      <td className="text-center py-4 px-4 bg-slate-50">
+                        <span className="inline-flex items-center justify-center w-12 h-12 bg-slate-200 text-slate-900 rounded-lg font-bold">
+                          {loading ? '...' : total}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-slate-200 bg-slate-50">
+                  <td className="py-4 px-4 font-bold text-slate-900">Total général</td>
+                  <td className="text-center py-4 px-4">
+                    <span className="inline-flex items-center justify-center w-12 h-12 bg-blue-200 text-blue-900 rounded-lg font-bold">
+                      {loading ? '...' : totalStats.nouveau}
+                    </span>
+                  </td>
+                  <td className="text-center py-4 px-4">
+                    <span className="inline-flex items-center justify-center w-12 h-12 bg-amber-200 text-amber-900 rounded-lg font-bold">
+                      {loading ? '...' : totalStats.en_cours}
+                    </span>
+                  </td>
+                  <td className="text-center py-4 px-4">
+                    <span className="inline-flex items-center justify-center w-12 h-12 bg-green-200 text-green-900 rounded-lg font-bold">
+                      {loading ? '...' : totalStats.traite}
+                    </span>
+                  </td>
+                  <td className="text-center py-4 px-4">
+                    <span className="inline-flex items-center justify-center w-12 h-12 bg-red-200 text-red-900 rounded-lg font-bold">
+                      {loading ? '...' : totalStats.rejete}
+                    </span>
+                  </td>
+                  <td className="text-center py-4 px-4">
+                    <span className="inline-flex items-center justify-center w-12 h-12 bg-slate-200 text-slate-900 rounded-lg font-bold">
+                      {loading ? '...' : totalStats.cloture}
+                    </span>
+                  </td>
+                  <td className="text-center py-4 px-4 bg-slate-100">
+                    <span className="inline-flex items-center justify-center w-12 h-12 bg-slate-300 text-slate-900 rounded-lg font-bold">
+                      {loading ? '...' : Object.values(totalStats).reduce((a, b) => a + b, 0)}
+                    </span>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>
       </div>
