@@ -249,176 +249,48 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <div className="flex items-center mb-6">
-              <PieChartIcon className="w-8 h-8 text-emerald-600 mr-3" />
-              <h2 className="text-2xl font-bold text-slate-900">Distribution par statut</h2>
-            </div>
-            {!loading && (
-              <div className="flex justify-center">
-                <PieChart
-                  data={[
-                    { label: 'Nouveau', value: totalStats.nouveau, color: '#3b82f6' },
-                    { label: 'En cours', value: totalStats.en_cours, color: '#f59e0b' },
-                    { label: 'Traité', value: totalStats.traite, color: '#10b981' },
-                    { label: 'Rejeté', value: totalStats.rejete, color: '#ef4444' },
-                    { label: 'Clôturé', value: totalStats.cloture, color: '#64748b' },
-                  ]}
-                  size={280}
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <div className="flex items-center mb-6">
-              <PieChartIcon className="w-8 h-8 text-blue-600 mr-3" />
-              <h2 className="text-2xl font-bold text-slate-900">Distribution par type</h2>
-            </div>
-            {!loading && (
-              <div className="flex justify-center">
-                <PieChart
-                  data={[
-                    {
-                      label: 'Produits cosmétiques',
-                      value: Object.values(stats['cosmetovigilance'] || {}).reduce((a, b) => a + b, 0),
-                      color: '#10b981'
-                    },
-                    {
-                      label: 'Dispositifs Médicaux',
-                      value: Object.values(stats['dispositifs-medicaux'] || {}).reduce((a, b) => a + b, 0),
-                      color: '#3b82f6'
-                    },
-                    {
-                      label: 'Diagnostic In Vitro',
-                      value: Object.values(stats['diagnostic-in-vitro'] || {}).reduce((a, b) => a + b, 0),
-                      color: '#f59e0b'
-                    },
-                    {
-                      label: 'Complément Alimentaire',
-                      value: Object.values(stats['complement-alimentaire'] || {}).reduce((a, b) => a + b, 0),
-                      color: '#ec4899'
-                    },
-                  ]}
-                  size={280}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="flex items-center mb-6">
             <TrendingUp className="w-8 h-8 text-emerald-600 mr-3" />
-            <h2 className="text-2xl font-bold text-slate-900">Répartition par type d'activité</h2>
+            <h2 className="text-2xl font-bold text-slate-900">Distribution par statut par type d'activité</h2>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b-2 border-slate-200">
-                  <th className="text-left py-4 px-4 font-semibold text-slate-700">Type d'activité</th>
-                  <th className="text-center py-4 px-4 font-semibold text-blue-700">Nouveau</th>
-                  <th className="text-center py-4 px-4 font-semibold text-amber-700">En cours</th>
-                  <th className="text-center py-4 px-4 font-semibold text-green-700">Traité</th>
-                  <th className="text-center py-4 px-4 font-semibold text-red-700">Rejeté</th>
-                  <th className="text-center py-4 px-4 font-semibold text-slate-700">Clôturé</th>
-                  <th className="text-center py-4 px-4 font-semibold text-slate-900 bg-slate-50">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {declarationTypes.map((type) => {
-                  const Icon = type.icon;
-                  const typeStats = stats[type.id] || {
-                    nouveau: 0,
-                    en_cours: 0,
-                    traite: 0,
-                    rejete: 0,
-                    cloture: 0
-                  };
-                  const total = Object.values(typeStats).reduce((a, b) => a + b, 0);
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {declarationTypes.map((type) => {
+              const Icon = type.icon;
+              const typeStats = stats[type.id] || {
+                nouveau: 0,
+                en_cours: 0,
+                traite: 0,
+                rejete: 0,
+                cloture: 0
+              };
 
-                  return (
-                    <tr key={type.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                      <td className="py-4 px-4">
-                        <div className="flex items-center">
-                          <div className={`p-2 ${type.bgColor} rounded-lg mr-3`}>
-                            <Icon className={`w-5 h-5 ${type.textColor}`} />
-                          </div>
-                          <span className="font-medium text-slate-900">{type.title}</span>
-                        </div>
-                      </td>
-                      <td className="text-center py-4 px-4">
-                        <span className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-900 rounded-lg font-semibold">
-                          {loading ? '...' : typeStats.nouveau}
-                        </span>
-                      </td>
-                      <td className="text-center py-4 px-4">
-                        <span className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 text-amber-900 rounded-lg font-semibold">
-                          {loading ? '...' : typeStats.en_cours}
-                        </span>
-                      </td>
-                      <td className="text-center py-4 px-4">
-                        <span className="inline-flex items-center justify-center w-12 h-12 bg-green-100 text-green-900 rounded-lg font-semibold">
-                          {loading ? '...' : typeStats.traite}
-                        </span>
-                      </td>
-                      <td className="text-center py-4 px-4">
-                        <span className="inline-flex items-center justify-center w-12 h-12 bg-red-100 text-red-900 rounded-lg font-semibold">
-                          {loading ? '...' : typeStats.rejete}
-                        </span>
-                      </td>
-                      <td className="text-center py-4 px-4">
-                        <span className="inline-flex items-center justify-center w-12 h-12 bg-slate-100 text-slate-900 rounded-lg font-semibold">
-                          {loading ? '...' : typeStats.cloture}
-                        </span>
-                      </td>
-                      <td className="text-center py-4 px-4 bg-slate-50">
-                        <span className="inline-flex items-center justify-center w-12 h-12 bg-slate-200 text-slate-900 rounded-lg font-bold">
-                          {loading ? '...' : total}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr className="border-t-2 border-slate-200 bg-slate-50">
-                  <td className="py-4 px-4 font-bold text-slate-900">Total général</td>
-                  <td className="text-center py-4 px-4">
-                    <span className="inline-flex items-center justify-center w-12 h-12 bg-blue-200 text-blue-900 rounded-lg font-bold">
-                      {loading ? '...' : totalStats.nouveau}
-                    </span>
-                  </td>
-                  <td className="text-center py-4 px-4">
-                    <span className="inline-flex items-center justify-center w-12 h-12 bg-amber-200 text-amber-900 rounded-lg font-bold">
-                      {loading ? '...' : totalStats.en_cours}
-                    </span>
-                  </td>
-                  <td className="text-center py-4 px-4">
-                    <span className="inline-flex items-center justify-center w-12 h-12 bg-green-200 text-green-900 rounded-lg font-bold">
-                      {loading ? '...' : totalStats.traite}
-                    </span>
-                  </td>
-                  <td className="text-center py-4 px-4">
-                    <span className="inline-flex items-center justify-center w-12 h-12 bg-red-200 text-red-900 rounded-lg font-bold">
-                      {loading ? '...' : totalStats.rejete}
-                    </span>
-                  </td>
-                  <td className="text-center py-4 px-4">
-                    <span className="inline-flex items-center justify-center w-12 h-12 bg-slate-200 text-slate-900 rounded-lg font-bold">
-                      {loading ? '...' : totalStats.cloture}
-                    </span>
-                  </td>
-                  <td className="text-center py-4 px-4 bg-slate-100">
-                    <span className="inline-flex items-center justify-center w-12 h-12 bg-slate-300 text-slate-900 rounded-lg font-bold">
-                      {loading ? '...' : Object.values(totalStats).reduce((a, b) => a + b, 0)}
-                    </span>
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+              return (
+                <div key={type.id} className="bg-slate-50 rounded-xl p-6">
+                  <div className="flex items-center mb-6">
+                    <div className={`p-3 ${type.bgColor} rounded-lg mr-3`}>
+                      <Icon className={`w-6 h-6 ${type.textColor}`} />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900">{type.title}</h3>
+                  </div>
+                  {!loading && (
+                    <div className="flex justify-center">
+                      <PieChart
+                        data={[
+                          { label: 'Nouveau', value: typeStats.nouveau, color: '#3b82f6' },
+                          { label: 'En cours', value: typeStats.en_cours, color: '#f59e0b' },
+                          { label: 'Traité', value: typeStats.traite, color: '#10b981' },
+                          { label: 'Rejeté', value: typeStats.rejete, color: '#ef4444' },
+                          { label: 'Clôturé', value: typeStats.cloture, color: '#64748b' },
+                        ]}
+                        size={280}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
