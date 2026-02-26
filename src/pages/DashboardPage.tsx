@@ -199,7 +199,7 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-bold text-slate-900">Statistiques globales</h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
               <p className="text-sm text-slate-600 mb-1">Total</p>
               <p className="text-3xl font-bold text-slate-900">
@@ -230,22 +230,6 @@ export default function DashboardPage() {
                 {loading ? '...' : totalStats.cloture + totalStats.rejete}
               </p>
             </div>
-          </div>
-
-          <div className="bg-slate-50 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Répartition par statut</h3>
-            {!loading && (
-              <BarChart
-                data={[
-                  { label: 'Nouveau', value: totalStats.nouveau, color: '#3b82f6' },
-                  { label: 'En cours', value: totalStats.en_cours, color: '#f59e0b' },
-                  { label: 'Traité', value: totalStats.traite, color: '#10b981' },
-                  { label: 'Rejeté', value: totalStats.rejete, color: '#ef4444' },
-                  { label: 'Clôturé', value: totalStats.cloture, color: '#64748b' },
-                ]}
-                height={250}
-              />
-            )}
           </div>
         </div>
 
