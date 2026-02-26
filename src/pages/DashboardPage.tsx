@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, Sparkles, Beaker, Package, Shield, FileText, TrendingUp, BarChart3 } from 'lucide-react';
+import { LogOut, Sparkles, Beaker, Package, Shield, FileText, TrendingUp, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
+import PieChart from '../components/PieChart';
+import BarChart from '../components/BarChart';
 
 const declarationTypes = [
   {
@@ -228,6 +230,81 @@ export default function DashboardPage() {
                 {loading ? '...' : totalStats.cloture + totalStats.rejete}
               </p>
             </div>
+          </div>
+
+          <div className="bg-slate-50 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Répartition par statut</h3>
+            {!loading && (
+              <BarChart
+                data={[
+                  { label: 'Nouveau', value: totalStats.nouveau, color: '#3b82f6' },
+                  { label: 'En cours', value: totalStats.en_cours, color: '#f59e0b' },
+                  { label: 'Traité', value: totalStats.traite, color: '#10b981' },
+                  { label: 'Rejeté', value: totalStats.rejete, color: '#ef4444' },
+                  { label: 'Clôturé', value: totalStats.cloture, color: '#64748b' },
+                ]}
+                height={250}
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="flex items-center mb-6">
+              <PieChartIcon className="w-8 h-8 text-emerald-600 mr-3" />
+              <h2 className="text-2xl font-bold text-slate-900">Distribution par statut</h2>
+            </div>
+            {!loading && (
+              <div className="flex justify-center">
+                <PieChart
+                  data={[
+                    { label: 'Nouveau', value: totalStats.nouveau, color: '#3b82f6' },
+                    { label: 'En cours', value: totalStats.en_cours, color: '#f59e0b' },
+                    { label: 'Traité', value: totalStats.traite, color: '#10b981' },
+                    { label: 'Rejeté', value: totalStats.rejete, color: '#ef4444' },
+                    { label: 'Clôturé', value: totalStats.cloture, color: '#64748b' },
+                  ]}
+                  size={280}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="flex items-center mb-6">
+              <PieChartIcon className="w-8 h-8 text-blue-600 mr-3" />
+              <h2 className="text-2xl font-bold text-slate-900">Distribution par type</h2>
+            </div>
+            {!loading && (
+              <div className="flex justify-center">
+                <PieChart
+                  data={[
+                    {
+                      label: 'Produits cosmétiques',
+                      value: Object.values(stats['cosmetovigilance'] || {}).reduce((a, b) => a + b, 0),
+                      color: '#10b981'
+                    },
+                    {
+                      label: 'Dispositifs Médicaux',
+                      value: Object.values(stats['dispositifs-medicaux'] || {}).reduce((a, b) => a + b, 0),
+                      color: '#3b82f6'
+                    },
+                    {
+                      label: 'Diagnostic In Vitro',
+                      value: Object.values(stats['diagnostic-in-vitro'] || {}).reduce((a, b) => a + b, 0),
+                      color: '#f59e0b'
+                    },
+                    {
+                      label: 'Complément Alimentaire',
+                      value: Object.values(stats['complement-alimentaire'] || {}).reduce((a, b) => a + b, 0),
+                      color: '#ec4899'
+                    },
+                  ]}
+                  size={280}
+                />
+              </div>
+            )}
           </div>
         </div>
 
