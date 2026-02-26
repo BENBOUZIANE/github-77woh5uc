@@ -169,48 +169,56 @@ export default function MyDeclarationsPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {declarations.map((declaration) => (
-                <button
-                  key={declaration.id}
-                  onClick={() => navigate(`/declaration/${declaration.id}`)}
-                  className="w-full text-left border border-slate-200 rounded-lg p-6 hover:shadow-md hover:border-emerald-300 transition-all"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                        Déclaration #{declaration.id.slice(0, 8)}
-                      </h3>
-                      <div className="mb-3">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-slate-200">
+                    <th className="text-left py-4 px-4 font-semibold text-slate-700">ID</th>
+                    <th className="text-left py-4 px-4 font-semibold text-slate-700">Patient</th>
+                    <th className="text-left py-4 px-4 font-semibold text-slate-700">Produit</th>
+                    <th className="text-left py-4 px-4 font-semibold text-slate-700">Localisation</th>
+                    <th className="text-left py-4 px-4 font-semibold text-slate-700">Statut</th>
+                    <th className="text-left py-4 px-4 font-semibold text-slate-700">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {declarations.map((declaration) => (
+                    <tr
+                      key={declaration.id}
+                      onClick={() => navigate(`/declaration/${declaration.id}`)}
+                      className="border-b border-slate-100 hover:bg-emerald-50 cursor-pointer transition-colors"
+                    >
+                      <td className="py-4 px-4 text-slate-900 font-medium">
+                        #{declaration.id.slice(0, 8)}
+                      </td>
+                      <td className="py-4 px-4 text-slate-700">
+                        {declaration.patient_nom && declaration.patient_prenom
+                          ? `${declaration.patient_prenom} ${declaration.patient_nom}`
+                          : '-'}
+                      </td>
+                      <td className="py-4 px-4 text-slate-700">
+                        {declaration.produit_nom_commercial || '-'}
+                      </td>
+                      <td className="py-4 px-4 text-slate-700">
+                        {declaration.effet_localisation || '-'}
+                      </td>
+                      <td className="py-4 px-4">
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${STATUS_BADGE[declaration.statut]}`}
                         >
                           {STATUS_LABEL[declaration.statut]}
                         </span>
-                      </div>
-                      {declaration.patient_nom && declaration.patient_prenom && (
-                        <p className="text-slate-700 mb-1">
-                          Patient: {declaration.patient_prenom} {declaration.patient_nom}
-                        </p>
-                      )}
-                      {declaration.produit_nom_commercial && (
-                        <p className="text-slate-700 mb-1">
-                          Produit: {declaration.produit_nom_commercial}
-                        </p>
-                      )}
-                      {declaration.effet_localisation && (
-                        <p className="text-slate-700">
-                          Localisation: {declaration.effet_localisation}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center text-sm text-slate-500">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      {new Date(declaration.created_at).toLocaleDateString('fr-FR')}
-                    </div>
-                  </div>
-                </button>
-              ))}
+                      </td>
+                      <td className="py-4 px-4 text-slate-600 text-sm">
+                        <div className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {new Date(declaration.created_at).toLocaleDateString('fr-FR')}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
