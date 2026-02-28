@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/attachments")
+@RequestMapping("/attachments")
 @RequiredArgsConstructor
 // Upload is allowed for public form submissions too; dashboard usage still requires JWT via security config
 @SecurityRequirement(name = "bearerAuth")

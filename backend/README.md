@@ -22,12 +22,10 @@ backend/
 │   ├── config/                     # Configuration classes
 │   │   ├── OpenApiConfig.java      # Swagger/OpenAPI configuration
 │   │   ├── SecurityConfig.java     # Spring Security configuration
-│   │   └── WebConfig.java          # Web/CORS + Static resources
+│   │   └── WebConfig.java          # Web/CORS configuration
 │   ├── controller/                 # REST Controllers
-│   │   ├── SpaController.java      # Frontend routing (NEW)
-│   │   ├── AuthController.java     # /api/auth endpoints
-│   │   ├── DeclarationController.java # /api/declarations endpoints
-│   │   └── AttachmentController.java  # /api/attachments endpoints
+│   │   ├── AuthController.java     # Authentication endpoints
+│   │   └── DeclarationController.java # Declaration management endpoints
 │   ├── dto/                        # Data Transfer Objects
 │   │   ├── ApiResponse.java
 │   │   ├── AuthResponse.java

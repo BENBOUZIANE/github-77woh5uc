@@ -7,23 +7,6 @@ Application web pour la gestion des déclarations de cosmétovigilance.
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS
 - **Backend**: Spring Boot (Java)
 - **Base de données**: MySQL
-- **Déploiement**: Application unifiée (Frontend + Backend sur port 8080)
-
-### Architecture de Production
-
-```
-http://localhost:8080/
-├── /                    → Frontend (React)
-├── /login              → Frontend (React Router)
-├── /dashboard          → Frontend (React Router)
-├── /cosmetovigilance   → Frontend (React Router)
-├── /declarations       → Frontend (React Router)
-├── /assets/*           → CSS, JS, Images
-└── /api/*              → Backend REST API
-    ├── /api/auth
-    ├── /api/declarations
-    └── /api/attachments
-```
 
 ## Prérequis
 
@@ -126,33 +109,6 @@ mvn clean install
 
 ## Démarrage de l'application
 
-### Déploiement en Production
-
-**IMPORTANT:** L'application a été restructurée pour servir le frontend et le backend depuis le même serveur (port 8080).
-
-Pour un guide complet de déploiement, consultez [DEPLOYMENT.md](DEPLOYMENT.md)
-
-**Déploiement rapide:**
-
-**Linux/Mac:**
-```bash
-chmod +x deploy.sh
-./deploy.sh
-cd backend
-java -jar target/cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
-```
-
-**Windows:**
-```cmd
-deploy.bat
-cd backend
-java -jar target\cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
-```
-
-L'application complète sera accessible sur **http://localhost:8080**
-
-### Développement Local
-
 ### Windows
 
 #### Développement local
@@ -168,30 +124,20 @@ mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
 npm run dev
 ```
 
-#### Production (avec frontend intégré dans le backend)
+#### Production
 
-**Étape 1 - Build du frontend:**
-```cmd
-npm run build
-```
-
-**Étape 2 - Copier les fichiers build dans le backend:**
-```cmd
-REM Créer le dossier static s'il n'existe pas
-mkdir backend\src\main\resources\static
-
-REM Copier le contenu de dist vers static
-xcopy /E /I /Y dist\* backend\src\main\resources\static\
-```
-
-**Étape 3 - Build et lancement du backend:**
+**Backend:**
 ```cmd
 cd backend
 mvnw.cmd clean package
 java -jar target\cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
-**L'application complète sera accessible sur:** http://localhost:8080
+**Frontend:**
+```cmd
+npm run build
+npm run serve
+```
 
 ### Linux
 
@@ -209,42 +155,27 @@ chmod +x mvnw
 npm run dev
 ```
 
-#### Production (avec frontend intégré dans le backend)
+#### Production
 
-**Étape 1 - Build du frontend:**
-```bash
-npm run build
-```
-
-**Étape 2 - Copier les fichiers build dans le backend:**
-```bash
-# Créer le dossier static s'il n'existe pas
-mkdir -p backend/src/main/resources/static
-
-# Copier le contenu de dist vers static
-cp -r dist/* backend/src/main/resources/static/
-```
-
-**Étape 3 - Build et lancement du backend:**
+**Backend:**
 ```bash
 cd backend
 ./mvnw clean package
 java -jar target/cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
-**L'application complète sera accessible sur:** http://localhost:8080
+**Frontend:**
+```bash
+npm run build
+npm run serve
+```
 
 ## Accès à l'application
 
-### Mode Développement
-- **Frontend**: http://localhost:5173
+- **Frontend (dev)**: http://localhost:5173
+- **Frontend (prod)**: http://localhost:3000
 - **Backend API**: http://localhost:8080/api
-- **Documentation API**: http://localhost:8080/api-docs
-
-### Mode Production
-- **Application complète**: http://localhost:8080 (frontend + backend)
-- **API**: http://localhost:8080/api
-- **Documentation API**: Désactivée en production
+- **Documentation API**: http://localhost:8080/swagger-ui.html
 
 ## Utilisateur de test
 
