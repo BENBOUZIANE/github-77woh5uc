@@ -17,12 +17,11 @@ function cspPlugin(): Plugin {
           `style-src 'self' 'nonce-${nonce}'; ` +
           `img-src 'self' data: https:; ` +
           `font-src 'self' data:; ` +
-          `connect-src 'self' http://localhost:8080 https:; ` +
+          `connect-src 'self' http://localhost:8080 http://192.168.1.109:8080 https:; ` +
           `object-src 'none'; ` +
           `base-uri 'self'; ` +
           `form-action 'self'; ` +
-          `frame-ancestors 'none'; ` +
-          `upgrade-insecure-requests;`
+          `frame-ancestors 'none';`
         );
         next();
       });
