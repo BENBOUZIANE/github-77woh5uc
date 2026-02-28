@@ -109,6 +109,29 @@ mvn clean install
 
 ## Démarrage de l'application
 
+### Déploiement automatisé (recommandé pour la production)
+
+Des scripts de déploiement automatisé sont disponibles pour simplifier le processus:
+
+**Linux/Mac:**
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+**Windows:**
+```cmd
+deploy.bat
+```
+
+Ces scripts vont:
+1. Builder le frontend
+2. Copier les fichiers dans le dossier static du backend
+3. Builder le backend avec Maven
+4. Afficher les instructions pour lancer l'application
+
+### Déploiement manuel
+
 ### Windows
 
 #### Développement local
@@ -124,20 +147,30 @@ mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
 npm run dev
 ```
 
-#### Production
+#### Production (avec frontend intégré dans le backend)
 
-**Backend:**
+**Étape 1 - Build du frontend:**
+```cmd
+npm run build
+```
+
+**Étape 2 - Copier les fichiers build dans le backend:**
+```cmd
+REM Créer le dossier static s'il n'existe pas
+mkdir backend\src\main\resources\static
+
+REM Copier le contenu de dist vers static
+xcopy /E /I /Y dist\* backend\src\main\resources\static\
+```
+
+**Étape 3 - Build et lancement du backend:**
 ```cmd
 cd backend
 mvnw.cmd clean package
 java -jar target\cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
-**Frontend:**
-```cmd
-npm run build
-npm run serve
-```
+**L'application complète sera accessible sur:** http://localhost:8080
 
 ### Linux
 
@@ -155,27 +188,42 @@ chmod +x mvnw
 npm run dev
 ```
 
-#### Production
+#### Production (avec frontend intégré dans le backend)
 
-**Backend:**
+**Étape 1 - Build du frontend:**
+```bash
+npm run build
+```
+
+**Étape 2 - Copier les fichiers build dans le backend:**
+```bash
+# Créer le dossier static s'il n'existe pas
+mkdir -p backend/src/main/resources/static
+
+# Copier le contenu de dist vers static
+cp -r dist/* backend/src/main/resources/static/
+```
+
+**Étape 3 - Build et lancement du backend:**
 ```bash
 cd backend
 ./mvnw clean package
 java -jar target/cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
-**Frontend:**
-```bash
-npm run build
-npm run serve
-```
+**L'application complète sera accessible sur:** http://localhost:8080
 
 ## Accès à l'application
 
-- **Frontend (dev)**: http://localhost:5173
-- **Frontend (prod)**: http://localhost:3000
+### Mode Développement
+- **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8080/api
-- **Documentation API**: http://localhost:8080/swagger-ui.html
+- **Documentation API**: http://localhost:8080/api-docs
+
+### Mode Production
+- **Application complète**: http://localhost:8080 (frontend + backend)
+- **API**: http://localhost:8080/api
+- **Documentation API**: Désactivée en production
 
 ## Utilisateur de test
 
