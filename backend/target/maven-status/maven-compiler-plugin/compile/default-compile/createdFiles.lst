@@ -5,7 +5,6 @@ com\cosmetovigilance\model\DeclarationStatus.class
 com\cosmetovigilance\dto\LoginRequest.class
 com\cosmetovigilance\dto\UpdateCommentaireAnmpsRequest.class
 com\cosmetovigilance\repository\DeclarationRepository.class
-com\cosmetovigilance\service\EmailService.class
 com\cosmetovigilance\repository\PriseChargeMedicaleRepository.class
 com\cosmetovigilance\repository\RepresentantLegalRepository.class
 com\cosmetovigilance\security\JwtAuthenticationFilter.class
@@ -28,7 +27,6 @@ com\cosmetovigilance\repository\MedicamentProduitSimultanementRepository.class
 com\cosmetovigilance\service\AttachmentService.class
 com\cosmetovigilance\controller\AuthController.class
 com\cosmetovigilance\dto\UserDto.class
-com\cosmetovigilance\service\EmailService$1.class
 com\cosmetovigilance\controller\AttachmentController.class
 com\cosmetovigilance\repository\UtilisateurRepository.class
 com\cosmetovigilance\dto\ProfessionnelSanteDto.class

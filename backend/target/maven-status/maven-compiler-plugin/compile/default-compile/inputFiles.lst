@@ -20,7 +20,6 @@ E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\WebConfig.java
 E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\AuthResponse.java
 E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\DeclarationRepository.java
 E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\PriseChargeMedicaleRepository.java
-E:\Vig\project\backend\src\main\java\com\cosmetovigilance\service\EmailService.java
 E:\Vig\project\backend\src\main\java\com\cosmetovigilance\security\JwtTokenProvider.java
 E:\Vig\project\backend\src\main\java\com\cosmetovigilance\CosmetovigilanceApplication.java
 E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\DeclarantDto.java

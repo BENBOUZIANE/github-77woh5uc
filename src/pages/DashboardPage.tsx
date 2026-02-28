@@ -134,7 +134,7 @@ export default function DashboardPage() {
         <div className="flex justify-between items-start mb-12">
           <div className="flex items-center">
             <img
-              src="/Designer_(2)_(1).png"
+              src="/Designer_(2)_(1)_(1).png"
               alt="Logo"
               className="w-20 h-20 object-contain mr-4"
             />
