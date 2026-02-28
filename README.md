@@ -6,7 +6,7 @@ Application web pour la gestion des déclarations de cosmétovigilance.
 
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS
 - **Backend**: Spring Boot (Java)
-- **Base de données**: PostgreSQL
+- **Base de données**: MySQL
 
 ## Prérequis
 
@@ -20,9 +20,9 @@ Application web pour la gestion des déclarations de cosmétovigilance.
    - Windows: https://www.oracle.com/java/technologies/downloads/
    - Linux: `sudo apt install openjdk-17-jdk` ou `sudo dnf install java-17-openjdk`
 
-3. **PostgreSQL** (version 14 ou supérieure)
-   - Windows: https://www.postgresql.org/download/windows/
-   - Linux: `sudo apt install postgresql postgresql-contrib` ou `sudo dnf install postgresql-server`
+3. **MySQL** (version 8.0 ou supérieure)
+   - Windows: https://dev.mysql.com/downloads/installer/
+   - Linux: `sudo apt install mysql-server` ou `sudo dnf install mysql-server`
 
 4. **Maven** (version 3.8 ou supérieure)
    - Windows: https://maven.apache.org/download.cgi (ajouter au PATH)
@@ -37,12 +37,12 @@ git clone <url-du-projet>
 cd project
 ```
 
-### 2. Configuration de la base de données PostgreSQL
+### 2. Configuration de la base de données MySQL
 
 #### Windows
 ```cmd
-# Se connecter à PostgreSQL
-psql -U postgres
+# Se connecter à MySQL
+mysql -u root -p
 
 # Créer la base de données
 CREATE DATABASE cosmetovigilance;
@@ -50,11 +50,11 @@ CREATE DATABASE cosmetovigilance;
 
 #### Linux
 ```bash
-# Démarrer PostgreSQL
-sudo systemctl start postgresql
+# Démarrer MySQL
+sudo systemctl start mysql
 
 # Se connecter
-sudo -u postgres psql
+mysql -u root -p
 
 # Créer la base de données
 CREATE DATABASE cosmetovigilance;
@@ -66,15 +66,15 @@ Les fichiers de configuration sont dans `backend/src/main/resources/`:
 
 **application-local.properties** (Développement local):
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/cosmetovigilance
-spring.datasource.username=postgres
+spring.datasource.url=jdbc:mysql://localhost:3306/cosmetovigilance
+spring.datasource.username=root
 spring.datasource.password=votre_mot_de_passe
 server.port=8080
 ```
 
 **application-prod.properties** (Production):
 ```properties
-spring.datasource.url=jdbc:postgresql://votre-serveur:5432/cosmetovigilance
+spring.datasource.url=jdbc:mysql://votre-serveur:3306/cosmetovigilance
 spring.datasource.username=user_prod
 spring.datasource.password=${DB_PASSWORD}
 server.port=8080
@@ -245,10 +245,10 @@ java -jar app.jar --spring.profiles.active=prod
 
 ### Problèmes courants
 
-**PostgreSQL ne démarre pas (Linux):**
+**MySQL ne démarre pas (Linux):**
 ```bash
-sudo systemctl status postgresql
-sudo systemctl start postgresql
+sudo systemctl status mysql
+sudo systemctl start mysql
 ```
 
 **Port 8080 déjà utilisé:**
@@ -263,7 +263,7 @@ sudo kill -9 <PID>
 ```
 
 **Erreur de connexion à la base:**
-- Vérifier que PostgreSQL est démarré
+- Vérifier que MySQL est démarré
 - Vérifier les credentials dans application-local.properties
 - Vérifier que la base cosmetovigilance existe
 

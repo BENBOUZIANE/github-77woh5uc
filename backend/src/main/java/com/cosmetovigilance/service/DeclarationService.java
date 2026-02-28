@@ -27,7 +27,6 @@ public class DeclarationService {
     private final UtilisateurRepository utilisateurRepository;
     private final ProfessionnelSanteRepository professionnelSanteRepository;
     private final RepresentantLegalRepository representantLegalRepository;
-    private final EmailService emailService;
 
     @Transactional
     public DeclarationResponse createDeclaration(DeclarationRequest request, String userEmail) {
@@ -366,13 +365,6 @@ public class DeclarationService {
 
         declaration.setCommentaireAnmps(commentaireAnmps);
         declaration = declarationRepository.save(declaration);
-
-        emailService.sendCommentaireAnmpsEmail(
-            declarant.getEmail(),
-            declaration.getId(),
-            commentaireAnmps,
-            declaration.getStatut()
-        );
 
         return mapToResponse(declaration);
     }
