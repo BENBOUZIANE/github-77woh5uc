@@ -20,8 +20,9 @@ import org.springframework.context.annotation.Configuration;
         )
     ),
     servers = {
-        @Server(url = "http://192.168.1.109:8080/api", description = "Local Server"),
-        @Server(url = "https://api.cosmetovigilance.com/api", description = "Production Server")
+        @Server(url = "http://192.168.1.109:8080", description = "Local Server - VM"),
+        @Server(url = "http://localhost:8080", description = "Local Server - Localhost"),
+        @Server(url = "https://api.cosmetovigilance.com", description = "Production Server")
     }
 )
 @SecurityScheme(
