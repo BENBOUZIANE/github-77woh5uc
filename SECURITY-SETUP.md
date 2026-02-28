@@ -60,8 +60,8 @@ server {
 Add to your `.htaccess` or virtual host configuration:
 
 ```apache
-# Content Security Policy
-Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';"
+# Strict Content Security Policy
+Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;"
 
 # Prevent MIME type sniffing
 Header set X-Content-Type-Options "nosniff"
@@ -77,6 +77,9 @@ Header set Referrer-Policy "strict-origin-when-cross-origin"
 
 # Permissions Policy
 Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
+# HSTS (when using HTTPS)
+Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 ```
 
 ## Development Environment
@@ -118,22 +121,40 @@ These are false positives caused by the scanner injecting malicious patterns int
 
 ### For Production Deployment:
 
-1. **Enable HTTPS:**
-   ```nginx
-   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+1. **HTTPS is MANDATORY:**
+   - The CSP includes `upgrade-insecure-requests` which requires HTTPS
+   - Configure SSL/TLS certificates (Let's Encrypt recommended)
+   - HSTS header is already enabled in configuration
+
+2. **CSP Security Notes:**
+   - Current configuration removes `'unsafe-inline'` and `'unsafe-eval'`
+   - Vite bundles all scripts into external files (no inline scripts)
+   - If you add inline scripts in the future, use:
+     - **Nonces**: Random tokens generated per request
+     - **Hashes**: SHA-256 hash of the script content
+
+   Example with hash:
+   ```bash
+   echo -n "console.log('hello')" | openssl dgst -sha256 -binary | openssl base64
+   # Add to CSP: script-src 'self' 'sha256-HASH_VALUE'
    ```
 
-2. **Tighten CSP (if possible):**
-   - Remove `'unsafe-inline'` and `'unsafe-eval'` if your app allows
-   - Use nonces or hashes for inline scripts
+3. **Backend API Security:**
+   - Update `connect-src` to whitelist only your backend domain
+   - Example: `connect-src 'self' https://api.yourdomain.com;`
+   - Remove `https:` wildcard for production
 
-3. **Enable Security Logging:**
+4. **Enable Security Logging:**
    - Monitor failed authentication attempts
    - Log suspicious activity
+   - Enable CSP violation reporting:
+     ```
+     report-uri https://yourdomain.com/csp-report;
+     ```
 
-4. **Regular Security Audits:**
+5. **Regular Security Audits:**
    - Run OWASP ZAP scans regularly
-   - Keep dependencies updated
+   - Keep dependencies updated: `npm audit fix`
    - Monitor security advisories
 
 ## Support
