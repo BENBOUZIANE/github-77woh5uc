@@ -1,322 +1,277 @@
-# 🧴 Application Cosmetovigilance
+# Application Cosmetovigilance
 
-Application de gestion des déclarations de cosmetovigilance avec backend Spring Boot et frontend React.
+Application web pour la gestion des déclarations de cosmétovigilance.
 
----
+## Architecture
 
-## 📚 Documentation
+- **Frontend**: React + TypeScript + Vite + Tailwind CSS
+- **Backend**: Spring Boot (Java)
+- **Base de données**: PostgreSQL
 
-### Guides de déploiement
+## Prérequis
 
-Choisissez le guide approprié selon votre système d'exploitation :
+### Outils nécessaires (Windows et Linux)
 
-| Système | Guide | Scripts |
-|---------|-------|---------|
-| **Windows** | [`GUIDE_WINDOWS.md`](./GUIDE_WINDOWS.md) | `start-local.bat`, `start-vm.bat` |
-| **Linux/Mac** | [`GUIDE_DEPLOIEMENT.md`](./GUIDE_DEPLOIEMENT.md) | `start-local.sh`, `start-vm.sh`, `deploy-production.sh` |
+1. **Node.js** (version 18 ou supérieure)
+   - Windows: https://nodejs.org/
+   - Linux: `sudo apt install nodejs npm` ou `sudo dnf install nodejs npm`
 
-### Résumé rapide
+2. **Java JDK** (version 17 ou supérieure)
+   - Windows: https://www.oracle.com/java/technologies/downloads/
+   - Linux: `sudo apt install openjdk-17-jdk` ou `sudo dnf install java-17-openjdk`
 
-#### 🏠 Développement Local
+3. **PostgreSQL** (version 14 ou supérieure)
+   - Windows: https://www.postgresql.org/download/windows/
+   - Linux: `sudo apt install postgresql postgresql-contrib` ou `sudo dnf install postgresql-server`
 
-**Windows :**
+4. **Maven** (version 3.8 ou supérieure)
+   - Windows: https://maven.apache.org/download.cgi (ajouter au PATH)
+   - Linux: `sudo apt install maven` ou `sudo dnf install maven`
+
+## Installation
+
+### 1. Cloner le projet
+
+```bash
+git clone <url-du-projet>
+cd project
+```
+
+### 2. Configuration de la base de données PostgreSQL
+
+#### Windows
 ```cmd
-start-local.bat
-```
+# Se connecter à PostgreSQL
+psql -U postgres
 
-**Linux/Mac :**
-```bash
-./start-local.sh
-```
-
-**Accès :** http://localhost:5173
-
----
-
-#### 🖥 VM Réseau Local
-
-**Windows :**
-1. Double-cliquer sur `start-vm.bat`
-2. Entrer l'IP de votre VM (ex: 192.168.1.50)
-3. Transférer les fichiers compilés vers la VM
-
-**Linux/Mac :**
-```bash
-./start-vm.sh
-```
-
-**Accès :** http://[IP_VM]:5173
-
----
-
-#### ☁️ Production Cloud
-
-**Linux uniquement :**
-```bash
-export DB_PASSWORD="votre_mot_de_passe"
-export JWT_SECRET="votre_cle_secrete"
-export CORS_ORIGINS="https://votredomaine.com"
-./deploy-production.sh
-```
-
----
-
-## 🛠 Technologies
-
-### Backend
-- Spring Boot 3.x
-- Java 17
-- MySQL 8.0
-- JWT Authentication
-- Spring Security
-- Flyway Migration
-- Swagger/OpenAPI
-
-### Frontend
-- React 18
-- TypeScript
-- Vite
-- React Router
-- Tailwind CSS
-- Lucide React Icons
-
----
-
-## 📂 Structure du Projet
-
-```
-cosmetovigilance/
-├── backend/                          # Backend Spring Boot
-│   ├── src/main/
-│   │   ├── java/com/cosmetovigilance/
-│   │   │   ├── config/              # Configuration (Security, CORS, Swagger)
-│   │   │   ├── controller/          # REST Controllers
-│   │   │   ├── dto/                 # Data Transfer Objects
-│   │   │   ├── model/               # Entités JPA
-│   │   │   ├── repository/          # Repositories JPA
-│   │   │   ├── security/            # JWT & Authentication
-│   │   │   └── service/             # Services métier
-│   │   └── resources/
-│   │       ├── application.properties           # Config principale
-│   │       ├── application-local.properties     # Config locale
-│   │       ├── application-vm.properties        # Config VM
-│   │       ├── application-prod.properties      # Config production
-│   │       └── db/migration/                    # Scripts Flyway
-│   └── target/                      # Fichiers compilés
-│
-├── src/                             # Frontend React
-│   ├── components/                  # Composants réutilisables
-│   ├── contexts/                    # Contexts React (Auth, etc.)
-│   ├── pages/                       # Pages de l'application
-│   ├── services/                    # Services API
-│   └── data/                        # Données statiques
-│
-├── dist/                            # Build frontend (généré)
-│
-├── .env.local                       # Config frontend local
-├── .env.vm                          # Config frontend VM
-├── .env.production                  # Config frontend production
-│
-├── start-local.bat                  # Script Windows - Local
-├── start-vm.bat                     # Script Windows - VM
-├── start-local.sh                   # Script Linux - Local
-├── start-vm.sh                      # Script Linux - VM
-├── stop-vm.sh                       # Script Linux - Arrêt VM
-├── deploy-production.sh             # Script Linux - Production
-│
-├── GUIDE_WINDOWS.md                 # Guide Windows
-├── GUIDE_DEPLOIEMENT.md             # Guide Linux/Mac
-└── README.md                        # Ce fichier
-```
-
----
-
-## 🚀 Démarrage Rapide
-
-### Prérequis
-
-- Java 17+
-- Node.js 18+
-- MySQL 8.0+
-- Maven (inclus via wrapper)
-
-### Installation
-
-1. **Cloner le projet**
-```bash
-git clone <url_du_projet>
-cd cosmetovigilance
-```
-
-2. **Créer la base de données**
-```sql
+# Créer la base de données
 CREATE DATABASE cosmetovigilance;
 ```
 
-3. **Installer les dépendances frontend**
+#### Linux
+```bash
+# Démarrer PostgreSQL
+sudo systemctl start postgresql
+
+# Se connecter
+sudo -u postgres psql
+
+# Créer la base de données
+CREATE DATABASE cosmetovigilance;
+```
+
+### 3. Configuration Backend
+
+Les fichiers de configuration sont dans `backend/src/main/resources/`:
+
+**application-local.properties** (Développement local):
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/cosmetovigilance
+spring.datasource.username=postgres
+spring.datasource.password=votre_mot_de_passe
+server.port=8080
+```
+
+**application-prod.properties** (Production):
+```properties
+spring.datasource.url=jdbc:postgresql://votre-serveur:5432/cosmetovigilance
+spring.datasource.username=user_prod
+spring.datasource.password=${DB_PASSWORD}
+server.port=8080
+```
+
+### 4. Configuration Frontend
+
+Le fichier de configuration est `.env`:
+
+**Pour développement local:**
+```env
+VITE_API_URL=http://localhost:8080/api
+```
+
+**Pour production:**
+```env
+VITE_API_URL=https://votre-domaine.com/api
+```
+
+### 5. Installation des dépendances
+
+#### Frontend
 ```bash
 npm install
 ```
 
-4. **Lancer l'application**
-
-**Windows :** Double-cliquer sur `start-local.bat`
-
-**Linux/Mac :**
-```bash
-chmod +x start-local.sh
-./start-local.sh
-```
-
-5. **Accéder à l'application**
-- Frontend : http://localhost:5173
-- Backend : http://localhost:8080/api
-- Swagger : http://localhost:8080/api/swagger-ui.html
-
----
-
-## 🔐 Configuration
-
-### Fichiers d'environnement
-
-#### Frontend (.env)
-```env
-VITE_API_URL=http://localhost:8080/api
-VITE_APP_URL=http://localhost:5173
-```
-
-#### Backend (application.properties)
-```properties
-# Base de données
-spring.datasource.url=jdbc:mysql://localhost:3306/cosmetovigilance
-spring.datasource.username=root
-spring.datasource.password=votre_mot_de_passe
-
-# JWT
-jwt.secret=votre_cle_secrete
-jwt.expiration-ms=86400000
-
-# CORS
-cors.allowed-origins=http://localhost:5173
-```
-
----
-
-## 📡 API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Inscription
-- `POST /api/auth/login` - Connexion
-
-### Déclarations
-- `GET /api/declarations` - Liste des déclarations
-- `GET /api/declarations/{id}` - Détails d'une déclaration
-- `POST /api/declarations` - Créer une déclaration
-- `PUT /api/declarations/{id}` - Modifier une déclaration
-- `DELETE /api/declarations/{id}` - Supprimer une déclaration
-- `PATCH /api/declarations/{id}/status` - Changer le statut
-
-### Fichiers
-- `POST /api/attachments/upload` - Upload de fichier
-- `GET /api/attachments/{id}` - Télécharger un fichier
-
-**Documentation complète :** http://localhost:8080/api/swagger-ui.html
-
----
-
-## 🧪 Tests
-
-### Backend
+#### Backend
 ```bash
 cd backend
-./mvnw test
+mvn clean install
 ```
 
-### Frontend
+## Démarrage de l'application
+
+### Windows
+
+#### Développement local
+
+**Terminal 1 - Backend:**
+```cmd
+cd backend
+mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+**Terminal 2 - Frontend:**
+```cmd
+npm run dev
+```
+
+#### Production
+
+**Backend:**
+```cmd
+cd backend
+mvnw.cmd clean package
+java -jar target\cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+```
+
+**Frontend:**
+```cmd
+npm run build
+npm run serve
+```
+
+### Linux
+
+#### Développement local
+
+**Terminal 1 - Backend:**
 ```bash
-npm run test
+cd backend
+chmod +x mvnw
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
----
-
-## 🔨 Build
-
-### Développement
+**Terminal 2 - Frontend:**
 ```bash
 npm run dev
 ```
 
-### Production
-```bash
-# Frontend
-npm run build
+#### Production
 
-# Backend
+**Backend:**
+```bash
 cd backend
 ./mvnw clean package
+java -jar target/cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
----
+**Frontend:**
+```bash
+npm run build
+npm run serve
+```
 
-## 📝 Notes de développement
+## Accès à l'application
 
-### Profils Spring Boot
+- **Frontend (dev)**: http://localhost:5173
+- **Frontend (prod)**: http://localhost:3000
+- **Backend API**: http://localhost:8080/api
+- **Documentation API**: http://localhost:8080/swagger-ui.html
 
-Le backend utilise 3 profils différents :
+## Utilisateur de test
 
-- **local** : Développement sur PC local
-- **vm** : Déploiement sur VM réseau
-- **prod** : Production cloud
+- **Email**: sana.amkar@ammps.gov.ma
+- **Mot de passe**: test123
 
-Activer un profil :
+## Structure du projet
+
+```
+project/
+├── backend/                    # Application Spring Boot
+│   ├── src/main/
+│   │   ├── java/              # Code source Java
+│   │   │   └── com/cosmetovigilance/
+│   │   │       ├── config/    # Configuration
+│   │   │       ├── controller/# REST Controllers
+│   │   │       ├── dto/       # Data Transfer Objects
+│   │   │       ├── model/     # Entités JPA
+│   │   │       ├── repository/# Repositories
+│   │   │       ├── security/  # JWT & Security
+│   │   │       └── service/   # Services métier
+│   │   └── resources/
+│   │       ├── application.properties         # Config principale
+│   │       ├── application-local.properties   # Config locale
+│   │       ├── application-prod.properties    # Config production
+│   │       └── db/migration/                  # Scripts SQL
+│   └── pom.xml                # Dépendances Maven
+│
+├── src/                       # Application React
+│   ├── components/            # Composants React
+│   ├── pages/                 # Pages
+│   ├── services/              # Services API
+│   ├── contexts/              # Contextes React
+│   └── data/                  # Données statiques
+│
+├── public/                    # Fichiers statiques
+├── .env                       # Configuration frontend
+└── package.json              # Dépendances npm
+```
+
+## Scripts npm disponibles
+
+- `npm run dev` - Serveur de développement
+- `npm run build` - Build de production
+- `npm run preview` - Prévisualisation du build
+- `npm run lint` - Vérification du code
+- `npm run serve` - Servir l'application compilée
+
+## Scripts Maven disponibles
+
+- `mvn clean install` - Compiler et installer
+- `mvn spring-boot:run` - Démarrer l'application
+- `mvn test` - Exécuter les tests
+- `mvn clean package` - Créer le JAR exécutable
+
+## Environnements supportés
+
+1. **local**: Développement local (localhost)
+2. **prod**: Production
+
+Pour changer d'environnement:
 ```bash
 java -jar app.jar --spring.profiles.active=prod
 ```
 
-### Migrations de base de données
-
-Les migrations Flyway sont dans `backend/src/main/resources/db/migration/`
-
-Créer une nouvelle migration :
-1. Créer un fichier `V8__description.sql`
-2. Ajouter les commandes SQL
-3. Redémarrer l'application
-
----
-
-## 🐛 Dépannage
+## Dépannage
 
 ### Problèmes courants
 
-**Backend ne démarre pas**
-- Vérifier que MySQL est démarré
-- Vérifier les identifiants de connexion
-- Vérifier que le port 8080 est libre
+**PostgreSQL ne démarre pas (Linux):**
+```bash
+sudo systemctl status postgresql
+sudo systemctl start postgresql
+```
 
-**Frontend ne charge pas**
-- Vérifier que le backend est démarré
-- Vérifier le fichier `.env`
-- Vérifier la configuration CORS
+**Port 8080 déjà utilisé:**
+```bash
+# Windows
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
 
-**Erreur de connexion à la base de données**
-- Vérifier que la base `cosmetovigilance` existe
-- Vérifier les credentials dans `application.properties`
-- Tester la connexion : `mysql -u root -p`
+# Linux
+sudo lsof -i :8080
+sudo kill -9 <PID>
+```
 
-Pour plus de détails, consultez les guides de déploiement.
+**Erreur de connexion à la base:**
+- Vérifier que PostgreSQL est démarré
+- Vérifier les credentials dans application-local.properties
+- Vérifier que la base cosmetovigilance existe
 
----
+**Frontend ne se connecte pas au backend:**
+- Vérifier que le backend est démarré sur le port 8080
+- Vérifier l'URL dans le fichier .env
+- Vérifier la configuration CORS dans le backend
 
-## 📄 Licence
-
-Ce projet est privé et confidentiel.
-
----
-
-## 👥 Contact
+## Support
 
 Pour toute question, contactez l'équipe de développement.
-
----
-
-**Fait avec ❤️ pour la cosmetovigilance au Maroc**

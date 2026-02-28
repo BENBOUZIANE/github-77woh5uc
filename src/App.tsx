@@ -3,9 +3,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import CosmetovigillancePage from './pages/CosmetovigillancePage';
-import Test1Page from './pages/Test1Page';
-import Test2Page from './pages/Test2Page';
-import Test3Page from './pages/Test3Page';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import MyDeclarationsPage from './pages/MyDeclarationsPage';
@@ -20,9 +17,6 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/cosmetovigilance" element={<CosmetovigillancePage />} />
-            <Route path="/test1" element={<Test1Page />} />
-            <Route path="/test2" element={<Test2Page />} />
-            <Route path="/test3" element={<Test3Page />} />
             <Route
               path="/dashboard"
               element={
