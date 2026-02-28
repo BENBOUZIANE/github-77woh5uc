@@ -22,6 +22,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const initAuth = async () => {
+      setLoading(false);
+      return;
+
       try {
         if (api.isAuthenticated()) {
           const userData = await api.getCurrentUser();
@@ -31,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Auth init error:', error);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -56,7 +60,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
-      {children}
+      {!loading ? children : (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+            <p className="text-slate-600">Chargement...</p>
+          </div>
+        </div>
+      )}
     </AuthContext.Provider>
   );
 }
