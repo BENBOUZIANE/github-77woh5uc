@@ -4,6 +4,14 @@ Ce guide vous explique comment déployer l'application dans 3 environnements dif
 
 ---
 
+## ⚠️ Important : Choisissez le bon guide
+
+- **Vous utilisez Windows ?** → Consultez **`GUIDE_WINDOWS.md`** pour les instructions Windows
+- **Vous utilisez Linux/Mac ?** → Continuez avec ce guide
+- **Déploiement production ?** → Voir la section "Environnement 3" ci-dessous
+
+---
+
 ## 📋 Table des Matières
 
 1. [Prérequis](#-prérequis)
