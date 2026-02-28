@@ -7,6 +7,23 @@ Application web pour la gestion des déclarations de cosmétovigilance.
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS
 - **Backend**: Spring Boot (Java)
 - **Base de données**: MySQL
+- **Déploiement**: Application unifiée (Frontend + Backend sur port 8080)
+
+### Architecture de Production
+
+```
+http://localhost:8080/
+├── /                    → Frontend (React)
+├── /login              → Frontend (React Router)
+├── /dashboard          → Frontend (React Router)
+├── /cosmetovigilance   → Frontend (React Router)
+├── /declarations       → Frontend (React Router)
+├── /assets/*           → CSS, JS, Images
+└── /api/*              → Backend REST API
+    ├── /api/auth
+    ├── /api/declarations
+    └── /api/attachments
+```
 
 ## Prérequis
 
@@ -109,28 +126,32 @@ mvn clean install
 
 ## Démarrage de l'application
 
-### Déploiement automatisé (recommandé pour la production)
+### Déploiement en Production
 
-Des scripts de déploiement automatisé sont disponibles pour simplifier le processus:
+**IMPORTANT:** L'application a été restructurée pour servir le frontend et le backend depuis le même serveur (port 8080).
+
+Pour un guide complet de déploiement, consultez [DEPLOYMENT.md](DEPLOYMENT.md)
+
+**Déploiement rapide:**
 
 **Linux/Mac:**
 ```bash
 chmod +x deploy.sh
 ./deploy.sh
+cd backend
+java -jar target/cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
 **Windows:**
 ```cmd
 deploy.bat
+cd backend
+java -jar target\cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
-Ces scripts vont:
-1. Builder le frontend
-2. Copier les fichiers dans le dossier static du backend
-3. Builder le backend avec Maven
-4. Afficher les instructions pour lancer l'application
+L'application complète sera accessible sur **http://localhost:8080**
 
-### Déploiement manuel
+### Développement Local
 
 ### Windows
 

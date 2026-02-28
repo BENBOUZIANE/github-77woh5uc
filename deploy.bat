@@ -39,10 +39,16 @@ echo ==========================================
 echo Build terminé avec succès!
 echo ==========================================
 echo.
+echo IMPORTANT: Architecture modifiée
+echo   - Frontend et Backend sont maintenant sur le même serveur
+echo   - Port unique: 8080
+echo   - Frontend: http://localhost:8080/
+echo   - API: http://localhost:8080/api/
+echo.
 echo Pour lancer l'application:
 echo   cd backend
 echo   java -jar target\cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 echo.
-echo L'application sera accessible sur: http://localhost:8080
+echo Consultez DEPLOYMENT.md pour plus d'informations
 echo ==========================================
 pause
