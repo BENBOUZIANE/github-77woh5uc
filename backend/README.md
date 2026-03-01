@@ -103,32 +103,65 @@ Le backend utilise des **profils Spring** ; chaque environnement a son fichier :
 | **vm** | `application-vm.properties` | VM / réseau local avec Nginx (voir [README-VM.md](../README-VM.md)) |
 | **prod** | `application-prod.properties` | Production Linux (voir [README-PROD.md](../README-PROD.md)) |
 
-Lancer avec un profil :
+### Lancer avec un profil
+
+**IMPORTANT** : Le mot de passe de la base de données est maintenant **chiffré avec AES-256**. Vous devez définir la variable d'environnement `JASYPT_ENCRYPTOR_PASSWORD` pour démarrer l'application.
 
 ```bash
-# Local
+# Local (Windows)
+set JASYPT_ENCRYPTOR_PASSWORD=cosmetoKey
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 
-# VM
+# Local (Linux/Mac)
+export JASYPT_ENCRYPTOR_PASSWORD=cosmetoKey
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+
+# VM (Windows)
+set JASYPT_ENCRYPTOR_PASSWORD=cosmetoKey
+java -jar target/cosmetovigilance-backend-1.0.0.jar --spring.profiles.active=vm
+
+# VM (Linux/Mac)
+export JASYPT_ENCRYPTOR_PASSWORD=cosmetoKey
 java -jar target/cosmetovigilance-backend-1.0.0.jar --spring.profiles.active=vm
 
 # Production
-java -jar target/cosmetovigilance-backend-1.0.0.jar --spring.profiles.active=prod
+JASYPT_ENCRYPTOR_PASSWORD=<votre_cle_production> java -jar target/cosmetovigilance-backend-1.0.0.jar --spring.profiles.active=prod
 ```
 
-Exemple pour le **profil local** dans `src/main/resources/application-local.properties` :
+### Mot de passe de la Base de Données (Chiffrement AES-256)
+
+Le mot de passe `test1234` est maintenant **chiffré** dans tous les fichiers de configuration avec **Jasypt** et l'algorithme **AES-256** :
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/cosmetovigilance?...
-spring.datasource.username=root
-spring.datasource.password=test1234
+spring.datasource.password=ENC(JCwGHLjP0Y8yN2kVxRQzMw==)
 ```
 
-**Mot de passe DB (profils local et vm)**  
-- Par défaut le mot de passe est en **clair** (`test1234`) pour que la config fonctionne sans étape supplémentaire.
-- Pour le **chiffrer** (optionnel) : lancer `mvn compile exec:java -Dexec.mainClass=com.cosmetovigilance.util.EncryptPasswordUtil -Dexec.args="cosmetoKey test1234"`, copier la ligne `spring.datasource.password=ENC(...)` affichée dans le fichier, et au démarrage définir `JASYPT_ENCRYPTOR_PASSWORD=cosmetoKey`.
+**Clé de chiffrement** : `cosmetoKey` (à définir dans `JASYPT_ENCRYPTOR_PASSWORD`)
 
-En **production**, la configuration passe par des variables d'environnement (voir `application-prod.properties` et [README-PROD.md](../README-PROD.md)).
+#### Générer un nouveau mot de passe chiffré
+
+Si vous souhaitez changer le mot de passe de la base de données :
+
+**Windows :**
+```cmd
+encrypt-password.cmd <cle_jasypt> <nouveau_mot_de_passe>
+```
+
+**Linux/Mac :**
+```bash
+./encrypt-password.sh <cle_jasypt> <nouveau_mot_de_passe>
+```
+
+Exemple :
+```bash
+./encrypt-password.sh cosmetoKey monNouveauPassword
+```
+
+Le script affichera la valeur chiffrée à copier dans les fichiers de configuration.
+
+**Documentation complète** : Consultez [CHIFFREMENT-PASSWORD.md](CHIFFREMENT-PASSWORD.md) et [SECURITE.md](SECURITE.md)
+
+En **production**, utilisez une clé de chiffrement **différente et forte** !
 
 ## Running the Application
 
@@ -170,11 +203,21 @@ All declaration endpoints require Bearer token authentication.
 
 ## Security
 
+### JWT Authentication
+
 The API uses JWT (JSON Web Tokens) for authentication. Include the token in the Authorization header:
 
 ```
 Authorization: Bearer <your-jwt-token>
 ```
+
+### Database Password Encryption
+
+Le mot de passe de la base de données est chiffré avec **Jasypt** (AES-256). Pour plus d'informations :
+- [CHIFFREMENT-PASSWORD.md](CHIFFREMENT-PASSWORD.md) - Guide complet du chiffrement
+- [SECURITE.md](SECURITE.md) - Documentation de sécurité générale
+
+**Important** : En production, changez la clé de chiffrement Jasypt et la clé JWT !
 
 ## Database Migrations
 
