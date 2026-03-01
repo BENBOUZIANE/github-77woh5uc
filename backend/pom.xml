@@ -94,6 +94,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Jasypt : chiffrement/déchiffrement du mot de passe DB (utilitaire + déchiffrement au démarrage) -->
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
+            <version>1.9.3</version>
+        </dependency>
+
         <!-- Spring Boot Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -121,6 +128,14 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.cosmetovigilance.util.EncryptPasswordUtil</mainClass>
                 </configuration>
             </plugin>
         </plugins>

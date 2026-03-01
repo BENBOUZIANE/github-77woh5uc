@@ -95,13 +95,40 @@ backend/
 
 ## Configuration
 
-Update `src/main/resources/application.properties` with your database credentials:
+Le backend utilise des **profils Spring** ; chaque environnement a son fichier :
+
+| Profil | Fichier | Usage |
+|--------|---------|--------|
+| **local** | `application-local.properties` | Tests sur votre PC (voir [README-LOCAL.md](../README-LOCAL.md) à la racine) |
+| **vm** | `application-vm.properties` | VM / réseau local avec Nginx (voir [README-VM.md](../README-VM.md)) |
+| **prod** | `application-prod.properties` | Production Linux (voir [README-PROD.md](../README-PROD.md)) |
+
+Lancer avec un profil :
+
+```bash
+# Local
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+
+# VM
+java -jar target/cosmetovigilance-backend-1.0.0.jar --spring.profiles.active=vm
+
+# Production
+java -jar target/cosmetovigilance-backend-1.0.0.jar --spring.profiles.active=prod
+```
+
+Exemple pour le **profil local** dans `src/main/resources/application-local.properties` :
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/cosmetovigilance?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+spring.datasource.url=jdbc:mysql://localhost:3306/cosmetovigilance?...
 spring.datasource.username=root
-spring.datasource.password=root
+spring.datasource.password=test1234
 ```
+
+**Mot de passe DB (profils local et vm)**  
+- Par défaut le mot de passe est en **clair** (`test1234`) pour que la config fonctionne sans étape supplémentaire.
+- Pour le **chiffrer** (optionnel) : lancer `mvn compile exec:java -Dexec.mainClass=com.cosmetovigilance.util.EncryptPasswordUtil -Dexec.args="cosmetoKey test1234"`, copier la ligne `spring.datasource.password=ENC(...)` affichée dans le fichier, et au démarrage définir `JASYPT_ENCRYPTOR_PASSWORD=cosmetoKey`.
+
+En **production**, la configuration passe par des variables d'environnement (voir `application-prod.properties` et [README-PROD.md](../README-PROD.md)).
 
 ## Running the Application
 
@@ -120,14 +147,9 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-The API will be available at `http://localhost:8080/api`
+The API will be available at `http://localhost:8080/api` (with default config).
 
-## API Documentation
-
-Once the application is running, access the Swagger UI documentation at:
-```
-http://localhost:8081/api/swagger-ui.html
-```
+Swagger UI (when the profile enables it): `http://localhost:8080/api/swagger-ui.html`
 
 ## API Endpoints
 

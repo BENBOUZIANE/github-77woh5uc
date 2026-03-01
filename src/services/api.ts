@@ -1,5 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
-
+const API_URL = import.meta.env.VITE_API_URL ;
+console.log('test',API_URL )
 interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -25,14 +25,29 @@ class ApiService {
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
-    if (!response.ok) {
-      const error: ApiError = await response.json().catch(() => ({}));
-      throw new Error(error.error || error.message || 'An error occurred');
+    const encodingHeader = response.headers.get('X-Response-Encoded');
+    const text = await response.text();
+
+    let result: unknown;
+    if (encodingHeader === 'base64') {
+      try {
+        const wrapped = JSON.parse(text) as { e?: string };
+        const decoded = wrapped?.e ? atob(wrapped.e) : text;
+        result = JSON.parse(decoded) as unknown;
+      } catch {
+        result = text ? (JSON.parse(text) as unknown) : {};
+      }
+    } else {
+      result = text ? (JSON.parse(text) as unknown) : {};
     }
-    const result = await response.json();
-    // Backend wraps payload in { success, message, data }; fallback to raw object otherwise
+
+    if (!response.ok) {
+      const err = result as ApiError;
+      throw new Error(err?.error ?? err?.message ?? 'An error occurred');
+    }
+
     if (result && typeof result === 'object' && 'data' in result) {
-      return result.data as T;
+      return (result as { data: T }).data;
     }
     return result as T;
   }

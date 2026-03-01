@@ -2,276 +2,71 @@
 
 Application web pour la gestion des déclarations de cosmétovigilance.
 
-## Architecture
+## Stack
 
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
-- **Backend**: Spring Boot (Java)
-- **Base de données**: MySQL
+- **Frontend** : React + TypeScript + Vite
+- **Backend** : Spring Boot (Java 17)
+- **Base de données** : MySQL 8
 
-## Prérequis
+---
 
-### Outils nécessaires (Windows et Linux)
+## Quel environnement utiliser ?
 
-1. **Node.js** (version 18 ou supérieure)
-   - Windows: https://nodejs.org/
-   - Linux: `sudo apt install nodejs npm` ou `sudo dnf install nodejs npm`
+| Environnement | Fichier de config backend | Frontend | Serveur | Guide |
+|---------------|---------------------------|----------|---------|--------|
+| **Tests locaux** (votre PC) | `application-local.properties` | Vite (port 5137) | — | [README-LOCAL.md](README-LOCAL.md) |
+| **VM / réseau local** (Windows) | `application-vm.properties` | Build + Nginx | Windows + Nginx | [README-VM.md](README-VM.md) |
+| **Production** (Linux) | `application-prod.properties` | Build + Nginx | Linux + Nginx | [README-PROD.md](README-PROD.md) |
 
-2. **Java JDK** (version 17 ou supérieure)
-   - Windows: https://www.oracle.com/java/technologies/downloads/
-   - Linux: `sudo apt install openjdk-17-jdk` ou `sudo dnf install java-17-openjdk`
+---
 
-3. **MySQL** (version 8.0 ou supérieure)
-   - Windows: https://dev.mysql.com/downloads/installer/
-   - Linux: `sudo apt install mysql-server` ou `sudo dnf install mysql-server`
+## Démarrage rapide (local, Windows)
 
-4. **Maven** (version 3.8 ou supérieure)
-   - Windows: https://maven.apache.org/download.cgi (ajouter au PATH)
-   - Linux: `sudo apt install maven` ou `sudo dnf install maven`
+1. Copier la config frontend : créer **`.env.local`** (voir `.env.example` pour les variables) pour le dev local.
+2. Configurer la base dans `backend/src/main/resources/application-local.properties`
+3. **Backend** : `cd backend && mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local`
+4. **Frontend** : `npm install && npm run dev` → http://localhost:5137
 
-## Installation
+Détails et dépannage : [README-LOCAL.md](README-LOCAL.md).
 
-### 1. Cloner le projet
-
-```bash
-git clone <url-du-projet>
-cd project
-```
-
-### 2. Configuration de la base de données MySQL
-
-#### Windows
-```cmd
-# Se connecter à MySQL
-mysql -u root -p
-
-# Créer la base de données
-CREATE DATABASE cosmetovigilance;
-```
-
-#### Linux
-```bash
-# Démarrer MySQL
-sudo systemctl start mysql
-
-# Se connecter
-mysql -u root -p
-
-# Créer la base de données
-CREATE DATABASE cosmetovigilance;
-```
-
-### 3. Configuration Backend
-
-Les fichiers de configuration sont dans `backend/src/main/resources/`:
-
-**application-local.properties** (Développement local):
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/cosmetovigilance
-spring.datasource.username=root
-spring.datasource.password=votre_mot_de_passe
-server.port=8080
-```
-
-**application-prod.properties** (Production):
-```properties
-spring.datasource.url=jdbc:mysql://votre-serveur:3306/cosmetovigilance
-spring.datasource.username=user_prod
-spring.datasource.password=${DB_PASSWORD}
-server.port=8080
-```
-
-### 4. Configuration Frontend
-
-Le fichier de configuration est `.env`:
-
-**Pour développement local:**
-```env
-VITE_API_URL=http://localhost:8080/api
-```
-
-**Pour production:**
-```env
-VITE_API_URL=https://votre-domaine.com/api
-```
-
-### 5. Installation des dépendances
-
-#### Frontend
-```bash
-npm install
-```
-
-#### Backend
-```bash
-cd backend
-mvn clean install
-```
-
-## Démarrage de l'application
-
-### Windows
-
-#### Développement local
-
-**Terminal 1 - Backend:**
-```cmd
-cd backend
-mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
-```
-
-**Terminal 2 - Frontend:**
-```cmd
-npm run dev
-```
-
-#### Production
-
-**Backend:**
-```cmd
-cd backend
-mvnw.cmd clean package
-java -jar target\cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
-```
-
-**Frontend:**
-```cmd
-npm run build
-npm run serve
-```
-
-### Linux
-
-#### Développement local
-
-**Terminal 1 - Backend:**
-```bash
-cd backend
-chmod +x mvnw
-./mvnw spring-boot:run -Dspring-boot.run.profiles=local
-```
-
-**Terminal 2 - Frontend:**
-```bash
-npm run dev
-```
-
-#### Production
-
-**Backend:**
-```bash
-cd backend
-./mvnw clean package
-java -jar target/cosmetovigilance-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
-```
-
-**Frontend:**
-```bash
-npm run build
-npm run serve
-```
-
-## Accès à l'application
-
-- **Frontend (dev)**: http://localhost:5173
-- **Frontend (prod)**: http://localhost:3000
-- **Backend API**: http://localhost:8080/api
-- **Documentation API**: http://localhost:8080/swagger-ui.html
-
-## Utilisateur de test
-
-- **Email**: sana.amkar@ammps.gov.ma
-- **Mot de passe**: test123
+---
 
 ## Structure du projet
 
 ```
 project/
-├── backend/                    # Application Spring Boot
-│   ├── src/main/
-│   │   ├── java/              # Code source Java
-│   │   │   └── com/cosmetovigilance/
-│   │   │       ├── config/    # Configuration
-│   │   │       ├── controller/# REST Controllers
-│   │   │       ├── dto/       # Data Transfer Objects
-│   │   │       ├── model/     # Entités JPA
-│   │   │       ├── repository/# Repositories
-│   │   │       ├── security/  # JWT & Security
-│   │   │       └── service/   # Services métier
-│   │   └── resources/
-│   │       ├── application.properties         # Config principale
-│   │       ├── application-local.properties   # Config locale
-│   │       ├── application-prod.properties    # Config production
-│   │       └── db/migration/                  # Scripts SQL
-│   └── pom.xml                # Dépendances Maven
-│
-├── src/                       # Application React
-│   ├── components/            # Composants React
-│   ├── pages/                 # Pages
-│   ├── services/              # Services API
-│   ├── contexts/              # Contextes React
-│   └── data/                  # Données statiques
-│
-├── public/                    # Fichiers statiques
-├── .env                       # Configuration frontend
-└── package.json              # Dépendances npm
+├── backend/                          # Spring Boot
+│   ├── src/main/resources/
+│   │   ├── application.properties    # Config par défaut
+│   │   ├── application-local.properties   # Profil local
+│   │   ├── application-vm.properties      # Profil VM / réseau
+│   │   └── application-prod.properties    # Profil production
+│   └── pom.xml
+├── src/                              # React (Vite)
+├── public/
+├── .env.example                      # Modèle config front (port, API, CSP)
+├── README-LOCAL.md                   # Guide démarrage local
+├── README-VM.md                      # Guide VM / réseau (Windows + Nginx)
+├── README-PROD.md                   # Guide production (Linux + Nginx)
+└── SECURITY-SETUP.md                # (supprimé ; voir en-têtes dans nginx-security-headers.conf)
 ```
 
-## Scripts npm disponibles
+---
 
-- `npm run dev` - Serveur de développement
-- `npm run build` - Build de production
-- `npm run preview` - Prévisualisation du build
-- `npm run lint` - Vérification du code
-- `npm run serve` - Servir l'application compilée
+## Prérequis communs
 
-## Scripts Maven disponibles
+- **Node.js** 18+
+- **Java JDK** 17+
+- **Maven** 3.8+
+- **MySQL** 8+
 
-- `mvn clean install` - Compiler et installer
-- `mvn spring-boot:run` - Démarrer l'application
-- `mvn test` - Exécuter les tests
-- `mvn clean package` - Créer le JAR exécutable
+Pour Nginx (VM / prod) : voir les README dédiés.
 
-## Environnements supportés
+---
 
-1. **local**: Développement local (localhost)
-2. **prod**: Production
+## Documentation
 
-Pour changer d'environnement:
-```bash
-java -jar app.jar --spring.profiles.active=prod
-```
-
-## Dépannage
-
-### Problèmes courants
-
-**MySQL ne démarre pas (Linux):**
-```bash
-sudo systemctl status mysql
-sudo systemctl start mysql
-```
-
-**Port 8080 déjà utilisé:**
-```bash
-# Windows
-netstat -ano | findstr :8080
-taskkill /PID <PID> /F
-
-# Linux
-sudo lsof -i :8080
-sudo kill -9 <PID>
-```
-
-**Erreur de connexion à la base:**
-- Vérifier que MySQL est démarré
-- Vérifier les credentials dans application-local.properties
-- Vérifier que la base cosmetovigilance existe
-
-**Frontend ne se connecte pas au backend:**
-- Vérifier que le backend est démarré sur le port 8080
-- Vérifier l'URL dans le fichier .env
-- Vérifier la configuration CORS dans le backend
-
-## Support
-
-Pour toute question, contactez l'équipe de développement.
+- [README-LOCAL.md](README-LOCAL.md) — Lancer en local avec Vite (port 5137), config `application-local.properties`
+- [README-VM.md](README-VM.md) — VM / réseau local (Windows), Nginx, start/stop
+- [README-PROD.md](README-PROD.md) — Production (Linux), Nginx, systemctl
+- [backend/README.md](backend/README.md) — Détails API et structure backend

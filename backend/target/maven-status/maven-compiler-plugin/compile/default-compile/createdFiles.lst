@@ -2,6 +2,7 @@ com\cosmetovigilance\config\WebConfig.class
 com\cosmetovigilance\service\AuthService.class
 com\cosmetovigilance\model\PersonneExposee.class
 com\cosmetovigilance\model\DeclarationStatus.class
+com\cosmetovigilance\config\BufferingResponseWrapper$1.class
 com\cosmetovigilance\dto\LoginRequest.class
 com\cosmetovigilance\dto\UpdateCommentaireAnmpsRequest.class
 com\cosmetovigilance\repository\DeclarationRepository.class
@@ -10,11 +11,16 @@ com\cosmetovigilance\repository\RepresentantLegalRepository.class
 com\cosmetovigilance\security\JwtAuthenticationFilter.class
 com\cosmetovigilance\model\MedicamentProduitSimultanement.class
 com\cosmetovigilance\repository\PersonneExposeeRepository.class
+com\cosmetovigilance\config\JasyptDecryptor.class
 com\cosmetovigilance\dto\EffetIndesirableDto.class
 com\cosmetovigilance\service\CustomUserDetailsService.class
 com\cosmetovigilance\model\Declaration.class
+com\cosmetovigilance\config\DecryptDataSourcePasswordPostProcessor.class
+com\cosmetovigilance\config\ApiResponseEncodingFilter.class
+com\cosmetovigilance\config\BufferingResponseWrapper.class
 com\cosmetovigilance\model\Utilisateur.class
 com\cosmetovigilance\repository\EffetIndesirableRepository.class
+com\cosmetovigilance\config\SecurityHeadersConfig.class
 com\cosmetovigilance\model\ProduitSuspecte.class
 com\cosmetovigilance\dto\AuthResponse.class
 com\cosmetovigilance\security\JwtTokenProvider.class
@@ -49,6 +55,7 @@ com\cosmetovigilance\config\OpenApiConfig.class
 com\cosmetovigilance\model\PriseChargeMedicale.class
 com\cosmetovigilance\model\AllergiesConnues.class
 com\cosmetovigilance\dto\PriseChargeMedicaleDto.class
+com\cosmetovigilance\util\EncryptPasswordUtil.class
 com\cosmetovigilance\repository\DeclarantRepository.class
 com\cosmetovigilance\config\SecurityConfig.class
 com\cosmetovigilance\repository\AttachmentRepository.class

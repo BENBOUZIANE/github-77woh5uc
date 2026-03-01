@@ -48,7 +48,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between py-3">
             <div className="flex items-center space-x-4">
               <img
-                src="/Designer_(2)_(1)_(1).png"
+                src="/logo.png"
                 alt="Logo"
                 className="w-16 h-16 object-contain"
               />
