@@ -18,14 +18,9 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      console.log('📝 Démarrage du handleSubmit avec email:', email);
       await signIn(email, password);
-      console.log('✅ signIn terminé avec succès');
-      console.log('📍 Navigation vers /dashboard');
       navigate('/dashboard');
-      console.log('📍 Navigate appelé');
     } catch (err: any) {
-      console.error('❌ Erreur dans handleSubmit:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {
       setLoading(false);

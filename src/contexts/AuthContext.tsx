@@ -23,18 +23,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        console.log('🔐 Initialisation de l\'authentification...');
-        console.log('🔐 Token présent:', !!localStorage.getItem('access_token'));
         if (api.isAuthenticated()) {
-          console.log('🔐 Utilisateur authentifié, récupération des données...');
           const userData = await api.getCurrentUser();
-          console.log('🔐 Données utilisateur reçues:', userData);
           setUser(userData);
-        } else {
-          console.log('ℹ️ Aucun token d\'authentification trouvé');
         }
       } catch (error) {
-        console.error('❌ Erreur d\'initialisation auth:', error);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
       } finally {
@@ -47,14 +40,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('🔐 Démarrage du login...');
       const response = await api.login(email, password);
-      console.log('🔐 Réponse du login reçue:', response);
-      console.log('🔐 User dans la réponse:', response.user);
       setUser(response.user);
-      console.log('✅ User setUser avec succès');
     } catch (error) {
-      console.error('❌ Erreur lors du login:', error);
       throw error;
     }
   };

@@ -113,7 +113,7 @@ export default function DashboardPage() {
       setStats(statsByType);
       setTotalStats(totals);
     } catch (error) {
-      console.error('Error fetching statistics:', error);
+      // Erreur silencieuse
     } finally {
       setLoading(false);
     }
@@ -124,7 +124,7 @@ export default function DashboardPage() {
       await signOut();
       navigate('/');
     } catch (error) {
-      console.error('Error signing out:', error);
+      // Erreur silencieuse
     }
   };
 

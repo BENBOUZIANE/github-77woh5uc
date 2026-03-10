@@ -66,7 +66,15 @@ Pour Nginx (VM / prod) : voir les README dédiés.
 
 ## Documentation
 
-- [README-LOCAL.md](README-LOCAL.md) — Lancer en local avec Vite (port 5137), config `application-local.properties`
-- [README-VM.md](README-VM.md) — VM / réseau local (Windows), Nginx, start/stop
-- [README-PROD.md](README-PROD.md) — Production (Linux), Nginx, systemctl
-- [backend/README.md](backend/README.md) — Détails API et structure backend
+### Guides de Déploiement (NOUVEAUX - Complets)
+- **[README-DEPLOY-LOCAL.md](README-DEPLOY-LOCAL.md)** — Développement local (votre PC)
+- **[README-DEPLOY-VM.md](README-DEPLOY-VM.md)** — Déploiement sur VM réseau local avec Nginx
+- **[README-DEPLOY-SERVEUR.md](README-DEPLOY-SERVEUR.md)** — Déploiement serveur production avec HTTPS
+
+### Guides Techniques
+- [README-LOCAL.md](README-LOCAL.md) — Configuration locale détaillée
+- [README-VM.md](README-VM.md) — Configuration VM Windows/Nginx
+- [README-PROD.md](README-PROD.md) — Configuration production Linux
+- [backend/README.md](backend/README.md) — Documentation API backend
+- [backend/CHIFFREMENT-PASSWORD.md](backend/CHIFFREMENT-PASSWORD.md) — Chiffrement AES-256
+- [backend/SECURITE.md](backend/SECURITE.md) — Sécurité et bonnes pratiques

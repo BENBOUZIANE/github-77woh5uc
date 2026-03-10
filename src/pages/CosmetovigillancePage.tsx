@@ -381,7 +381,6 @@ export default function CosmetovigillancePage() {
         declarationPayload.representantLegal = formData.representantLegal;
       }
 
-      console.log('📝 Payload envoyé au serveur:', JSON.stringify(declarationPayload, null, 2));
       const declaration = await api.createDeclaration(declarationPayload) as { id: string };
 
       // Upload du document d'enregistrement même sans connexion
@@ -399,7 +398,6 @@ export default function CosmetovigillancePage() {
       alert('Déclaration soumise avec succès!');
       navigate('/');
     } catch (error) {
-      console.error('Error submitting form:', error);
       alert('Erreur lors de la soumission du formulaire. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);
