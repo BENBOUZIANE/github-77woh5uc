@@ -10,10 +10,8 @@ public class ProfessionnelSanteDto {
     @NotBlank(message = "Profession is required")
     private String profession;
 
-    @NotBlank(message = "Structure is required")
     private String structure;
 
-    @NotBlank(message = "Ville is required")
     private String ville;
 }
 

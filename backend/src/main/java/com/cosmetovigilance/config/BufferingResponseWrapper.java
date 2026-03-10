@@ -12,16 +12,31 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Wrapper qui met en buffer le corps de la réponse pour permettre un encodage (ex. base64) après le filtre.
+ * Wrapper qui met en buffer le corps de la réponse pour permettre un encodage (ex. AES) après le filtre.
  */
 public class BufferingResponseWrapper extends HttpServletResponseWrapper {
 
     private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     private ServletOutputStream outputStream;
     private PrintWriter writer;
+    private String cachedContentType;
 
     public BufferingResponseWrapper(HttpServletResponse response) {
         super(response);
+    }
+
+    @Override
+    public void setContentType(String type) {
+        super.setContentType(type);
+        this.cachedContentType = type;
+    }
+
+    @Override
+    public String getContentType() {
+        if (cachedContentType != null) {
+            return cachedContentType;
+        }
+        return super.getContentType();
     }
 
     @Override
@@ -68,6 +83,10 @@ public class BufferingResponseWrapper extends HttpServletResponseWrapper {
     public byte[] getBuffer() throws IOException {
         if (writer != null) {
             writer.flush();
+            writer.close();
+        }
+        if (outputStream != null) {
+            outputStream.flush();
         }
         return buffer.toByteArray();
     }

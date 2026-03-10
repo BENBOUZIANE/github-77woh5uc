@@ -59,9 +59,12 @@ public class SecurityHeadersConfig implements Filter {
         if (!StringUtils.hasText(allowedHttpHosts)) {
             return base;
         }
+        String privateIpPattern = "^(10\\.|172\\.(1[6-9]|2\\d|3[0-1])\\.|192\\.168\\.)";
         String hosts = Arrays.stream(allowedHttpHosts.split(","))
                 .map(String::trim)
                 .filter(StringUtils::hasText)
+                // drop bare private network IPs to avoid leaking internal addresses
+                .filter(h -> !h.matches(privateIpPattern))
                 .map(h -> "http://" + h + ":" + serverPort)
                 .collect(Collectors.joining(" "));
         if (StringUtils.hasText(hosts)) {

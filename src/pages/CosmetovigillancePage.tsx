@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Save, Plus, X, Upload, Image as ImageIcon, File } from 'lucide-react';
+import { ArrowLeft, Sparkles, Save, Plus, X, Upload, Image as ImageIcon, File, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { villesMaroc } from '../data/villesMaroc';
@@ -322,20 +322,18 @@ export default function CosmetovigillancePage() {
 
     setIsSubmitting(true);
     try {
-      const declarationPayload = {
+      const declarationPayload: any = {
         utilisateurType: formData.utilisateurType === 'autre' && formData.utilisateurTypeAutre
           ? formData.utilisateurTypeAutre
           : formData.utilisateurType,
         declarant: formData.declarant,
-        professionnelSante: formData.professionnelSante,
-        representantLegal: formData.representantLegal,
         personneExposee: {
           ...formData.personneExposee,
           allergies: formData.allergiesConnues,
           antecedents: formData.antecedentsMedicaux,
           medicaments: formData.medicamentsSimultanes,
         },
-        effetsIndesirables: formData.effetIndesirable
+        effetsIndesirables: formData.effetIndesirable?.descriptionSymptomes
           ? [{
               localisation: formData.effetIndesirable.localisation,
               descriptionSymptomes: formData.effetIndesirable.descriptionSymptomes,
@@ -346,7 +344,7 @@ export default function CosmetovigillancePage() {
               evolutionEffet: formData.effetIndesirable.evolutionEffet,
             }]
           : [],
-        produitsSuspectes: formData.produitSuspecte
+        produitsSuspectes: formData.produitSuspecte?.nomCommercial
           ? [{
               nomCommercial: formData.produitSuspecte.nomCommercial,
               marque: formData.produitSuspecte.marque,
@@ -373,7 +371,18 @@ export default function CosmetovigillancePage() {
         commentaire: formData.commentaire,
       };
 
-      const declaration = await api.createDeclaration(declarationPayload);
+      // Ajouter professionnelSante seulement si c'est un professionnel ET les champs sont remplis
+      if (formData.utilisateurType === 'professionnel' && formData.professionnelSante?.profession) {
+        declarationPayload.professionnelSante = formData.professionnelSante;
+      }
+
+      // Ajouter representantLegal seulement si c'est un représentant ET les champs sont remplis
+      if (formData.utilisateurType === 'representant_legal' && formData.representantLegal?.nomEtablissement) {
+        declarationPayload.representantLegal = formData.representantLegal;
+      }
+
+      console.log('📝 Payload envoyé au serveur:', JSON.stringify(declarationPayload, null, 2));
+      const declaration = await api.createDeclaration(declarationPayload) as { id: string };
 
       // Upload du document d'enregistrement même sans connexion
       if (documentEnregistrement && (formData.utilisateurType === 'professionnel' || formData.utilisateurType === 'representant_legal')) {
@@ -1380,7 +1389,8 @@ export default function CosmetovigillancePage() {
                 <input
                   type="date"
                   value={formData.produitSuspecte.arretUtilisation}
-                  max={formData.produitSuspecte.dateDebutUtilisation || new Date().toISOString().split('T')[0]}
+                  min={formData.produitSuspecte.dateDebutUtilisation || new Date().toISOString().split('T')[0]}
+                  max={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, arretUtilisation: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
@@ -1520,6 +1530,53 @@ export default function CosmetovigillancePage() {
 
   return (
     <div className="min-h-screen">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative flex items-center justify-between py-3">
+            <div className="flex items-center space-x-4">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-16 h-16 object-contain"
+              />
+              <div className="flex flex-col">
+                <h2 className="text-lg font-bold text-slate-900">Vigilances Sanitaires</h2>
+                <p className="text-sm text-slate-600">Gestion des Risques</p>
+              </div>
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <img
+                src="/logo_ammps.png"
+                alt="Logo AMMPS"
+                className="w-40 h-40 object-contain"
+              />
+            </div>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-slate-600">Bienvenue, {user.email}</span>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md hover:shadow-lg text-sm"
+                >
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Tableau de bord</span>
+                  <span className="sm:hidden">Dashboard</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md hover:shadow-md text-sm"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Connexion</span>
+                <span className="sm:hidden">Login</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <button
           onClick={() => navigate('/')}

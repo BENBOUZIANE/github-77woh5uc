@@ -14,7 +14,6 @@ public class ProduitSuspecteDto {
     @NotBlank(message = "Marque is required")
     private String marque;
 
-    @NotBlank(message = "Fabricant is required")
     private String fabricant;
 
     @NotBlank(message = "Type produit is required")

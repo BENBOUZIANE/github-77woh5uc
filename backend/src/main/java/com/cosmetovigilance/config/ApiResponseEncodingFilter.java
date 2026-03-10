@@ -1,5 +1,6 @@
 package com.cosmetovigilance.config;
 
+import com.cosmetovigilance.util.AesEncryptionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,23 +12,25 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Map;
 
 /**
- * Encode le corps JSON des réponses API en base64 (clé "e") pour que l'inspecteur
- * navigateur n'affiche pas le JSON en clair. Le frontend décode si l'en-tête X-Response-Encoded est présent.
- * Activé via app.api.encode-responses=true.
+ * Chiffre le corps JSON des réponses API avec AES (clé "e") pour que l'inspecteur
+ * navigateur n'affiche pas le JSON en clair. Le frontend déchiffre si l'en-tête X-Response-Encrypted est présent.
+ * Activé via app.api.encrypt-responses=true.
  */
 @Component
-@Order(Ordered.LOWEST_PRECEDENCE - 10)
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class ApiResponseEncodingFilter implements Filter {
 
-    private static final String HEADER_ENCODED = "X-Response-Encoded";
-    private static final String ENCODING_VALUE = "base64";
+    private static final String HEADER_ENCRYPTED = "X-Response-Encrypted";
+    private static final String ENCRYPTION_VALUE = "true";
 
-    @Value("${app.api.encode-responses:false}")
-    private boolean encodeResponses;
+    @Value("${app.api.encrypt-responses:false}")
+    private boolean encryptResponses;
+
+    @Value("${app.encryption.key:your-32-char-secret-key-here!!}")
+    private String encryptionKey;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -35,7 +38,7 @@ public class ApiResponseEncodingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        if (!encodeResponses || !(response instanceof HttpServletResponse)) {
+        if (!encryptResponses || !(response instanceof HttpServletResponse)) {
             chain.doFilter(request, response);
             return;
         }
@@ -46,25 +49,63 @@ public class ApiResponseEncodingFilter implements Filter {
         chain.doFilter(request, wrapper);
 
         byte[] body = wrapper.getBuffer();
+        System.out.println("🔒 ApiResponseEncodingFilter - Body length: " + body.length);
+
         if (body.length == 0) {
+            System.out.println("🔒 ApiResponseEncodingFilter - Empty body, skipping encryption");
             return;
         }
 
-        String contentType = resp.getContentType();
+        String contentType = wrapper.getContentType();
+        System.out.println("🔒 ApiResponseEncodingFilter - Content-Type: " + contentType);
+
         if (contentType == null || !contentType.toLowerCase().contains(MediaType.APPLICATION_JSON_VALUE)) {
+            System.out.println("🔒 ApiResponseEncodingFilter - Not JSON, skipping encryption");
             resp.getOutputStream().write(body);
+            resp.getOutputStream().flush();
             return;
         }
 
-        String bodyStr = new String(body, StandardCharsets.UTF_8);
-        String encoded = Base64.getEncoder().encodeToString(bodyStr.getBytes(StandardCharsets.UTF_8));
-        String wrapped = objectMapper.writeValueAsString(Map.of("e", encoded));
+        try {
+            String bodyStr = new String(body, StandardCharsets.UTF_8);
+            System.out.println("🔒 ApiResponseEncodingFilter - Original body (first 100 chars): " + bodyStr.substring(0, Math.min(100, bodyStr.length())));
 
-        resp.resetBuffer();
-        resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        resp.setHeader(HEADER_ENCODED, ENCODING_VALUE);
-        resp.setContentLength(wrapped.getBytes(StandardCharsets.UTF_8).length);
-        resp.getOutputStream().write(wrapped.getBytes(StandardCharsets.UTF_8));
+            String encrypted = AesEncryptionUtil.encrypt(bodyStr, encryptionKey);
+            System.out.println("🔒 ApiResponseEncodingFilter - Encrypted successfully, length: " + encrypted.length());
+
+            // Structure: {"encrypted": true, "data": "...chifferé..."}
+            String wrapped = objectMapper.writeValueAsString(Map.of(
+                    "encrypted", true,
+                    "data", encrypted
+            ));
+            byte[] encryptedBody = wrapped.getBytes(StandardCharsets.UTF_8);
+
+            // Définir les headers AVANT l'écriture
+            resp.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8");
+            resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            resp.setContentLength(encryptedBody.length);
+            resp.setHeader(HEADER_ENCRYPTED, ENCRYPTION_VALUE);
+
+            System.out.println("🔒 ApiResponseEncodingFilter - Headers définis et réponse à envoyer: " + wrapped.substring(0, Math.min(100, wrapped.length())));
+
+            // Écrire le contenu
+            resp.getOutputStream().write(encryptedBody);
+            resp.getOutputStream().flush();
+            resp.flushBuffer();
+            System.out.println("🔒 ApiResponseEncodingFilter - Response encrypted and sent");
+        } catch (Exception e) {
+            // En cas d'erreur de chiffrement, log et essaie de retourner la réponse brute
+            System.err.println("❌ Erreur lors du chiffrement de la réponse: " + e.getMessage());
+            e.printStackTrace();
+            try {
+                resp.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8");
+                resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                resp.setContentLength(body.length);
+                resp.getOutputStream().write(body);
+                resp.getOutputStream().flush();
+            } catch (Exception ex) {
+                System.err.println("❌ Erreur lors de l'écriture du body non chiffré: " + ex.getMessage());
+            }
+        }
     }
 }

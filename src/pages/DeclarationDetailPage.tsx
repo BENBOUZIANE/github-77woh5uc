@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import { ArrowLeft, AlertCircle, User, Heart, Package, FileText, Calendar, Download, Image as ImageIcon, File } from 'lucide-react';
+import { ArrowLeft, AlertCircle, User, Heart, Package, FileText, Calendar, Download, Image as ImageIcon, File, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
 
 type DeclarationStatus = 'nouveau' | 'en_cours' | 'traite' | 'rejete' | 'cloture';
 
@@ -276,6 +276,53 @@ export default function DeclarationDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative flex items-center justify-between py-3">
+            <div className="flex items-center space-x-4">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-16 h-16 object-contain"
+              />
+              <div className="flex flex-col">
+                <h2 className="text-lg font-bold text-slate-900">Vigilances Sanitaires</h2>
+                <p className="text-sm text-slate-600">Gestion des Risques</p>
+              </div>
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <img
+                src="/logo_ammps.png"
+                alt="Logo AMMPS"
+                className="w-40 h-40 object-contain"
+              />
+            </div>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-slate-600">Bienvenue, {user.email}</span>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md hover:shadow-lg text-sm"
+                >
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Tableau de bord</span>
+                  <span className="sm:hidden">Dashboard</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md hover:shadow-md text-sm"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Connexion</span>
+                <span className="sm:hidden">Login</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <button
           onClick={() => navigate(-1)}

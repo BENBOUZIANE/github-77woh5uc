@@ -19,12 +19,16 @@ function buildCspConnectSrc(env: Record<string, string>): string {
   } catch (_) {}
   const hostsStr = env.VITE_CSP_ALLOWED_HTTP_HOSTS || 'localhost,127.0.0.1';
   const allowPrivate = env.VITE_CSP_ALLOW_PRIVATE_NETWORK_HTTP === 'true';
+
+  // sanitize list by removing bare private network IPs to avoid leaking internal addresses
+  const privateIpRegex = /^(10\.|172\.(1[6-9]|2\d|3[0-1])\.|192\.168\.)/;
   const hosts = hostsStr
     .split(',')
     .map((h) => h.trim())
-    .filter(Boolean)
+    .filter((h) => h && !privateIpRegex.test(h)) // drop private IPs
     .map((h) => `http://${h}:${port}`)
     .join(' ');
+
   let connect = base;
   if (hosts) connect += ' ' + hosts;
   if (allowPrivate) connect += ' http://*:' + port;

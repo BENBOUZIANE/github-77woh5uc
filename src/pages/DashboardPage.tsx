@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, Sparkles, Beaker, Package, Shield, FileText, TrendingUp, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
+import { LogOut, LogIn, LayoutDashboard, Sparkles, Beaker, Package, Shield, FileText, TrendingUp, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import PieChart from '../components/PieChart';
@@ -130,28 +130,55 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-between items-start mb-12">
-          <div className="flex items-center">
-            <img
-              src="/logo.png"
-              alt="Logo"
-              className="w-20 h-20 object-contain mr-4"
-            />
-            <div>
-              <h1 className="text-4xl font-bold text-slate-900 mb-2">Tableau de bord</h1>
-              <p className="text-lg text-slate-600">
-                Bienvenue, <span className="font-medium">{user?.email}</span>
-              </p>
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative flex items-center justify-between py-3">
+            <div className="flex items-center space-x-4">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-20 h-20 object-contain"
+              />
+              <div className="flex flex-col">
+                <h2 className="text-xl font-bold text-slate-900">Vigilances Sanitaires</h2>
+                <p className="text-sm text-slate-600">Gestion des Risques</p>
+              </div>
             </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <img
+                src="/logo_ammps.png"
+                alt="Logo AMMPS"
+                className="w-40 h-40 object-contain"
+              />
+            </div>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-slate-600">Bienvenue, {user.email}</span>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center px-4 py-2 bg-white text-slate-700 rounded-lg shadow-sm hover:shadow-md transition-all text-sm"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  <span>Déconnexion</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md hover:shadow-md text-sm"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Connexion</span>
+                <span className="sm:hidden">Login</span>
+              </button>
+            )}
           </div>
-          <button
-            onClick={handleSignOut}
-            className="flex items-center px-4 py-2 text-slate-700 hover:text-slate-900 bg-white rounded-lg shadow-sm hover:shadow-md transition-all"
-          >
-            <LogOut className="w-5 h-5 mr-2" />
-            Déconnexion
-          </button>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl font-bold text-slate-900">Tableau de bord</h1>
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">

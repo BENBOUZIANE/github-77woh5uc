@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ArrowLeft, LogIn } from 'lucide-react';
+import { ArrowLeft, LogIn, LayoutDashboard } from 'lucide-react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { signIn } = useAuth();
+  const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,9 +18,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      console.log('📝 Démarrage du handleSubmit avec email:', email);
       await signIn(email, password);
+      console.log('✅ signIn terminé avec succès');
+      console.log('📍 Navigation vers /dashboard');
       navigate('/dashboard');
+      console.log('📍 Navigate appelé');
     } catch (err: any) {
+      console.error('❌ Erreur dans handleSubmit:', err);
       setError(err.message || 'Une erreur est survenue');
     } finally {
       setLoading(false);
@@ -28,6 +34,53 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative flex items-center justify-between py-3">
+            <div className="flex items-center space-x-4">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-16 h-16 object-contain"
+              />
+              <div className="flex flex-col">
+                <h2 className="text-lg font-bold text-slate-900">Vigilances Sanitaires</h2>
+                <p className="text-sm text-slate-600">Gestion des Risques</p>
+              </div>
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <img
+                src="/logo_ammps.png"
+                alt="Logo AMMPS"
+                className="w-40 h-40 object-contain"
+              />
+            </div>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-slate-600">Bienvenue, {user.email}</span>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md hover:shadow-lg text-sm"
+                >
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Tableau de bord</span>
+                  <span className="sm:hidden">Dashboard</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md hover:shadow-lg text-sm"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Connexion</span>
+                <span className="sm:hidden">Login</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <button
           onClick={() => navigate('/')}
@@ -39,11 +92,13 @@ export default function LoginPage() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="flex items-center justify-center mb-6">
-            <img
-              src="/logo.png"
-              alt="Logo Cosmétovigilance"
-              className="w-32 h-32 object-contain"
-            />
+            <div className="flex items-center justify-center space-x-4">
+              <img
+                src="/logo.png"
+                alt="Logo Cosmétovigilance"
+                className="w-32 h-32 object-contain"
+              />
+            </div>
           </div>
 
           <h1 className="text-3xl font-bold text-slate-900 text-center mb-2">

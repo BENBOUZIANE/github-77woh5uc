@@ -45,17 +45,24 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-3">
+          <div className="relative flex items-center justify-between py-3">
             <div className="flex items-center space-x-4">
               <img
                 src="/logo.png"
                 alt="Logo"
                 className="w-16 h-16 object-contain"
               />
-              <div>
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">Vigilances Sanitaires</h2>
-                <p className="text-xs sm:text-sm text-emerald-600 font-medium">Gestion des Risques</p>
+              <div className="flex flex-col">
+                <h2 className="text-lg font-bold text-slate-900">Vigilances Sanitaires</h2>
+                <p className="text-sm text-slate-600">Gestion des Risques</p>
               </div>
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <img
+                src="/logo_ammps.png"
+                alt="Logo AMMPS"
+                className="w-40 h-40 object-contain"
+              />
             </div>
             {user ? (
               <button

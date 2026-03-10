@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -18,11 +20,7 @@ import org.springframework.context.annotation.Configuration;
             name = "Cosmetovigilance",
             email = "contact@cosmetovigilance.com"
         )
-    ),
-    servers = {
-        @Server(url = "http://192.168.1.109:8080/api", description = "Local Server"),
-        @Server(url = "https://api.cosmetovigilance.com/api", description = "Production Server")
-    }
+    )
 )
 @SecurityScheme(
     name = "bearerAuth",
@@ -31,4 +29,21 @@ import org.springframework.context.annotation.Configuration;
     scheme = "bearer"
 )
 public class OpenApiConfig {
+    
+    @Bean
+    public OpenAPI customOpenAPI() {
+        Server server = new Server();
+        server.setUrl("http://localhost:8080/api");
+        server.setDescription("Local Development Server");
+        
+        Server prodServer = new Server();
+        prodServer.setUrl("https://api.cosmetovigilance.com/api");
+        prodServer.setDescription("Production Server");
+        
+        OpenAPI openAPI = new OpenAPI();
+        openAPI.addServersItem(server);
+        openAPI.addServersItem(prodServer);
+        
+        return openAPI;
+    }
 }

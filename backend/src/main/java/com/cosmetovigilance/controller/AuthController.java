@@ -40,6 +40,7 @@ public class AuthController {
             AuthResponse response = authService.login(request);
             return ResponseEntity.ok(ApiResponse.success("Login successful", response));
         } catch (RuntimeException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error("Invalid email or password"));
         }
