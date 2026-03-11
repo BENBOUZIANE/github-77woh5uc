@@ -9,9 +9,8 @@
     "build:vm": "vite build --mode vm",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "test:encryption": "node -e \"import('./src/utils/encryption.ts').then(m => { console.log('🧪 Test du chiffrement AES...'); const success = m.testEncryption(); console.log(success ? '✅ Test réussi' : '❌ Test échoué'); process.exit(success ? 0 : 1); })\""
-  },
+    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    },
   "dependencies": {
     "crypto-js": "^4.2.0",
     "lucide-react": "^0.344.0",

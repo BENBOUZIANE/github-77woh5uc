@@ -49,18 +49,9 @@ public class ApiResponseEncodingFilter implements Filter {
         chain.doFilter(request, wrapper);
 
         byte[] body = wrapper.getBuffer();
-        System.out.println("🔒 ApiResponseEncodingFilter - Body length: " + body.length);
-
-        if (body.length == 0) {
-            System.out.println("🔒 ApiResponseEncodingFilter - Empty body, skipping encryption");
-            return;
-        }
-
         String contentType = wrapper.getContentType();
-        System.out.println("🔒 ApiResponseEncodingFilter - Content-Type: " + contentType);
 
         if (contentType == null || !contentType.toLowerCase().contains(MediaType.APPLICATION_JSON_VALUE)) {
-            System.out.println("🔒 ApiResponseEncodingFilter - Not JSON, skipping encryption");
             resp.getOutputStream().write(body);
             resp.getOutputStream().flush();
             return;
@@ -68,12 +59,8 @@ public class ApiResponseEncodingFilter implements Filter {
 
         try {
             String bodyStr = new String(body, StandardCharsets.UTF_8);
-            System.out.println("🔒 ApiResponseEncodingFilter - Original body (first 100 chars): " + bodyStr.substring(0, Math.min(100, bodyStr.length())));
-
             String encrypted = AesEncryptionUtil.encrypt(bodyStr, encryptionKey);
-            System.out.println("🔒 ApiResponseEncodingFilter - Encrypted successfully, length: " + encrypted.length());
 
-            // Structure: {"encrypted": true, "data": "...chifferé..."}
             String wrapped = objectMapper.writeValueAsString(Map.of(
                     "encrypted", true,
                     "data", encrypted
@@ -86,13 +73,10 @@ public class ApiResponseEncodingFilter implements Filter {
             resp.setContentLength(encryptedBody.length);
             resp.setHeader(HEADER_ENCRYPTED, ENCRYPTION_VALUE);
 
-            System.out.println("🔒 ApiResponseEncodingFilter - Headers définis et réponse à envoyer: " + wrapped.substring(0, Math.min(100, wrapped.length())));
-
             // Écrire le contenu
             resp.getOutputStream().write(encryptedBody);
             resp.getOutputStream().flush();
             resp.flushBuffer();
-            System.out.println("🔒 ApiResponseEncodingFilter - Response encrypted and sent");
         } catch (Exception e) {
             // En cas d'erreur de chiffrement, log et essaie de retourner la réponse brute
             System.err.println("❌ Erreur lors du chiffrement de la réponse: " + e.getMessage());

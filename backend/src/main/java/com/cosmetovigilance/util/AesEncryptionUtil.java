@@ -53,24 +53,4 @@ public class AesEncryptionUtil {
         return Base64.getEncoder().encodeToString(encrypted);
     }
 
-    /**
-     * Test du chiffrement/déchiffrement (pour debug)
-     */
-    public static boolean testEncryption(String key) {
-        try {
-            String testData = "{\"email\":\"test@example.com\",\"password\":\"test123\"}";
-            String encrypted = encrypt(testData, key);
-            String decrypted = decrypt(encrypted, key);
-
-            System.out.println("Backend encryption test:");
-            System.out.println("Original: " + testData);
-            System.out.println("Encrypted: " + encrypted.substring(0, Math.min(50, encrypted.length())) + "...");
-            System.out.println("Decrypted: " + decrypted);
-
-            return testData.equals(decrypted);
-        } catch (Exception e) {
-            System.err.println("Backend encryption test failed: " + e.getMessage());
-            return false;
-        }
-    }
 }
