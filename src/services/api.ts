@@ -29,22 +29,38 @@ class ApiService {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     const text = await response.text();
+    console.log('📥 Response received:', {
+      status: response.status,
+      ok: response.ok,
+      textLength: text.length,
+      textPreview: text.substring(0, 200)
+    });
 
     let result: unknown;
     try {
       const parsed = JSON.parse(text) as any;
+      console.log('📦 Parsed response:', {
+        encrypted: parsed?.encrypted,
+        hasData: !!parsed?.data,
+        dataLength: parsed?.data?.length
+      });
 
       if (parsed?.encrypted === true && parsed?.data) {
         try {
+          console.log('🔓 Attempting decryption...');
           const decrypted = decryptData(parsed.data);
+          console.log('✅ Decryption successful:', decrypted);
           result = decrypted;
         } catch (error) {
+          console.error('❌ Decryption failed:', error);
           throw error;
         }
       } else {
+        console.log('ℹ️ Response not encrypted, using as-is');
         result = parsed;
       }
     } catch (error) {
+      console.error('❌ Error processing response:', error);
       throw new Error('Erreur lors du traitement de la réponse');
     }
 
@@ -55,8 +71,10 @@ class ApiService {
     }
 
     if (result && typeof result === 'object' && 'data' in result) {
+      console.log('📤 Returning data field from result');
       return (result as { data: T }).data;
     }
+    console.log('📤 Returning full result');
     return result as T;
   }
 
