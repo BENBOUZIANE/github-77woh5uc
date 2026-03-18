@@ -12,12 +12,12 @@ const productTypes = [
     path: '/cosmetovigilance'
   },
   {
-    id: 'test1',
+    id: 'materiovigilance',
     title: 'Dispositifs Médicaux',
     description: 'Déclaration d\'incidents liés aux dispositifs médicaux',
     icon: Beaker,
     color: 'from-blue-500 to-cyan-600',
-    path: '/test1'
+    path: '/materiovigilance'
   },
   {
     id: 'test2',

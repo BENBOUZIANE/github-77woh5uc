@@ -1,9 +1,6 @@
 package com.cosmetovigilance.service;
 
-import com.cosmetovigilance.repository.DeclarationRepository;
-import com.cosmetovigilance.repository.EffetIndesirableRepository;
-import com.cosmetovigilance.repository.PersonneExposeeRepository;
-import com.cosmetovigilance.repository.ProduitSuspecteRepository;
+import com.cosmetovigilance.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +21,12 @@ public class StatisticsService {
 
     @Autowired
     private ProduitSuspecteRepository produitSuspecteRepository;
+
+    @Autowired
+    private DispositifMedicalRepository dispositifMedicalRepository;
+
+    @Autowired
+    private ComplementAlimentaireRepository complementAlimentaireRepository;
 
     public Map<String, Object> getStatsByAgeAndGravite() {
         List<Object[]> results = declarationRepository.findStatsByAgeAndGravite();
@@ -191,6 +194,54 @@ public class StatisticsService {
         allStats.put("typeProduitGravite", getStatsByTypeProduitAndGravite().get("data"));
         allStats.put("classification", getStatsByClassification().get("data"));
         return allStats;
+    }
+
+    public Map<String, Object> getGlobalStatistics() {
+        Map<String, Object> globalStats = new HashMap<>();
+
+        long cosmetiquesCount = declarationRepository.count();
+        long complementsCount = complementAlimentaireRepository.count();
+        long dispositifsCount = dispositifMedicalRepository.count();
+        long totalCount = cosmetiquesCount + complementsCount + dispositifsCount;
+
+        Map<String, Long> countByModule = new LinkedHashMap<>();
+        countByModule.put("Cosmétiques", cosmetiquesCount);
+        countByModule.put("Compléments alimentaires", complementsCount);
+        countByModule.put("Dispositifs médicaux", dispositifsCount);
+        countByModule.put("Total", totalCount);
+
+        Map<String, Long> cosmetiquesStatuts = new LinkedHashMap<>();
+        List<Object[]> cosmetiquesStatutResults = declarationRepository.findStatsByStatut();
+        for (Object[] result : cosmetiquesStatutResults) {
+            String statut = (String) result[0];
+            Long count = (Long) result[1];
+            cosmetiquesStatuts.put(getStatutLabel(statut), count);
+        }
+
+        long complementsEnAttente = complementAlimentaireRepository.findByStatut("EN_ATTENTE").size();
+        long complementsEnCours = complementAlimentaireRepository.findByStatut("EN_COURS").size();
+        long complementsTraitee = complementAlimentaireRepository.findByStatut("TRAITEE").size();
+
+        Map<String, Long> complementsStatuts = new LinkedHashMap<>();
+        complementsStatuts.put("En attente", complementsEnAttente);
+        complementsStatuts.put("En cours", complementsEnCours);
+        complementsStatuts.put("Traité", complementsTraitee);
+
+        long dispositifsEnAttente = dispositifMedicalRepository.findByStatut("EN_ATTENTE").size();
+        long dispositifsEnCours = dispositifMedicalRepository.findByStatut("EN_COURS").size();
+        long dispositifsTraitee = dispositifMedicalRepository.findByStatut("TRAITEE").size();
+
+        Map<String, Long> dispositifsStatuts = new LinkedHashMap<>();
+        dispositifsStatuts.put("En attente", dispositifsEnAttente);
+        dispositifsStatuts.put("En cours", dispositifsEnCours);
+        dispositifsStatuts.put("Traité", dispositifsTraitee);
+
+        globalStats.put("countByModule", countByModule);
+        globalStats.put("cosmetiquesStatuts", cosmetiquesStatuts);
+        globalStats.put("complementsStatuts", complementsStatuts);
+        globalStats.put("dispositifsStatuts", dispositifsStatuts);
+
+        return globalStats;
     }
 
     private String getAgeCategory(Integer age, String ageUnite) {

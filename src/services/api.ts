@@ -1,6 +1,7 @@
 import { encryptData, decryptData, createEncryptedPayload } from '../utils/encryption';
 
 const API_URL = import.meta.env.VITE_API_URL ;
+export const API_BASE_URL = API_URL;
 
 interface AuthResponse {
   accessToken: string;

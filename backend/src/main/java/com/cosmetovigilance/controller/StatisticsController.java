@@ -88,4 +88,14 @@ public class StatisticsController {
                 .data(allStats)
                 .build());
     }
+
+    @GetMapping("/global")
+    @Operation(summary = "Statistiques globales (tous les modules agrégés)")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getGlobalStatistics() {
+        Map<String, Object> globalStats = statisticsService.getGlobalStatistics();
+        return ResponseEntity.ok(ApiResponse.<Map<String, Object>>builder()
+                .success(true)
+                .data(globalStats)
+                .build());
+    }
 }

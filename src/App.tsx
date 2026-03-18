@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import CosmetovigillancePage from './pages/CosmetovigillancePage';
 import ComplementAlimentairePage from './pages/ComplementAlimentairePage';
+import DispositifMedicalPage from './pages/DispositifMedicalPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import MyDeclarationsPage from './pages/MyDeclarationsPage';
@@ -19,6 +20,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/cosmetovigilance" element={<CosmetovigillancePage />} />
             <Route path="/test3" element={<ComplementAlimentairePage />} />
+            <Route path="/materiovigilance" element={<DispositifMedicalPage />} />
             <Route
               path="/dashboard"
               element={
