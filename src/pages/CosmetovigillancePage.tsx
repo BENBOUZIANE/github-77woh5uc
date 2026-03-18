@@ -110,7 +110,6 @@ export default function CosmetovigillancePage() {
 
     baseSections.push(
       { title: 'Personne Exposée', icon: '🧑' },
-      { title: 'Antécédents Médicaux', icon: '📋' },
       { title: 'Effet Indésirable', icon: '⚠️' },
       { title: 'Prise en Charge', icon: '🏥' },
       { title: 'Cosmétique Suspect', icon: '🧴' },
@@ -158,7 +157,7 @@ export default function CosmetovigillancePage() {
         }
         break;
 
-      case 2: // Personne Exposée
+      case 2: // Personne Exposée (avec antécédents intégrés)
         if (!formData.personneExposee.nomPrenom.trim()) errors.nomPrenom = 'Le nom et prénom sont obligatoires';
         if (!formData.personneExposee.ville) errors.personneVille = 'La ville est obligatoire';
         if (!formData.personneExposee.dateNaissance && !formData.personneExposee.age) {
@@ -169,7 +168,7 @@ export default function CosmetovigillancePage() {
         }
         break;
 
-      case 4: // Effet Indésirable
+      case 3: // Effet Indésirable
         if (!formData.effetIndesirable.localisation.trim()) errors.localisation = 'La localisation est obligatoire';
         if (!formData.effetIndesirable.descriptionSymptomes.trim()) errors.descriptionSymptomes = 'La description est obligatoire';
         if (!formData.effetIndesirable.dateApparition) errors.dateApparition = 'La date d\'apparition est obligatoire';
@@ -180,13 +179,13 @@ export default function CosmetovigillancePage() {
         }
         break;
 
-      case 5: // Prise en Charge
+      case 4: // Prise en Charge
         if (formData.priseChargeMedicale?.mesuresPriseType === 'autre' && !formData.priseChargeMedicale.mesuresPriseAutre?.trim()) {
           errors.mesuresPriseAutre = 'Veuillez préciser les autres mesures';
         }
         break;
 
-      case 6: // Cosmétique Suspect
+      case 5: // Cosmétique Suspect
         if (!formData.produitSuspecte.nomCommercial.trim()) errors.nomCommercial = 'Le nom commercial est obligatoire';
         if (!formData.produitSuspecte.marque.trim()) errors.marque = 'La marque est obligatoire';
         if (!formData.produitSuspecte.numeroLot.trim()) errors.numeroLot = 'Le numéro de lot est obligatoire';
@@ -943,119 +942,118 @@ export default function CosmetovigillancePage() {
                 </label>
               </div>
             )}
+
+            <div className="mt-8 pt-8 border-t-2 border-slate-200">
+              <h3 className="text-xl font-bold text-slate-900 mb-6">Antécédents Médicaux</h3>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Allergies Connues</label>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={newAllergie}
+                      onChange={(e) => setNewAllergie(e.target.value)}
+                      placeholder="Ajouter une allergie"
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => addItem(formData.allergiesConnues, (items) => setFormData({ ...formData, allergiesConnues: items }), newAllergie, setNewAllergie)}
+                      className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {formData.allergiesConnues.map((allergie, index) => (
+                      <div key={index} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-lg">
+                        <span>{allergie}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(formData.allergiesConnues, (items) => setFormData({ ...formData, allergiesConnues: items }), index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Antécédents Médicaux</label>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={newAntecedent}
+                      onChange={(e) => setNewAntecedent(e.target.value)}
+                      placeholder="Ajouter un antécédent"
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => addItem(formData.antecedentsMedicaux, (items) => setFormData({ ...formData, antecedentsMedicaux: items }), newAntecedent, setNewAntecedent)}
+                      className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {formData.antecedentsMedicaux.map((antecedent, index) => (
+                      <div key={index} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-lg">
+                        <span>{antecedent}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(formData.antecedentsMedicaux, (items) => setFormData({ ...formData, antecedentsMedicaux: items }), index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Médicaments/Produits Utilisés Simultanément</label>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={newMedicament}
+                      onChange={(e) => setNewMedicament(e.target.value)}
+                      placeholder="Ajouter un médicament ou produit"
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => addItem(formData.medicamentsSimultanes, (items) => setFormData({ ...formData, medicamentsSimultanes: items }), newMedicament, setNewMedicament)}
+                      className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {formData.medicamentsSimultanes.map((medicament, index) => (
+                      <div key={index} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-lg">
+                        <span>{medicament}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(formData.medicamentsSimultanes, (items) => setFormData({ ...formData, medicamentsSimultanes: items }), index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         );
 
       case 3:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Antécédents Médicaux</h2>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Allergies Connues</label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={newAllergie}
-                  onChange={(e) => setNewAllergie(e.target.value)}
-                  placeholder="Ajouter une allergie"
-                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={() => addItem(formData.allergiesConnues, (items) => setFormData({ ...formData, allergiesConnues: items }), newAllergie, setNewAllergie)}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="space-y-2">
-                {formData.allergiesConnues.map((allergie, index) => (
-                  <div key={index} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-lg">
-                    <span>{allergie}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeItem(formData.allergiesConnues, (items) => setFormData({ ...formData, allergiesConnues: items }), index)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Antécédents Médicaux</label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={newAntecedent}
-                  onChange={(e) => setNewAntecedent(e.target.value)}
-                  placeholder="Ajouter un antécédent"
-                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={() => addItem(formData.antecedentsMedicaux, (items) => setFormData({ ...formData, antecedentsMedicaux: items }), newAntecedent, setNewAntecedent)}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="space-y-2">
-                {formData.antecedentsMedicaux.map((antecedent, index) => (
-                  <div key={index} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-lg">
-                    <span>{antecedent}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeItem(formData.antecedentsMedicaux, (items) => setFormData({ ...formData, antecedentsMedicaux: items }), index)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Médicaments/Produits Utilisés Simultanément</label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={newMedicament}
-                  onChange={(e) => setNewMedicament(e.target.value)}
-                  placeholder="Ajouter un médicament ou produit"
-                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={() => addItem(formData.medicamentsSimultanes, (items) => setFormData({ ...formData, medicamentsSimultanes: items }), newMedicament, setNewMedicament)}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="space-y-2">
-                {formData.medicamentsSimultanes.map((medicament, index) => (
-                  <div key={index} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-lg">
-                    <span>{medicament}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeItem(formData.medicamentsSimultanes, (items) => setFormData({ ...formData, medicamentsSimultanes: items }), index)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 4:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Effet Indésirable</h2>
@@ -1188,7 +1186,7 @@ export default function CosmetovigillancePage() {
           </div>
         );
 
-      case 5:
+      case 4:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Prise en Charge Médicale</h2>
@@ -1273,7 +1271,7 @@ export default function CosmetovigillancePage() {
           </div>
         );
 
-      case 6:
+      case 5:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Cosmétique Suspect</h2>
@@ -1424,7 +1422,7 @@ export default function CosmetovigillancePage() {
           </div>
         );
 
-      case 7:
+      case 6:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Commentaires Additionnels</h2>
