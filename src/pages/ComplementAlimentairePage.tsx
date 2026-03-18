@@ -1030,19 +1030,35 @@ export default function ComplementAlimentairePage() {
 
             {formData.complementsSuspectes.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-slate-800 mb-3">Liste des compléments déclarés</h3>
+                <h3 className="text-lg font-semibold text-slate-800 mb-3">Informations sur le complément alimentaire suspecté</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse border border-slate-300">
                     <thead>
-                      <tr className="bg-rose-100">
-                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Dénomination</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Fabricant</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">N° de lot</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Forme galénique</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Posologie et voie d'administration</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Date de début</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Date de fin</th>
-                        <th className="border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700">Actions</th>
+                      <tr className="bg-gray-200">
+                        <th className="border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-800">
+                          Nom de la spécialité/<br/>présentation
+                        </th>
+                        <th className="border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-800">
+                          Posologie / voie<br/>d'administration
+                        </th>
+                        <th className="border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-800">
+                          N° de<br/>lot
+                        </th>
+                        <th className="border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-800">
+                          Date Début<br/>de prise
+                        </th>
+                        <th className="border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-800">
+                          Date<br/>Arrêt<br/><span className="underline">de prise</span>
+                        </th>
+                        <th className="border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-800">
+                          Motif de la prise
+                        </th>
+                        <th className="border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-800">
+                          Lieu<br/>d'achat<br/>(**)
+                        </th>
+                        <th className="border border-slate-300 px-3 py-2 text-center text-xs font-semibold text-slate-800">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1052,19 +1068,20 @@ export default function ComplementAlimentairePage() {
                             <div className="font-medium">{complement.nomCommercial}</div>
                             <div className="text-xs text-slate-600">{complement.marque}</div>
                           </td>
-                          <td className="border border-slate-300 px-3 py-2 text-sm">{complement.fabricant || '-'}</td>
-                          <td className="border border-slate-300 px-3 py-2 text-sm">{complement.numeroLot}</td>
-                          <td className="border border-slate-300 px-3 py-2 text-sm">{complement.formeGalenique}</td>
                           <td className="border border-slate-300 px-3 py-2 text-sm">
                             <div>{complement.posologie || '-'}</div>
                             <div className="text-xs text-slate-600">{complement.frequenceUtilisation}</div>
                           </td>
-                          <td className="border border-slate-300 px-3 py-2 text-sm">
+                          <td className="border border-slate-300 px-3 py-2 text-sm text-center">{complement.numeroLot || '-'}</td>
+                          <td className="border border-slate-300 px-3 py-2 text-sm text-center">
                             {complement.dateDebutUtilisation ? new Date(complement.dateDebutUtilisation).toLocaleDateString('fr-FR') : '-'}
                           </td>
-                          <td className="border border-slate-300 px-3 py-2 text-sm">
-                            {complement.arretUtilisation === 'OUI' ? 'Arrêté' : complement.arretUtilisation === 'NON' ? 'En cours' : 'Inconnu'}
+                          <td className="border border-slate-300 px-3 py-2 text-sm text-center">
+                            {complement.dateArretUtilisation ? new Date(complement.dateArretUtilisation).toLocaleDateString('fr-FR') :
+                             complement.arretUtilisation === 'OUI' ? 'Arrêté' : complement.arretUtilisation === 'NON' ? 'En cours' : '-'}
                           </td>
+                          <td className="border border-slate-300 px-3 py-2 text-sm">{complement.motifPrise || '-'}</td>
+                          <td className="border border-slate-300 px-3 py-2 text-sm text-center">{complement.lieuAchat || '-'}</td>
                           <td className="border border-slate-300 px-3 py-2 text-center">
                             <div className="flex gap-1 justify-center">
                               <button
@@ -1091,6 +1108,9 @@ export default function ComplementAlimentairePage() {
                       ))}
                     </tbody>
                   </table>
+                  <p className="text-xs text-slate-600 mt-2">
+                    **Précisez si : 1 : Pharmacie &nbsp;&nbsp; 2 : Parapharmacie &nbsp;&nbsp; 3 : Internet &nbsp;&nbsp; 4 : Inconnu
+                  </p>
                 </div>
               </div>
             )}
