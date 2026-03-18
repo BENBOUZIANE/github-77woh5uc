@@ -42,22 +42,16 @@ interface FormData {
   antecedentsMedicaux: string[];
   medicamentsSimultanes: string[];
   effetIndesirable: {
-    localisation: string;
     descriptionSymptomes: string;
     dateApparition: string;
     delaiSurvenue: string;
     gravite: boolean;
     criteresGravite: string[];
     evolutionEffet: string;
+    reexposition?: boolean;
+    reapparition?: boolean;
   };
-  priseChargeMedicale: {
-    consultationMedicale: boolean;
-    diagnosticMedecin: string;
-    mesuresPriseType: string;
-    mesuresPriseAutre: string;
-    examensRealise: string;
-  };
-  complementSuspecte: {
+  complementsSuspectes: {
     nomCommercial: string;
     marque: string;
     fabricant: string;
@@ -70,7 +64,7 @@ interface FormData {
     reexpositionProduit: boolean;
     reapparitionEffetIndesirable: boolean;
     compositionProduit: string;
-  };
+  }[];
   commentaire: string;
 }
 
@@ -87,9 +81,8 @@ export default function ComplementAlimentairePage() {
     allergiesConnues: [],
     antecedentsMedicaux: [],
     medicamentsSimultanes: [],
-    effetIndesirable: { localisation: '', descriptionSymptomes: '', dateApparition: '', delaiSurvenue: '', gravite: false, criteresGravite: [], evolutionEffet: '' },
-    priseChargeMedicale: { consultationMedicale: false, diagnosticMedecin: '', mesuresPriseType: '', mesuresPriseAutre: '', examensRealise: '' },
-    complementSuspecte: { nomCommercial: '', marque: '', fabricant: '', numeroLot: '', formeGalenique: '', posologie: '', frequenceUtilisation: '', dateDebutUtilisation: '', arretUtilisation: '', reexpositionProduit: false, reapparitionEffetIndesirable: false, compositionProduit: '' },
+    effetIndesirable: { descriptionSymptomes: '', dateApparition: '', delaiSurvenue: '', gravite: false, criteresGravite: [], evolutionEffet: '', reexposition: false, reapparition: false },
+    complementsSuspectes: [],
     commentaire: ''
   });
 
@@ -98,6 +91,22 @@ export default function ComplementAlimentairePage() {
   const [newMedicament, setNewMedicament] = useState('');
   const [documentEnregistrement, setDocumentEnregistrement] = useState<File | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [currentComplement, setCurrentComplement] = useState({
+    nomCommercial: '',
+    marque: '',
+    fabricant: '',
+    numeroLot: '',
+    formeGalenique: '',
+    posologie: '',
+    frequenceUtilisation: '',
+    dateDebutUtilisation: '',
+    arretUtilisation: '',
+    reexpositionProduit: false,
+    reapparitionEffetIndesirable: false,
+    compositionProduit: ''
+  });
+  const [isEditingComplement, setIsEditingComplement] = useState(false);
+  const [editingComplementIndex, setEditingComplementIndex] = useState<number | null>(null);
 
   const getSections = () => {
     const baseSections = [{ title: 'Notificateur', icon: '👤' }];
@@ -111,7 +120,6 @@ export default function ComplementAlimentairePage() {
     baseSections.push(
       { title: 'Personne Exposée', icon: '🧑' },
       { title: 'Effet Indésirable', icon: '⚠️' },
-      { title: 'Prise en Charge', icon: '🏥' },
       { title: 'Complément Suspect', icon: '💊' },
       { title: 'Commentaires', icon: '💬' }
     );
@@ -841,20 +849,6 @@ export default function ComplementAlimentairePage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Effet Indésirable</h2>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Localisation*</label>
-              <input
-                type="text"
-                value={formData.effetIndesirable.localisation}
-                onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, localisation: e.target.value } })}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                required
-              />
-              {validationErrors.localisation && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.localisation}</p>
-              )}
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Description des symptômes observés*</label>
               <textarea
                 value={formData.effetIndesirable.descriptionSymptomes}
@@ -958,267 +952,283 @@ export default function ComplementAlimentairePage() {
                 <p className="mt-1 text-sm text-red-600">{validationErrors.evolutionEffet}</p>
               )}
             </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Prise en Charge Médicale</h2>
-
-            <div>
-              <label className="flex items-center mb-4">
-                <input
-                  type="checkbox"
-                  checked={formData.priseChargeMedicale.consultationMedicale}
-                  onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, consultationMedicale: e.target.checked } })}
-                  className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
-                />
-                <span className="ml-2 text-sm font-medium text-slate-700">Consultation médicale effectuée</span>
-              </label>
-            </div>
-
-            {formData.priseChargeMedicale.consultationMedicale && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Diagnostic du médecin</label>
-                  <textarea
-                    value={formData.priseChargeMedicale.diagnosticMedecin}
-                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, diagnosticMedecin: e.target.value } })}
-                    rows={3}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    placeholder="Diagnostic posé par le médecin..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Examens réalisés</label>
-                  <textarea
-                    value={formData.priseChargeMedicale.examensRealise}
-                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, examensRealise: e.target.value } })}
-                    rows={3}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    placeholder="Décrivez les examens réalisés..."
-                  />
-                </div>
-              </>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Mesures de prise en charge</label>
-              <select
-                value={formData.priseChargeMedicale.mesuresPriseType}
-                onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseType: e.target.value } })}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              >
-                <option value="">Sélectionner une mesure</option>
-                <option value="ARRET_PRODUIT">Arrêt du produit</option>
-                <option value="TRAITEMENT_SYMPTOMATIQUE">Traitement symptomatique</option>
-                <option value="HOSPITALISATION">Hospitalisation</option>
-                <option value="SURVEILLANCE">Surveillance</option>
-                <option value="AUCUNE">Aucune mesure</option>
-                <option value="autre">Autre</option>
-              </select>
-            </div>
-
-            {formData.priseChargeMedicale.mesuresPriseType === 'autre' && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Précisez les autres mesures*</label>
-                <textarea
-                  value={formData.priseChargeMedicale.mesuresPriseAutre}
-                  onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseAutre: e.target.value } })}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="Décrivez les autres mesures prises..."
-                />
-                {validationErrors.mesuresPriseAutre && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.mesuresPriseAutre}</p>
-                )}
-              </div>
-            )}
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Complément Alimentaire Suspecté</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Nom Commercial*</label>
-                <input
-                  type="text"
-                  value={formData.complementSuspecte.nomCommercial}
-                  onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, nomCommercial: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  required
-                />
-                {validationErrors.nomCommercial && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.nomCommercial}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Marque*</label>
-                <input
-                  type="text"
-                  value={formData.complementSuspecte.marque}
-                  onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, marque: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  required
-                />
-                {validationErrors.marque && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.marque}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Fabricant</label>
-                <input
-                  type="text"
-                  value={formData.complementSuspecte.fabricant}
-                  onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, fabricant: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Numéro de Lot*</label>
-                <input
-                  type="text"
-                  value={formData.complementSuspecte.numeroLot}
-                  onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, numeroLot: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  required
-                />
-                {validationErrors.numeroLot && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.numeroLot}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Forme Galénique*</label>
-                <select
-                  value={formData.complementSuspecte.formeGalenique}
-                  onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, formeGalenique: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  required
-                >
-                  <option value="">Sélectionner une forme</option>
-                  <option value="Gélule">Gélule</option>
-                  <option value="Comprimé">Comprimé</option>
-                  <option value="Poudre">Poudre</option>
-                  <option value="Sirop">Sirop</option>
-                  <option value="Ampoule">Ampoule</option>
-                  <option value="Sachet">Sachet</option>
-                  <option value="Autre">Autre</option>
-                </select>
-                {validationErrors.formeGalenique && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.formeGalenique}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Fréquence d'Utilisation*</label>
-                <select
-                  value={formData.complementSuspecte.frequenceUtilisation}
-                  onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, frequenceUtilisation: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  required
-                >
-                  <option value="">Sélectionner une fréquence</option>
-                  <option value="Quotidienne">Quotidienne</option>
-                  <option value="Hebdomadaire">Hebdomadaire</option>
-                  <option value="Mensuelle">Mensuelle</option>
-                  <option value="Occasionnelle">Occasionnelle</option>
-                </select>
-                {validationErrors.frequenceUtilisation && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.frequenceUtilisation}</p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Posologie</label>
-              <input
-                type="text"
-                value={formData.complementSuspecte.posologie}
-                onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, posologie: e.target.value } })}
-                placeholder="Ex: 1 gélule par jour"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Composition du produit</label>
-              <textarea
-                value={formData.complementSuspecte.compositionProduit}
-                onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, compositionProduit: e.target.value } })}
-                rows={3}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="Listez les ingrédients principaux..."
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Date de Début d'Utilisation*</label>
-                <input
-                  type="date"
-                  value={formData.complementSuspecte.dateDebutUtilisation}
-                  onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, dateDebutUtilisation: e.target.value } })}
-                  max={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  required
-                />
-                {validationErrors.dateDebutUtilisation && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.dateDebutUtilisation}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Arrêt d'Utilisation</label>
-                <select
-                  value={formData.complementSuspecte.arretUtilisation}
-                  onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, arretUtilisation: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                >
-                  <option value="">Sélectionner une option</option>
-                  <option value="OUI">Oui</option>
-                  <option value="NON">Non</option>
-                  <option value="INCONNU">Inconnu</option>
-                </select>
-              </div>
-            </div>
 
             <div className="space-y-3">
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={formData.complementSuspecte.reexpositionProduit}
-                  onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, reexpositionProduit: e.target.checked } })}
-                  className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                  checked={formData.effetIndesirable.reexposition || false}
+                  onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, reexposition: e.target.checked, reapparition: e.target.checked ? formData.effetIndesirable.reapparition : false } })}
+                  className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
                 />
-                <span className="ml-2 text-sm text-slate-700">Réexposition au produit</span>
+                <span className="ml-2 text-sm font-medium text-slate-700">Complément alimentaire réadministré</span>
               </label>
 
-              {formData.complementSuspecte.reexpositionProduit && (
+              {formData.effetIndesirable.reexposition && (
                 <label className="flex items-center ml-6">
                   <input
                     type="checkbox"
-                    checked={formData.complementSuspecte.reapparitionEffetIndesirable}
-                    onChange={(e) => setFormData({ ...formData, complementSuspecte: { ...formData.complementSuspecte, reapparitionEffetIndesirable: e.target.checked } })}
-                    className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                    checked={formData.effetIndesirable.reapparition || false}
+                    onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, reapparition: e.target.checked } })}
+                    className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
                   />
-                  <span className="ml-2 text-sm text-slate-700">Réapparition de l'effet indésirable</span>
+                  <span className="ml-2 text-sm text-slate-700">Réapparition de l'évènement indésirable</span>
                 </label>
               )}
             </div>
           </div>
         );
 
-      case 6:
+      case 4:
+        const addOrUpdateComplement = () => {
+          if (!currentComplement.nomCommercial || !currentComplement.marque || !currentComplement.numeroLot ||
+              !currentComplement.formeGalenique || !currentComplement.frequenceUtilisation || !currentComplement.dateDebutUtilisation) {
+            alert('Veuillez remplir tous les champs obligatoires');
+            return;
+          }
+
+          if (isEditingComplement && editingComplementIndex !== null) {
+            const updatedComplements = [...formData.complementsSuspectes];
+            updatedComplements[editingComplementIndex] = currentComplement;
+            setFormData({ ...formData, complementsSuspectes: updatedComplements });
+            setIsEditingComplement(false);
+            setEditingComplementIndex(null);
+          } else {
+            setFormData({ ...formData, complementsSuspectes: [...formData.complementsSuspectes, currentComplement] });
+          }
+
+          setCurrentComplement({
+            nomCommercial: '',
+            marque: '',
+            fabricant: '',
+            numeroLot: '',
+            formeGalenique: '',
+            posologie: '',
+            frequenceUtilisation: '',
+            dateDebutUtilisation: '',
+            arretUtilisation: '',
+            reexpositionProduit: false,
+            reapparitionEffetIndesirable: false,
+            compositionProduit: ''
+          });
+        };
+
+        const editComplement = (index: number) => {
+          setCurrentComplement(formData.complementsSuspectes[index]);
+          setIsEditingComplement(true);
+          setEditingComplementIndex(index);
+        };
+
+        const removeComplement = (index: number) => {
+          const updatedComplements = formData.complementsSuspectes.filter((_, i) => i !== index);
+          setFormData({ ...formData, complementsSuspectes: updatedComplements });
+        };
+
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Compléments Alimentaires Suspectés</h2>
+
+            {formData.complementsSuspectes.length > 0 && (
+              <div className="space-y-3 mb-6">
+                <h3 className="text-lg font-semibold text-slate-800">Liste des compléments déclarés</h3>
+                {formData.complementsSuspectes.map((complement, index) => (
+                  <div key={index} className="flex items-center justify-between bg-rose-50 border border-rose-200 px-4 py-3 rounded-lg">
+                    <div className="flex-1">
+                      <p className="font-medium text-slate-900">{complement.nomCommercial} - {complement.marque}</p>
+                      <p className="text-sm text-slate-600">Lot: {complement.numeroLot} | Forme: {complement.formeGalenique}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => editComplement(index)}
+                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeComplement(index)}
+                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 bg-slate-50">
+              <h3 className="text-lg font-semibold text-slate-800 mb-4">
+                {isEditingComplement ? 'Modifier le complément' : 'Ajouter un complément alimentaire'}
+              </h3>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Nom Commercial*</label>
+                    <input
+                      type="text"
+                      value={currentComplement.nomCommercial}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, nomCommercial: e.target.value })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Marque*</label>
+                    <input
+                      type="text"
+                      value={currentComplement.marque}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, marque: e.target.value })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Fabricant</label>
+                    <input
+                      type="text"
+                      value={currentComplement.fabricant}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, fabricant: e.target.value })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Numéro de Lot*</label>
+                    <input
+                      type="text"
+                      value={currentComplement.numeroLot}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, numeroLot: e.target.value })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Forme Galénique*</label>
+                    <select
+                      value={currentComplement.formeGalenique}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, formeGalenique: e.target.value })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    >
+                      <option value="">Sélectionner une forme</option>
+                      <option value="Gélule">Gélule</option>
+                      <option value="Comprimé">Comprimé</option>
+                      <option value="Poudre">Poudre</option>
+                      <option value="Sirop">Sirop</option>
+                      <option value="Ampoule">Ampoule</option>
+                      <option value="Sachet">Sachet</option>
+                      <option value="Autre">Autre</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Fréquence d'Utilisation*</label>
+                    <select
+                      value={currentComplement.frequenceUtilisation}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, frequenceUtilisation: e.target.value })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    >
+                      <option value="">Sélectionner une fréquence</option>
+                      <option value="Quotidienne">Quotidienne</option>
+                      <option value="Hebdomadaire">Hebdomadaire</option>
+                      <option value="Mensuelle">Mensuelle</option>
+                      <option value="Occasionnelle">Occasionnelle</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Posologie</label>
+                    <input
+                      type="text"
+                      value={currentComplement.posologie}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, posologie: e.target.value })}
+                      placeholder="Ex: 1 gélule par jour"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Date de Début*</label>
+                    <input
+                      type="date"
+                      value={currentComplement.dateDebutUtilisation}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, dateDebutUtilisation: e.target.value })}
+                      max={new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Arrêt d'Utilisation</label>
+                    <select
+                      value={currentComplement.arretUtilisation}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, arretUtilisation: e.target.value })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="OUI">Oui</option>
+                      <option value="NON">Non</option>
+                      <option value="INCONNU">Inconnu</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Composition du produit</label>
+                  <textarea
+                    value={currentComplement.compositionProduit}
+                    onChange={(e) => setCurrentComplement({ ...currentComplement, compositionProduit: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    placeholder="Listez les ingrédients principaux..."
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={currentComplement.reexpositionProduit}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, reexpositionProduit: e.target.checked, reapparitionEffetIndesirable: e.target.checked ? currentComplement.reapparitionEffetIndesirable : false })}
+                      className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
+                    />
+                    <span className="ml-2 text-sm text-slate-700">Réexposition au produit</span>
+                  </label>
+
+                  {currentComplement.reexpositionProduit && (
+                    <label className="flex items-center ml-6">
+                      <input
+                        type="checkbox"
+                        checked={currentComplement.reapparitionEffetIndesirable}
+                        onChange={(e) => setCurrentComplement({ ...currentComplement, reapparitionEffetIndesirable: e.target.checked })}
+                        className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
+                      />
+                      <span className="ml-2 text-sm text-slate-700">Réapparition de l'effet indésirable</span>
+                    </label>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={addOrUpdateComplement}
+                  className="w-full px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-medium hover:from-rose-600 hover:to-pink-700 transition-all shadow-md hover:shadow-lg"
+                >
+                  {isEditingComplement ? 'Mettre à jour le complément' : 'Ajouter à la liste'}
+                </button>
+              </div>
+            </div>
+
+            {formData.complementsSuspectes.length === 0 && (
+              <p className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                Vous devez ajouter au moins un complément alimentaire suspecté.
+              </p>
+            )}
+          </div>
+        );
+
+      case 5:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Commentaires Additionnels</h2>
