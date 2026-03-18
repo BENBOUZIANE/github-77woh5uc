@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, LogIn, LayoutDashboard, Sparkles, Beaker, Package, Shield, FileText, TrendingUp, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
+import { LogOut, LogIn, LayoutDashboard, Sparkles, Beaker, Package, Shield, FileText, TrendingUp, BarChart3, PieChart as PieChartIcon, Users, AlertTriangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import PieChart from '../components/PieChart';
 import BarChart from '../components/BarChart';
+import StackedBarChart from '../components/StackedBarChart';
 
 const declarationTypes = [
   {
@@ -57,11 +58,21 @@ interface StatsByType {
   [key: string]: StatsByStatus;
 }
 
+interface AdvancedStats {
+  ageGravite: any;
+  sexeGravite: any;
+  notifiantGravite: any;
+  criteresGravite: any;
+  typeProduitGravite: any;
+  classification: any;
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [stats, setStats] = useState<StatsByType>({});
   const [loading, setLoading] = useState(true);
+  const [advancedStats, setAdvancedStats] = useState<AdvancedStats | null>(null);
   const [totalStats, setTotalStats] = useState<StatsByStatus>({
     nouveau: 0,
     en_cours: 0,
@@ -112,6 +123,13 @@ export default function DashboardPage() {
 
       setStats(statsByType);
       setTotalStats(totals);
+
+      try {
+        const advancedData = await api.getAllStatistics();
+        setAdvancedStats(advancedData);
+      } catch (error) {
+        console.error('Error fetching advanced statistics:', error);
+      }
     } catch (error) {
       // Erreur silencieuse
     } finally {
@@ -304,6 +322,104 @@ export default function DashboardPage() {
             })}
           </div>
         </div>
+
+        {advancedStats && (
+          <>
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="flex items-center mb-6">
+                <Users className="w-8 h-8 text-blue-600 mr-3" />
+                <h2 className="text-2xl font-bold text-slate-900">Statistiques par tranche d'âge et gravité</h2>
+              </div>
+              <div className="flex justify-center">
+                <StackedBarChart
+                  data={advancedStats.ageGravite}
+                  width={800}
+                  height={400}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="flex items-center mb-6">
+                <Users className="w-8 h-8 text-pink-600 mr-3" />
+                <h2 className="text-2xl font-bold text-slate-900">Statistiques par sexe et gravité</h2>
+              </div>
+              <div className="flex justify-center">
+                <StackedBarChart
+                  data={advancedStats.sexeGravite}
+                  width={500}
+                  height={400}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="flex items-center mb-6">
+                <FileText className="w-8 h-8 text-purple-600 mr-3" />
+                <h2 className="text-2xl font-bold text-slate-900">Statistiques par qualité du notifiant et gravité</h2>
+              </div>
+              <div className="flex justify-center">
+                <StackedBarChart
+                  data={advancedStats.notifiantGravite}
+                  width={700}
+                  height={400}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="flex items-center mb-6">
+                <AlertTriangle className="w-8 h-8 text-red-600 mr-3" />
+                <h2 className="text-2xl font-bold text-slate-900">Nombre d'EIG par critères de gravité</h2>
+              </div>
+              <div className="flex justify-center">
+                <BarChart
+                  data={Object.entries(advancedStats.criteresGravite).map(([label, value]) => ({
+                    label,
+                    value: value as number,
+                    color: '#ef4444'
+                  }))}
+                  width={800}
+                  height={400}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="flex items-center mb-6">
+                <Package className="w-8 h-8 text-amber-600 mr-3" />
+                <h2 className="text-2xl font-bold text-slate-900">Statistiques par type de produit et gravité</h2>
+              </div>
+              <div className="flex justify-center">
+                <StackedBarChart
+                  data={advancedStats.typeProduitGravite}
+                  width={800}
+                  height={400}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="flex items-center mb-6">
+                <PieChartIcon className="w-8 h-8 text-teal-600 mr-3" />
+                <h2 className="text-2xl font-bold text-slate-900">Répartition des déclarations selon leur classification</h2>
+              </div>
+              <div className="flex justify-center">
+                <PieChart
+                  data={Object.entries(advancedStats.classification).map(([label, value], index) => {
+                    const colors = ['#3b82f6', '#f59e0b', '#10b981', '#ef4444', '#64748b'];
+                    return {
+                      label,
+                      value: value as number,
+                      color: colors[index % colors.length]
+                    };
+                  })}
+                  size={400}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

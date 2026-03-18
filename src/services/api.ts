@@ -194,6 +194,14 @@ class ApiService {
   getToken(): string | null {
     return localStorage.getItem('access_token');
   }
+
+  async getAllStatistics() {
+    const response = await fetch(`${API_URL}/statistics/all`, {
+      headers: this.getAuthHeaders()
+    });
+
+    return this.handleResponse(response);
+  }
 }
 
 export const api = new ApiService();
