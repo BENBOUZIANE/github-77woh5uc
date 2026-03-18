@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import CosmetovigillancePage from './pages/CosmetovigillancePage';
+import ComplementAlimentairePage from './pages/ComplementAlimentairePage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import MyDeclarationsPage from './pages/MyDeclarationsPage';
@@ -17,6 +18,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/cosmetovigilance" element={<CosmetovigillancePage />} />
+            <Route path="/test3" element={<ComplementAlimentairePage />} />
             <Route
               path="/dashboard"
               element={
