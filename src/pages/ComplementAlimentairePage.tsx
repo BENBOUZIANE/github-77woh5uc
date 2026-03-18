@@ -1304,99 +1304,89 @@ export default function ComplementAlimentairePage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center text-slate-600 hover:text-slate-900 mb-6 transition-colors"
+          className="flex items-center text-slate-600 hover:text-slate-900 mb-8 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
           Retour à l'accueil
         </button>
 
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-rose-500 to-pink-600 p-6">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-rose-500 to-pink-600 px-8 py-6">
             <div className="flex items-center">
-              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl mr-4">
-                <Pill className="w-8 h-8 text-white" />
-              </div>
+              <Pill className="w-10 h-10 text-white mr-4" />
               <div>
-                <h1 className="text-2xl font-bold text-white mb-1">
-                  Déclaration d'Effet Indésirable
+                <h1 className="text-3xl font-bold text-white">
+                  Déclaration de Nutrivigilance
                 </h1>
-                <p className="text-white/90">
-                  Complément Alimentaire
+                <p className="text-rose-100 mt-1">
+                  Compléments alimentaires
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-8">
+          <div className="px-8 py-6 border-b border-slate-200">
+            <div className="flex overflow-x-auto space-x-4 pb-2">
               {sections.map((section, index) => (
-                <div key={index} className="flex items-center">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full ${index <= currentSection ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-slate-200 text-slate-600'} font-medium text-sm transition-all`}>
-                    {index < currentSection ? '✓' : index + 1}
-                  </div>
-                  {index < sections.length - 1 && (
-                    <div className={`w-12 h-1 mx-2 ${index < currentSection ? 'bg-gradient-to-r from-rose-500 to-pink-600' : 'bg-slate-200'} transition-all`} />
-                  )}
-                </div>
+                <button
+                  key={index}
+                  onClick={() => setCurrentSection(index)}
+                  type="button"
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                    currentSection === index
+                      ? 'bg-rose-100 text-rose-700'
+                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  <span className="text-lg">{section.icon}</span>
+                  <span className="text-sm font-medium">{section.title}</span>
+                </button>
               ))}
             </div>
+          </div>
 
-            <div className="mb-6">
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                {sections[currentSection].title}
-              </h3>
-              <div className="w-20 h-1 bg-gradient-to-r from-rose-500 to-pink-600 rounded-full" />
-            </div>
-
+          <div className="px-8 py-8">
             <form onSubmit={(e) => e.preventDefault()}>
               {renderSection()}
 
-              <div className="flex justify-between mt-8 pt-6 border-t border-slate-200">
-                <button
-                  type="button"
-                  onClick={previousSection}
-                  disabled={currentSection === 0}
-                  className={`px-6 py-2 rounded-lg font-medium transition-colors ${currentSection === 0
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                    }`}
-                >
-                  Précédent
-                </button>
-
-                {currentSection < sections.length - 1 ? (
-                  <button
-                    type="button"
-                    onClick={nextSection}
-                    className="px-6 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-medium hover:from-rose-600 hover:to-pink-700 transition-all shadow-md hover:shadow-lg"
-                  >
-                    Suivant
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="flex items-center px-6 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-medium hover:from-rose-600 hover:to-pink-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? (
-                      <>Envoi en cours...</>
-                    ) : (
-                      <>
-                        <Save className="w-5 h-5 mr-2" />
-                        Soumettre
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
             </form>
           </div>
+
+          <div className="px-8 py-6 bg-slate-50 border-t border-slate-200 flex justify-between">
+            <button
+              type="button"
+              onClick={previousSection}
+              disabled={currentSection === 0}
+              className="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Précédent
+            </button>
+
+            {currentSection < sections.length - 1 ? (
+              <button
+                type="button"
+                onClick={nextSection}
+                className="px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors"
+              >
+                Suivant
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="flex items-center px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 disabled:opacity-50 transition-colors"
+              >
+                <Save className="w-5 h-5 mr-2" />
+                {isSubmitting ? 'Envoi en cours...' : 'Soumettre la Déclaration'}
+              </button>
+            )}
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
