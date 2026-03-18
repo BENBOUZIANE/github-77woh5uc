@@ -52,18 +52,13 @@ interface FormData {
     reapparition?: boolean;
   };
   complementsSuspectes: {
-    nomCommercial: string;
-    marque: string;
-    fabricant: string;
-    numeroLot: string;
-    formeGalenique: string;
+    nomSpecialite: string;
     posologie: string;
-    frequenceUtilisation: string;
-    dateDebutUtilisation: string;
-    arretUtilisation: string;
-    reexpositionProduit: boolean;
-    reapparitionEffetIndesirable: boolean;
-    compositionProduit: string;
+    numeroLot: string;
+    dateDebutPrise: string;
+    dateArretPrise: string;
+    motifPrise: string;
+    lieuAchat: string;
   }[];
   commentaire: string;
 }
@@ -92,18 +87,13 @@ export default function ComplementAlimentairePage() {
   const [documentEnregistrement, setDocumentEnregistrement] = useState<File | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [currentComplement, setCurrentComplement] = useState({
-    nomCommercial: '',
-    marque: '',
-    fabricant: '',
-    numeroLot: '',
-    formeGalenique: '',
+    nomSpecialite: '',
     posologie: '',
-    frequenceUtilisation: '',
-    dateDebutUtilisation: '',
-    arretUtilisation: '',
-    reexpositionProduit: false,
-    reapparitionEffetIndesirable: false,
-    compositionProduit: ''
+    numeroLot: '',
+    dateDebutPrise: '',
+    dateArretPrise: '',
+    motifPrise: '',
+    lieuAchat: ''
   });
   const [isEditingComplement, setIsEditingComplement] = useState(false);
   const [editingComplementIndex, setEditingComplementIndex] = useState<number | null>(null);
@@ -981,9 +971,8 @@ export default function ComplementAlimentairePage() {
 
       case 4:
         const addOrUpdateComplement = () => {
-          if (!currentComplement.nomCommercial || !currentComplement.marque || !currentComplement.numeroLot ||
-              !currentComplement.formeGalenique || !currentComplement.frequenceUtilisation || !currentComplement.dateDebutUtilisation) {
-            alert('Veuillez remplir tous les champs obligatoires');
+          if (!currentComplement.nomSpecialite || !currentComplement.numeroLot || !currentComplement.dateDebutPrise) {
+            alert('Veuillez remplir tous les champs obligatoires (Nom de spécialité, N° de lot, Date début de prise)');
             return;
           }
 
@@ -998,18 +987,13 @@ export default function ComplementAlimentairePage() {
           }
 
           setCurrentComplement({
-            nomCommercial: '',
-            marque: '',
-            fabricant: '',
-            numeroLot: '',
-            formeGalenique: '',
+            nomSpecialite: '',
             posologie: '',
-            frequenceUtilisation: '',
-            dateDebutUtilisation: '',
-            arretUtilisation: '',
-            reexpositionProduit: false,
-            reapparitionEffetIndesirable: false,
-            compositionProduit: ''
+            numeroLot: '',
+            dateDebutPrise: '',
+            dateArretPrise: '',
+            motifPrise: '',
+            lieuAchat: ''
           });
         };
 
@@ -1065,20 +1049,17 @@ export default function ComplementAlimentairePage() {
                       {formData.complementsSuspectes.map((complement, index) => (
                         <tr key={index} className="hover:bg-slate-50">
                           <td className="border border-slate-300 px-3 py-2 text-sm">
-                            <div className="font-medium">{complement.nomCommercial}</div>
-                            <div className="text-xs text-slate-600">{complement.marque}</div>
+                            {complement.nomSpecialite}
                           </td>
                           <td className="border border-slate-300 px-3 py-2 text-sm">
-                            <div>{complement.posologie || '-'}</div>
-                            <div className="text-xs text-slate-600">{complement.frequenceUtilisation}</div>
+                            {complement.posologie || '-'}
                           </td>
                           <td className="border border-slate-300 px-3 py-2 text-sm text-center">{complement.numeroLot || '-'}</td>
                           <td className="border border-slate-300 px-3 py-2 text-sm text-center">
-                            {complement.dateDebutUtilisation ? new Date(complement.dateDebutUtilisation).toLocaleDateString('fr-FR') : '-'}
+                            {complement.dateDebutPrise ? new Date(complement.dateDebutPrise).toLocaleDateString('fr-FR') : '-'}
                           </td>
                           <td className="border border-slate-300 px-3 py-2 text-sm text-center">
-                            {complement.dateArretUtilisation ? new Date(complement.dateArretUtilisation).toLocaleDateString('fr-FR') :
-                             complement.arretUtilisation === 'OUI' ? 'Arrêté' : complement.arretUtilisation === 'NON' ? 'En cours' : '-'}
+                            {complement.dateArretPrise ? new Date(complement.dateArretPrise).toLocaleDateString('fr-FR') : '-'}
                           </td>
                           <td className="border border-slate-300 px-3 py-2 text-sm">{complement.motifPrise || '-'}</td>
                           <td className="border border-slate-300 px-3 py-2 text-sm text-center">{complement.lieuAchat || '-'}</td>
@@ -1123,37 +1104,28 @@ export default function ComplementAlimentairePage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Nom Commercial*</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Nom de la spécialité/présentation*</label>
                     <input
                       type="text"
-                      value={currentComplement.nomCommercial}
-                      onChange={(e) => setCurrentComplement({ ...currentComplement, nomCommercial: e.target.value })}
+                      value={currentComplement.nomSpecialite}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, nomSpecialite: e.target.value })}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Marque*</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Posologie / voie d'administration</label>
                     <input
                       type="text"
-                      value={currentComplement.marque}
-                      onChange={(e) => setCurrentComplement({ ...currentComplement, marque: e.target.value })}
+                      value={currentComplement.posologie}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, posologie: e.target.value })}
+                      placeholder="Ex: 1 gélule par jour, voie orale"
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Fabricant</label>
-                    <input
-                      type="text"
-                      value={currentComplement.fabricant}
-                      onChange={(e) => setCurrentComplement({ ...currentComplement, fabricant: e.target.value })}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Numéro de Lot*</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">N° de lot*</label>
                     <input
                       type="text"
                       value={currentComplement.numeroLot}
@@ -1163,108 +1135,52 @@ export default function ComplementAlimentairePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Forme Galénique*</label>
-                    <select
-                      value={currentComplement.formeGalenique}
-                      onChange={(e) => setCurrentComplement({ ...currentComplement, formeGalenique: e.target.value })}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                    >
-                      <option value="">Sélectionner une forme</option>
-                      <option value="Gélule">Gélule</option>
-                      <option value="Comprimé">Comprimé</option>
-                      <option value="Poudre">Poudre</option>
-                      <option value="Sirop">Sirop</option>
-                      <option value="Ampoule">Ampoule</option>
-                      <option value="Sachet">Sachet</option>
-                      <option value="Autre">Autre</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Fréquence d'Utilisation*</label>
-                    <select
-                      value={currentComplement.frequenceUtilisation}
-                      onChange={(e) => setCurrentComplement({ ...currentComplement, frequenceUtilisation: e.target.value })}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                    >
-                      <option value="">Sélectionner une fréquence</option>
-                      <option value="Quotidienne">Quotidienne</option>
-                      <option value="Hebdomadaire">Hebdomadaire</option>
-                      <option value="Mensuelle">Mensuelle</option>
-                      <option value="Occasionnelle">Occasionnelle</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Posologie</label>
-                    <input
-                      type="text"
-                      value={currentComplement.posologie}
-                      onChange={(e) => setCurrentComplement({ ...currentComplement, posologie: e.target.value })}
-                      placeholder="Ex: 1 gélule par jour"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Date de Début*</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Date Début de prise*</label>
                     <input
                       type="date"
-                      value={currentComplement.dateDebutUtilisation}
-                      onChange={(e) => setCurrentComplement({ ...currentComplement, dateDebutUtilisation: e.target.value })}
+                      value={currentComplement.dateDebutPrise}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, dateDebutPrise: e.target.value })}
                       max={new Date().toISOString().split('T')[0]}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Arrêt d'Utilisation</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Date Arrêt de prise</label>
+                    <input
+                      type="date"
+                      value={currentComplement.dateArretPrise}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, dateArretPrise: e.target.value })}
+                      max={new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Motif de la prise</label>
+                    <input
+                      type="text"
+                      value={currentComplement.motifPrise}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, motifPrise: e.target.value })}
+                      placeholder="Ex: Renforcement immunitaire"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Lieu d'achat**</label>
                     <select
-                      value={currentComplement.arretUtilisation}
-                      onChange={(e) => setCurrentComplement({ ...currentComplement, arretUtilisation: e.target.value })}
+                      value={currentComplement.lieuAchat}
+                      onChange={(e) => setCurrentComplement({ ...currentComplement, lieuAchat: e.target.value })}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                     >
                       <option value="">Sélectionner</option>
-                      <option value="OUI">Oui</option>
-                      <option value="NON">Non</option>
-                      <option value="INCONNU">Inconnu</option>
+                      <option value="1">1 - Pharmacie</option>
+                      <option value="2">2 - Parapharmacie</option>
+                      <option value="3">3 - Internet</option>
+                      <option value="4">4 - Inconnu</option>
                     </select>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Composition du produit</label>
-                  <textarea
-                    value={currentComplement.compositionProduit}
-                    onChange={(e) => setCurrentComplement({ ...currentComplement, compositionProduit: e.target.value })}
-                    rows={3}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                    placeholder="Listez les ingrédients principaux..."
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={currentComplement.reexpositionProduit}
-                      onChange={(e) => setCurrentComplement({ ...currentComplement, reexpositionProduit: e.target.checked, reapparitionEffetIndesirable: e.target.checked ? currentComplement.reapparitionEffetIndesirable : false })}
-                      className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
-                    />
-                    <span className="ml-2 text-sm text-slate-700">Réexposition au produit</span>
-                  </label>
-
-                  {currentComplement.reexpositionProduit && (
-                    <label className="flex items-center ml-6">
-                      <input
-                        type="checkbox"
-                        checked={currentComplement.reapparitionEffetIndesirable}
-                        onChange={(e) => setCurrentComplement({ ...currentComplement, reapparitionEffetIndesirable: e.target.checked })}
-                        className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
-                      />
-                      <span className="ml-2 text-sm text-slate-700">Réapparition de l'effet indésirable</span>
-                    </label>
-                  )}
                 </div>
 
                 <button

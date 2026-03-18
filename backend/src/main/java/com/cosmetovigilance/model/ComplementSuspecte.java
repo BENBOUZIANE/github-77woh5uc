@@ -16,36 +16,24 @@ public class ComplementSuspecte {
     @JoinColumn(name = "complement_alimentaire_id")
     private ComplementAlimentaire complementAlimentaire;
 
-    @Column(name = "nom_commercial")
-    private String nomCommercial;
-
-    private String marque;
-    private String fabricant;
-
-    @Column(name = "numero_lot")
-    private String numeroLot;
-
-    @Column(name = "forme_galenique")
-    private String formeGalenique;
+    @Column(name = "nom_specialite")
+    private String nomSpecialite;
 
     @Column(name = "posologie")
     private String posologie;
 
-    @Column(name = "frequence_utilisation")
-    private String frequenceUtilisation;
+    @Column(name = "numero_lot")
+    private String numeroLot;
 
-    @Column(name = "date_debut_utilisation")
-    private LocalDate dateDebutUtilisation;
+    @Column(name = "date_debut_prise")
+    private LocalDate dateDebutPrise;
 
-    @Column(name = "arret_utilisation")
-    private String arretUtilisation;
+    @Column(name = "date_arret_prise")
+    private LocalDate dateArretPrise;
 
-    @Column(name = "reexposition_produit")
-    private Boolean reexpositionProduit;
+    @Column(name = "motif_prise")
+    private String motifPrise;
 
-    @Column(name = "reapparition_effet_indesirable")
-    private Boolean reapparitionEffetIndesirable;
-
-    @Column(name = "composition_produit", columnDefinition = "TEXT")
-    private String compositionProduit;
+    @Column(name = "lieu_achat")
+    private String lieuAchat;
 }

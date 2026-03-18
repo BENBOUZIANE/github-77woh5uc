@@ -181,22 +181,20 @@ public class ComplementAlimentaireService {
     private void saveComplementSuspecte(ComplementSuspecteDto dto, ComplementAlimentaire complementAlimentaire) {
         ComplementSuspecte cs = new ComplementSuspecte();
         cs.setComplementAlimentaire(complementAlimentaire);
-        cs.setNomCommercial(dto.getNomCommercial());
-        cs.setMarque(dto.getMarque());
-        cs.setFabricant(dto.getFabricant());
-        cs.setNumeroLot(dto.getNumeroLot());
-        cs.setFormeGalenique(dto.getFormeGalenique());
+        cs.setNomSpecialite(dto.getNomSpecialite());
         cs.setPosologie(dto.getPosologie());
-        cs.setFrequenceUtilisation(dto.getFrequenceUtilisation());
+        cs.setNumeroLot(dto.getNumeroLot());
 
-        if (dto.getDateDebutUtilisation() != null && !dto.getDateDebutUtilisation().isEmpty()) {
-            cs.setDateDebutUtilisation(LocalDate.parse(dto.getDateDebutUtilisation()));
+        if (dto.getDateDebutPrise() != null && !dto.getDateDebutPrise().isEmpty()) {
+            cs.setDateDebutPrise(LocalDate.parse(dto.getDateDebutPrise()));
         }
 
-        cs.setArretUtilisation(dto.getArretUtilisation());
-        cs.setReexpositionProduit(dto.getReexpositionProduit());
-        cs.setReapparitionEffetIndesirable(dto.getReapparitionEffetIndesirable());
-        cs.setCompositionProduit(dto.getCompositionProduit());
+        if (dto.getDateArretPrise() != null && !dto.getDateArretPrise().isEmpty()) {
+            cs.setDateArretPrise(LocalDate.parse(dto.getDateArretPrise()));
+        }
+
+        cs.setMotifPrise(dto.getMotifPrise());
+        cs.setLieuAchat(dto.getLieuAchat());
         complementSuspecteRepository.save(cs);
     }
 
@@ -372,18 +370,13 @@ public class ComplementAlimentaireService {
     private ComplementSuspecteDto toComplementSuspecteDto(ComplementSuspecte cs) {
         if (cs == null) return null;
         ComplementSuspecteDto dto = new ComplementSuspecteDto();
-        dto.setNomCommercial(cs.getNomCommercial());
-        dto.setMarque(cs.getMarque());
-        dto.setFabricant(cs.getFabricant());
-        dto.setNumeroLot(cs.getNumeroLot());
-        dto.setFormeGalenique(cs.getFormeGalenique());
+        dto.setNomSpecialite(cs.getNomSpecialite());
         dto.setPosologie(cs.getPosologie());
-        dto.setFrequenceUtilisation(cs.getFrequenceUtilisation());
-        dto.setDateDebutUtilisation(cs.getDateDebutUtilisation() != null ? cs.getDateDebutUtilisation().toString() : null);
-        dto.setArretUtilisation(cs.getArretUtilisation());
-        dto.setReexpositionProduit(cs.getReexpositionProduit());
-        dto.setReapparitionEffetIndesirable(cs.getReapparitionEffetIndesirable());
-        dto.setCompositionProduit(cs.getCompositionProduit());
+        dto.setNumeroLot(cs.getNumeroLot());
+        dto.setDateDebutPrise(cs.getDateDebutPrise() != null ? cs.getDateDebutPrise().toString() : null);
+        dto.setDateArretPrise(cs.getDateArretPrise() != null ? cs.getDateArretPrise().toString() : null);
+        dto.setMotifPrise(cs.getMotifPrise());
+        dto.setLieuAchat(cs.getLieuAchat());
         return dto;
     }
 }
