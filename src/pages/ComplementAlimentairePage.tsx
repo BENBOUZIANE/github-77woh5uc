@@ -1029,32 +1029,69 @@ export default function ComplementAlimentairePage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Compléments Alimentaires Suspectés</h2>
 
             {formData.complementsSuspectes.length > 0 && (
-              <div className="space-y-3 mb-6">
-                <h3 className="text-lg font-semibold text-slate-800">Liste des compléments déclarés</h3>
-                {formData.complementsSuspectes.map((complement, index) => (
-                  <div key={index} className="flex items-center justify-between bg-rose-50 border border-rose-200 px-4 py-3 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-medium text-slate-900">{complement.nomCommercial} - {complement.marque}</p>
-                      <p className="text-sm text-slate-600">Lot: {complement.numeroLot} | Forme: {complement.formeGalenique}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => editComplement(index)}
-                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                      >
-                        Modifier
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeComplement(index)}
-                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-slate-800 mb-3">Liste des compléments déclarés</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-slate-300">
+                    <thead>
+                      <tr className="bg-rose-100">
+                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Dénomination</th>
+                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Fabricant</th>
+                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">N° de lot</th>
+                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Forme galénique</th>
+                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Posologie et voie d'administration</th>
+                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Date de début</th>
+                        <th className="border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-700">Date de fin</th>
+                        <th className="border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {formData.complementsSuspectes.map((complement, index) => (
+                        <tr key={index} className="hover:bg-slate-50">
+                          <td className="border border-slate-300 px-3 py-2 text-sm">
+                            <div className="font-medium">{complement.nomCommercial}</div>
+                            <div className="text-xs text-slate-600">{complement.marque}</div>
+                          </td>
+                          <td className="border border-slate-300 px-3 py-2 text-sm">{complement.fabricant || '-'}</td>
+                          <td className="border border-slate-300 px-3 py-2 text-sm">{complement.numeroLot}</td>
+                          <td className="border border-slate-300 px-3 py-2 text-sm">{complement.formeGalenique}</td>
+                          <td className="border border-slate-300 px-3 py-2 text-sm">
+                            <div>{complement.posologie || '-'}</div>
+                            <div className="text-xs text-slate-600">{complement.frequenceUtilisation}</div>
+                          </td>
+                          <td className="border border-slate-300 px-3 py-2 text-sm">
+                            {complement.dateDebutUtilisation ? new Date(complement.dateDebutUtilisation).toLocaleDateString('fr-FR') : '-'}
+                          </td>
+                          <td className="border border-slate-300 px-3 py-2 text-sm">
+                            {complement.arretUtilisation === 'OUI' ? 'Arrêté' : complement.arretUtilisation === 'NON' ? 'En cours' : 'Inconnu'}
+                          </td>
+                          <td className="border border-slate-300 px-3 py-2 text-center">
+                            <div className="flex gap-1 justify-center">
+                              <button
+                                type="button"
+                                onClick={() => editComplement(index)}
+                                className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                                title="Modifier"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeComplement(index)}
+                                className="p-1 text-red-600 hover:bg-red-100 rounded transition-colors"
+                                title="Supprimer"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
