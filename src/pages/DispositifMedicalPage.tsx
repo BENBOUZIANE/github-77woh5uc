@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Beaker, Save, Plus, X, Upload, Image as ImageIcon, File, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
+import { ArrowLeft, Beaker, Save, Upload, Image as ImageIcon, File, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { villesMaroc } from '../data/villesMaroc';
 
@@ -37,32 +37,30 @@ interface FormData {
     sexe: string;
     ville: string;
   };
-  allergiesConnues: string[];
-  antecedentsMedicaux: string[];
-  medicamentsSimultanes: string[];
   incident: {
     description: string;
-    dateIncident: string;
-    lieuIncident: string;
-    circonstances: string;
-    consequences: string;
-    graviteCriteres: string[];
-  };
-  priseChargeMedicale: {
-    consultationMedicale: boolean;
-    diagnosticMedecin: string;
-    mesuresPriseType: string;
-    mesuresPriseAutre: string;
-    examensRealise: string;
+    nombreDM: string;
+    dateSurvenue: string;
+    consequencesCliniques: string;
+    structureSurvenue: string;
+    adresseSurvenue: string;
   };
   dispositifSuspecte: {
-    denomination: string;
-    fabricant: string;
+    nomCommercial: string;
+    marque: string;
+    designation: string;
+    reference: string;
     modele: string;
     numeroSerie: string;
     numeroLot: string;
+    udi: string;
+    versionLogiciel: string;
+    nomFabricant: string;
+    adresseFabricant: string;
+    localisationActuelle: string;
+    estImplantable: boolean;
     dateImplantation?: string;
-    lieuAchat: string;
+    dateExplantation?: string;
   };
   commentaire: string;
 }
@@ -77,18 +75,11 @@ export default function DispositifMedicalPage() {
     utilisateurType: 'professionnel',
     declarant: { nom: '', prenom: '', email: '', tel: '' },
     personneExposee: { type: 'patient', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: 'Année', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
-    allergiesConnues: [],
-    antecedentsMedicaux: [],
-    medicamentsSimultanes: [],
-    incident: { description: '', dateIncident: '', lieuIncident: '', circonstances: '', consequences: '', graviteCriteres: [] },
-    priseChargeMedicale: { consultationMedicale: false, diagnosticMedecin: '', mesuresPriseType: '', mesuresPriseAutre: '', examensRealise: '' },
-    dispositifSuspecte: { denomination: '', fabricant: '', modele: '', numeroSerie: '', numeroLot: '', lieuAchat: '' },
+    incident: { description: '', nombreDM: '', dateSurvenue: '', consequencesCliniques: '', structureSurvenue: '', adresseSurvenue: '' },
+    dispositifSuspecte: { nomCommercial: '', marque: '', designation: '', reference: '', modele: '', numeroSerie: '', numeroLot: '', udi: '', versionLogiciel: '', nomFabricant: '', adresseFabricant: '', localisationActuelle: '', estImplantable: false },
     commentaire: ''
   });
 
-  const [newAllergie, setNewAllergie] = useState('');
-  const [newAntecedent, setNewAntecedent] = useState('');
-  const [newMedicament, setNewMedicament] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [documentEnregistrement, setDocumentEnregistrement] = useState<File | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -105,7 +96,6 @@ export default function DispositifMedicalPage() {
     baseSections.push(
       { title: 'Personne Exposée', icon: '🧑' },
       { title: 'Incident/Risque', icon: '⚠️' },
-      { title: 'Prise en Charge', icon: '🏥' },
       { title: 'Dispositif Médical', icon: '🩺' },
       { title: 'Commentaires', icon: '💬' }
     );
@@ -164,19 +154,13 @@ export default function DispositifMedicalPage() {
 
       case 3:
         if (!formData.incident.description.trim()) errors.incidentDescription = 'La description est obligatoire';
-        if (!formData.incident.dateIncident) errors.dateIncident = 'La date d\'incident est obligatoire';
-        if (!formData.incident.lieuIncident.trim()) errors.lieuIncident = 'Le lieu d\'incident est obligatoire';
+        if (!formData.incident.dateSurvenue) errors.dateSurvenue = 'La date de survenue est obligatoire';
+        if (!formData.incident.structureSurvenue.trim()) errors.structureSurvenue = 'La structure de survenue est obligatoire';
         break;
 
       case 4:
-        if (formData.priseChargeMedicale?.mesuresPriseType === 'autre' && !formData.priseChargeMedicale.mesuresPriseAutre?.trim()) {
-          errors.mesuresPriseAutre = 'Veuillez préciser les autres mesures';
-        }
-        break;
-
-      case 5:
-        if (!formData.dispositifSuspecte.denomination.trim()) errors.denomination = 'La dénomination est obligatoire';
-        if (!formData.dispositifSuspecte.fabricant.trim()) errors.fabricant = 'Le fabricant est obligatoire';
+        if (!formData.dispositifSuspecte.nomCommercial.trim()) errors.nomCommercial = 'Le nom commercial est obligatoire';
+        if (!formData.dispositifSuspecte.nomFabricant.trim()) errors.nomFabricant = 'Le nom du fabricant est obligatoire';
         break;
     }
 
@@ -217,22 +201,8 @@ export default function DispositifMedicalPage() {
     adjustedIndex--;
 
     if (adjustedIndex === 0) return 5;
-    adjustedIndex--;
-
-    if (adjustedIndex === 0) return 6;
 
     return 0;
-  };
-
-  const addItem = (list: string[], setList: (items: string[]) => void, item: string, setItem: (val: string) => void) => {
-    if (item.trim()) {
-      setList([...list, item.trim()]);
-      setItem('');
-    }
-  };
-
-  const removeItem = (list: string[], setList: (items: string[]) => void, index: number) => {
-    setList(list.filter((_, i) => i !== index));
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -827,114 +797,6 @@ export default function DispositifMedicalPage() {
                 </label>
               </div>
             )}
-
-            <div className="mt-8 pt-8 border-t-2 border-slate-200">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Antécédents Médicaux</h3>
-
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Allergies Connues</label>
-                  <div className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={newAllergie}
-                      onChange={(e) => setNewAllergie(e.target.value)}
-                      placeholder="Ajouter une allergie"
-                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => addItem(formData.allergiesConnues, (items) => setFormData({ ...formData, allergiesConnues: items }), newAllergie, setNewAllergie)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="space-y-2">
-                    {formData.allergiesConnues.map((allergie, index) => (
-                      <div key={index} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-lg">
-                        <span>{allergie}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeItem(formData.allergiesConnues, (items) => setFormData({ ...formData, allergiesConnues: items }), index)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Antécédents Médicaux</label>
-                  <div className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={newAntecedent}
-                      onChange={(e) => setNewAntecedent(e.target.value)}
-                      placeholder="Ajouter un antécédent"
-                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => addItem(formData.antecedentsMedicaux, (items) => setFormData({ ...formData, antecedentsMedicaux: items }), newAntecedent, setNewAntecedent)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="space-y-2">
-                    {formData.antecedentsMedicaux.map((antecedent, index) => (
-                      <div key={index} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-lg">
-                        <span>{antecedent}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeItem(formData.antecedentsMedicaux, (items) => setFormData({ ...formData, antecedentsMedicaux: items }), index)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Médicaments/Produits Utilisés Simultanément</label>
-                  <div className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={newMedicament}
-                      onChange={(e) => setNewMedicament(e.target.value)}
-                      placeholder="Ajouter un médicament ou produit"
-                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => addItem(formData.medicamentsSimultanes, (items) => setFormData({ ...formData, medicamentsSimultanes: items }), newMedicament, setNewMedicament)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="space-y-2">
-                    {formData.medicamentsSimultanes.map((medicament, index) => (
-                      <div key={index} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-lg">
-                        <span>{medicament}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeItem(formData.medicamentsSimultanes, (items) => setFormData({ ...formData, medicamentsSimultanes: items }), index)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         );
 
@@ -944,7 +806,7 @@ export default function DispositifMedicalPage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations sur l'Incident ou le Risque d'Incident</h2>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Description de l'incident*</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Description de l'incident ou du risque d'incident*</label>
               <textarea
                 value={formData.incident.description}
                 onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, description: e.target.value } })}
@@ -960,85 +822,67 @@ export default function DispositifMedicalPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Date de l'Incident*</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nombre de DM concernés</label>
+                <input
+                  type="text"
+                  value={formData.incident.nombreDM}
+                  onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, nombreDM: e.target.value } })}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Ex: 1, 2, plusieurs..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Date de survenue*</label>
                 <input
                   type="date"
-                  value={formData.incident.dateIncident}
-                  onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, dateIncident: e.target.value } })}
+                  value={formData.incident.dateSurvenue}
+                  onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, dateSurvenue: e.target.value } })}
                   max={new Date().toISOString().split('T')[0]}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
-                {validationErrors.dateIncident && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.dateIncident}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Lieu de l'Incident*</label>
-                <input
-                  type="text"
-                  value={formData.incident.lieuIncident}
-                  onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, lieuIncident: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Ex: Hôpital, domicile, clinique..."
-                  required
-                />
-                {validationErrors.lieuIncident && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.lieuIncident}</p>
+                {validationErrors.dateSurvenue && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.dateSurvenue}</p>
                 )}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Circonstances de l'incident</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Conséquences cliniques et état actuel du patient ou personne impliquée</label>
               <textarea
-                value={formData.incident.circonstances}
-                onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, circonstances: e.target.value } })}
+                value={formData.incident.consequencesCliniques}
+                onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, consequencesCliniques: e.target.value } })}
                 rows={3}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Décrivez les circonstances dans lesquelles l'incident s'est produit..."
+                placeholder="Décrivez les conséquences cliniques observées..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Conséquences de l'incident</label>
-              <textarea
-                value={formData.incident.consequences}
-                onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, consequences: e.target.value } })}
-                rows={3}
+              <label className="block text-sm font-medium text-slate-700 mb-2">Structure de survenue*</label>
+              <input
+                type="text"
+                value={formData.incident.structureSurvenue}
+                onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, structureSurvenue: e.target.value } })}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Décrivez les conséquences observées..."
+                placeholder="Ex: Hôpital, clinique, cabinet..."
+                required
               />
+              {validationErrors.structureSurvenue && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.structureSurvenue}</p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Critères de Gravité</label>
-              <div className="space-y-2">
-                {[
-                  'Décès',
-                  'Mise en jeu du pronostic vital',
-                  'Hospitalisation ou prolongation d\'hospitalisation',
-                  'Invalidité ou incapacité',
-                  'Anomalie ou malformation congénitale',
-                  'Autre'
-                ].map((critere) => (
-                  <label key={critere} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.incident.graviteCriteres.includes(critere)}
-                      onChange={(e) => {
-                        const newCriteres = e.target.checked
-                          ? [...formData.incident.graviteCriteres, critere]
-                          : formData.incident.graviteCriteres.filter(c => c !== critere);
-                        setFormData({ ...formData, incident: { ...formData.incident, graviteCriteres: newCriteres } });
-                      }}
-                      className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-slate-700">{critere}</span>
-                  </label>
-                ))}
-              </div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Adresse de survenue</label>
+              <textarea
+                value={formData.incident.adresseSurvenue}
+                onChange={(e) => setFormData({ ...formData, incident: { ...formData.incident, adresseSurvenue: e.target.value } })}
+                rows={2}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Adresse complète du lieu de survenue..."
+              />
             </div>
           </div>
         );
@@ -1046,118 +890,50 @@ export default function DispositifMedicalPage() {
       case 4:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Prise en Charge Médicale</h2>
-
-            <div>
-              <label className="flex items-center mb-4">
-                <input
-                  type="checkbox"
-                  checked={formData.priseChargeMedicale.consultationMedicale}
-                  onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, consultationMedicale: e.target.checked } })}
-                  className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm font-medium text-slate-700">Consultation médicale effectuée</span>
-              </label>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Diagnostic du médecin</label>
-              <textarea
-                value={formData.priseChargeMedicale.diagnosticMedecin}
-                onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, diagnosticMedecin: e.target.value } })}
-                rows={3}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Décrivez le diagnostic médical..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Mesures prises</label>
-              <div className="space-y-3">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="mesuresPriseType"
-                    value="traitement_symptomatique"
-                    checked={formData.priseChargeMedicale.mesuresPriseType === 'traitement_symptomatique'}
-                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseType: e.target.value, mesuresPriseAutre: '' } })}
-                    className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-slate-700">Traitement symptomatique</span>
-                </label>
-
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="mesuresPriseType"
-                    value="autre"
-                    checked={formData.priseChargeMedicale.mesuresPriseType === 'autre'}
-                    onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseType: e.target.value } })}
-                    className="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-slate-700">Autre à préciser</span>
-                </label>
-
-                {formData.priseChargeMedicale.mesuresPriseType === 'autre' && (
-                  <div>
-                    <textarea
-                      value={formData.priseChargeMedicale.mesuresPriseAutre}
-                      onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, mesuresPriseAutre: e.target.value } })}
-                      rows={3}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Précisez les autres mesures prises..."
-                    />
-                    {validationErrors.mesuresPriseAutre && (
-                      <p className="mt-1 text-sm text-red-600">{validationErrors.mesuresPriseAutre}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Examens réalisés</label>
-              <textarea
-                value={formData.priseChargeMedicale.examensRealise}
-                onChange={(e) => setFormData({ ...formData, priseChargeMedicale: { ...formData.priseChargeMedicale, examensRealise: e.target.value } })}
-                rows={3}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Décrivez les examens réalisés..."
-              />
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="space-y-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations sur le Dispositif Médical Impliqué</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Dénomination*</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nom Commercial*</label>
                 <input
                   type="text"
-                  value={formData.dispositifSuspecte.denomination}
-                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, denomination: e.target.value } })}
+                  value={formData.dispositifSuspecte.nomCommercial}
+                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, nomCommercial: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                {validationErrors.denomination && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.denomination}</p>
+                {validationErrors.nomCommercial && (
+                  <p className="mt-1 text-sm text-red-600">{validationErrors.nomCommercial}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Fabricant*</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Marque</label>
                 <input
                   type="text"
-                  value={formData.dispositifSuspecte.fabricant}
-                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, fabricant: e.target.value } })}
+                  value={formData.dispositifSuspecte.marque}
+                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, marque: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                {validationErrors.fabricant && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.fabricant}</p>
-                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Désignation</label>
+                <input
+                  type="text"
+                  value={formData.dispositifSuspecte.designation}
+                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, designation: e.target.value } })}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Référence</label>
+                <input
+                  type="text"
+                  value={formData.dispositifSuspecte.reference}
+                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, reference: e.target.value } })}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
 
               <div>
@@ -1191,31 +967,101 @@ export default function DispositifMedicalPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Date d'Implantation/Utilisation</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Unique Device Identifier (UDI), Si disponible</label>
                 <input
-                  type="date"
-                  value={formData.dispositifSuspecte.dateImplantation || ''}
-                  max={new Date().toISOString().split('T')[0]}
-                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, dateImplantation: e.target.value } })}
+                  type="text"
+                  value={formData.dispositifSuspecte.udi}
+                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, udi: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Lieu d'Achat</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Version (Si Logiciel)</label>
                 <input
                   type="text"
-                  value={formData.dispositifSuspecte.lieuAchat}
-                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, lieuAchat: e.target.value } })}
+                  value={formData.dispositifSuspecte.versionLogiciel}
+                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, versionLogiciel: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Ex: Pharmacie, hôpital, en ligne..."
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Nom du fabricant*</label>
+              <input
+                type="text"
+                value={formData.dispositifSuspecte.nomFabricant}
+                onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, nomFabricant: e.target.value } })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {validationErrors.nomFabricant && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.nomFabricant}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Adresse du fabricant</label>
+              <textarea
+                value={formData.dispositifSuspecte.adresseFabricant}
+                onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, adresseFabricant: e.target.value } })}
+                rows={2}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Localisation actuelle du DM</label>
+              <input
+                type="text"
+                value={formData.dispositifSuspecte.localisationActuelle}
+                onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, localisationActuelle: e.target.value } })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Ex: À l'hôpital, chez le patient..."
+              />
+            </div>
+
+            <div className="border-t border-slate-200 pt-4 mt-6">
+              <label className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  checked={formData.dispositifSuspecte.estImplantable}
+                  onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, estImplantable: e.target.checked } })}
+                  className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm font-medium text-slate-700">DM implantable</span>
+              </label>
+
+              {formData.dispositifSuspecte.estImplantable && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Date d'implantation</label>
+                    <input
+                      type="date"
+                      value={formData.dispositifSuspecte.dateImplantation || ''}
+                      max={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, dateImplantation: e.target.value } })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Date d'explantation</label>
+                    <input
+                      type="date"
+                      value={formData.dispositifSuspecte.dateExplantation || ''}
+                      max={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setFormData({ ...formData, dispositifSuspecte: { ...formData.dispositifSuspecte, dateExplantation: e.target.value } })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         );
 
-      case 6:
+      case 5:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Commentaires Additionnels</h2>
@@ -1305,8 +1151,8 @@ export default function DispositifMedicalPage() {
               <div className="space-y-2 text-sm text-slate-700">
                 <p><strong>Déclarant:</strong> {formData.declarant.prenom} {formData.declarant.nom}</p>
                 <p><strong>Personne exposée:</strong> {formData.personneExposee.nomPrenom}</p>
-                <p><strong>Dispositif médical:</strong> {formData.dispositifSuspecte.denomination || 'Non renseigné'}</p>
-                <p><strong>Date incident:</strong> {formData.incident.dateIncident || 'Non renseigné'}</p>
+                <p><strong>Dispositif médical:</strong> {formData.dispositifSuspecte.nomCommercial || 'Non renseigné'}</p>
+                <p><strong>Date survenue:</strong> {formData.incident.dateSurvenue || 'Non renseigné'}</p>
               </div>
             </div>
           </div>
