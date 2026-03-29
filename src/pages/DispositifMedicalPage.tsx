@@ -4,6 +4,7 @@ import { ArrowLeft, Beaker, Save, Upload, Image as ImageIcon, File, LayoutDashbo
 import { useAuth } from '../contexts/AuthContext';
 import { villesMaroc } from '../data/villesMaroc';
 import { validateTelMaroc } from '../utils/validation';
+import { apiDM } from '../services/apiDM';
 
 interface FormData {
   utilisateurType: string;
@@ -255,10 +256,42 @@ export default function DispositifMedicalPage() {
 
     setIsSubmitting(true);
     try {
+      const payload = {
+        commentaire: formData.commentaire,
+        declarant: {
+          nom: formData.declarant.nom,
+          prenom: formData.declarant.prenom,
+          email: formData.declarant.email,
+          telephone: formData.declarant.tel,
+        },
+        personneExposee: {
+          nom: formData.personneExposee.nomPrenom?.split(' ')[0] || '',
+          prenom: formData.personneExposee.nomPrenom?.split(' ').slice(1).join(' ') || '',
+          dateNaissance: formData.personneExposee.dateNaissance || undefined,
+          age: formData.personneExposee.age,
+          ageUnite: formData.personneExposee.ageUnite,
+          sexe: formData.personneExposee.sexe,
+          ville: formData.personneExposee.ville,
+          grossesse: formData.personneExposee.grossesse,
+          allaitement: formData.personneExposee.allaitement,
+        },
+        dispositifsSuspectes: [{
+          nomSpecialite: formData.dispositifSuspecte.nomCommercial,
+          numeroLot: formData.dispositifSuspecte.numeroLot,
+          motifPrise: formData.incident.description,
+        }],
+        effetsIndesirables: [{
+          description: formData.incident.consequencesCliniques,
+          dateApparition: formData.incident.dateSurvenue || undefined,
+          gravite: '',
+        }],
+      };
+
+      await apiDM.createDeclaration(payload);
       alert('Déclaration soumise avec succès!');
-      navigate('/');
-    } catch (error) {
-      alert('Erreur lors de la soumission du formulaire. Veuillez réessayer.');
+      navigate('/dashboard');
+    } catch (error: any) {
+      alert('Erreur lors de la soumission: ' + (error.message || 'Erreur inconnue'));
     } finally {
       setIsSubmitting(false);
     }

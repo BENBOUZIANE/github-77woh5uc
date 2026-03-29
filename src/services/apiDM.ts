@@ -121,16 +121,13 @@ export interface DispositifMedicalResponse {
 
 export const apiDM = {
   createDeclaration: async (data: DispositifMedicalRequest): Promise<DispositifMedicalResponse> => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
+    const token = localStorage.getItem('access_token');
 
     const response = await fetch(`${API_BASE_URL}/dispositif-medical`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        ...(token && { 'Authorization': `Bearer ${token}` }),
       },
       body: JSON.stringify(data),
     });
@@ -145,7 +142,7 @@ export const apiDM = {
   },
 
   getMyDeclarations: async (): Promise<DispositifMedicalResponse[]> => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) {
       throw new Error('No authentication token found');
     }
@@ -166,7 +163,7 @@ export const apiDM = {
   },
 
   getAllDeclarations: async (): Promise<DispositifMedicalResponse[]> => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) {
       throw new Error('No authentication token found');
     }
@@ -187,7 +184,7 @@ export const apiDM = {
   },
 
   getDeclarationById: async (id: number): Promise<DispositifMedicalResponse> => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) {
       throw new Error('No authentication token found');
     }
@@ -208,7 +205,7 @@ export const apiDM = {
   },
 
   updateStatut: async (id: number, statut: string): Promise<DispositifMedicalResponse> => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) {
       throw new Error('No authentication token found');
     }
@@ -231,7 +228,7 @@ export const apiDM = {
   },
 
   updateCommentaireAnmps: async (id: number, commentaireAnmps: string): Promise<DispositifMedicalResponse> => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) {
       throw new Error('No authentication token found');
     }

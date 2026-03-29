@@ -1,5 +1,7 @@
 package com.cosmetovigilance.service;
 
+import com.cosmetovigilance.model.*;
+import com.cosmetovigilance.model.DeclarationStatus;
 import com.cosmetovigilance.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,33 +30,54 @@ public class StatisticsService {
     @Autowired
     private ComplementAlimentaireRepository complementAlimentaireRepository;
 
+    @Autowired
+    private PersonneExposeeCARepository personneExposeeCARepository;
+
+    @Autowired
+    private EffetIndesirableCARepository effetIndesirableCARepository;
+
+    @Autowired
+    private EffetIndesirableDMRepository effetIndesirableDMRepository;
+
     public Map<String, Object> getStatsByAgeAndGravite() {
-        List<Object[]> results = declarationRepository.findStatsByAgeAndGravite();
-
         Map<String, Map<String, Long>> data = new LinkedHashMap<>();
-        data.put("0-2 ans", new LinkedHashMap<>());
-        data.put("3-11 ans", new LinkedHashMap<>());
-        data.put("12-17 ans", new LinkedHashMap<>());
-        data.put("18-64 ans", new LinkedHashMap<>());
-        data.put("65+ ans", new LinkedHashMap<>());
-
-        for (Map.Entry<String, Map<String, Long>> entry : data.entrySet()) {
-            entry.getValue().put("Grave", 0L);
-            entry.getValue().put("Non grave", 0L);
+        for (String t : new String[]{"0-2 ans","3-11 ans","12-17 ans","18-64 ans","65+ ans","Non spécifié"}) {
+            data.put(t, new LinkedHashMap<>(Map.of("Grave", 0L, "Non grave", 0L)));
         }
 
-        for (Object[] result : results) {
-            Integer age = (Integer) result[0];
-            String ageUnite = (String) result[1];
-            Boolean gravite = (Boolean) result[2];
-            Long count = (Long) result[3];
+        // Cosmétiques
+        List<Object[]> cosmo = declarationRepository.findStatsByAgeAndGravite();
+        for (Object[] r : cosmo) {
+            Integer age = r[0] != null ? ((Number) r[0]).intValue() : null;
+            String ageUnite = r[1] != null ? r[1].toString() : null;
+            Boolean gravite = toBoolean(r[2]);
+            Long count = r[3] != null ? ((Number) r[3]).longValue() : 0L;
+            String dateNaissance = r[4] != null ? r[4].toString() : null;
+            String tranche = getAgeCategory(age, ageUnite, dateNaissance);
+            String label = gravite ? "Grave" : "Non grave";
+            if (data.containsKey(tranche)) data.get(tranche).merge(label, count, Long::sum);
+        }
 
-            String tranche = getAgeCategory(age, ageUnite);
-            String graviteLabel = (gravite != null && gravite) ? "Grave" : "Non grave";
+        // Compléments alimentaires
+        for (PersonneExposeeCA pe : personneExposeeCARepository.findAll()) {
+            ComplementAlimentaire ca = pe.getComplementAlimentaire();
+            if (ca == null || ca.getEffetIndesirable() == null) continue;
+            Boolean gravite = ca.getEffetIndesirable().getGravite();
+            String tranche = getAgeCategory(pe.getAge(), pe.getAgeUnite(), pe.getDateNaissance());
+            String label = Boolean.TRUE.equals(gravite) ? "Grave" : "Non grave";
+            if (data.containsKey(tranche)) data.get(tranche).merge(label, 1L, Long::sum);
+        }
 
-            if (data.containsKey(tranche)) {
-                data.get(tranche).put(graviteLabel, data.get(tranche).get(graviteLabel) + count);
-            }
+        // Dispositifs médicaux
+        for (DispositifMedical dm : dispositifMedicalRepository.findAll()) {
+            if (dm.getPersonneExposee() == null) continue;
+            PersonneExposeeDM pe = dm.getPersonneExposee();
+            List<EffetIndesirableDM> effets = effetIndesirableDMRepository.findByDispositifMedicalId(dm.getId());
+            boolean grave = effets.stream().anyMatch(e -> e.getGravite() != null && !e.getGravite().isBlank() && !"non".equalsIgnoreCase(e.getGravite()));
+            String dateNaissanceDM = pe.getDateNaissance() != null ? pe.getDateNaissance().toString() : null;
+            String tranche = getAgeCategory(pe.getAge(), pe.getAgeUnite(), dateNaissanceDM);
+            String label = grave ? "Grave" : "Non grave";
+            if (data.containsKey(tranche)) data.get(tranche).merge(label, 1L, Long::sum);
         }
 
         Map<String, Object> response = new HashMap<>();
@@ -63,33 +86,44 @@ public class StatisticsService {
     }
 
     public Map<String, Object> getStatsBySexeAndGravite() {
-        List<Object[]> results = declarationRepository.findStatsBySexeAndGravite();
-
         Map<String, Map<String, Long>> data = new LinkedHashMap<>();
-        data.put("Masculin", Map.of("Grave", 0L, "Non grave", 0L));
-        data.put("Féminin", Map.of("Grave", 0L, "Non grave", 0L));
+        data.put("Masculin", new LinkedHashMap<>(Map.of("Grave", 0L, "Non grave", 0L)));
+        data.put("Féminin", new LinkedHashMap<>(Map.of("Grave", 0L, "Non grave", 0L)));
 
-        Map<String, Map<String, Long>> mutableData = new LinkedHashMap<>();
-        for (Map.Entry<String, Map<String, Long>> entry : data.entrySet()) {
-            mutableData.put(entry.getKey(), new LinkedHashMap<>(entry.getValue()));
+        // Cosmétiques
+        List<Object[]> cosmo = declarationRepository.findStatsBySexeAndGravite();
+        for (Object[] r : cosmo) {
+            String sexe = r[0] != null ? r[0].toString() : "";
+            Boolean gravite = toBoolean(r[1]);
+            Long count = r[2] != null ? ((Number) r[2]).longValue() : 0L;
+            String sexeLabel = "M".equalsIgnoreCase(sexe) ? "Masculin" : "Féminin";
+            String label = gravite ? "Grave" : "Non grave";
+            data.get(sexeLabel).merge(label, count, Long::sum);
         }
 
-        for (Object[] result : results) {
-            String sexe = (String) result[0];
-            Boolean gravite = (Boolean) result[1];
-            Long count = (Long) result[2];
+        // Compléments alimentaires
+        for (PersonneExposeeCA pe : personneExposeeCARepository.findAll()) {
+            ComplementAlimentaire ca = pe.getComplementAlimentaire();
+            if (ca == null || ca.getEffetIndesirable() == null) continue;
+            Boolean gravite = ca.getEffetIndesirable().getGravite();
+            String sexeLabel = "M".equalsIgnoreCase(pe.getSexe()) ? "Masculin" : "Féminin";
+            String label = Boolean.TRUE.equals(gravite) ? "Grave" : "Non grave";
+            data.get(sexeLabel).merge(label, 1L, Long::sum);
+        }
 
-            String sexeLabel = "M".equalsIgnoreCase(sexe) ? "Masculin" : "Féminin";
-            String graviteLabel = (gravite != null && gravite) ? "Grave" : "Non grave";
-
-            if (mutableData.containsKey(sexeLabel)) {
-                mutableData.get(sexeLabel).put(graviteLabel,
-                    mutableData.get(sexeLabel).get(graviteLabel) + count);
-            }
+        // Dispositifs médicaux
+        for (DispositifMedical dm : dispositifMedicalRepository.findAll()) {
+            if (dm.getPersonneExposee() == null) continue;
+            PersonneExposeeDM pe = dm.getPersonneExposee();
+            List<EffetIndesirableDM> effets = effetIndesirableDMRepository.findByDispositifMedicalId(dm.getId());
+            boolean grave = effets.stream().anyMatch(e -> e.getGravite() != null && !e.getGravite().isBlank() && !"non".equalsIgnoreCase(e.getGravite()));
+            String sexeLabel = "M".equalsIgnoreCase(pe.getSexe()) ? "Masculin" : "Féminin";
+            String label = grave ? "Grave" : "Non grave";
+            data.get(sexeLabel).merge(label, 1L, Long::sum);
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("data", mutableData);
+        response.put("data", data);
         return response;
     }
 
@@ -99,9 +133,9 @@ public class StatisticsService {
         Map<String, Map<String, Long>> data = new LinkedHashMap<>();
 
         for (Object[] result : results) {
-            String type = (String) result[0];
-            Boolean gravite = (Boolean) result[1];
-            Long count = (Long) result[2];
+            String type = result[0] != null ? result[0].toString() : "";
+            Boolean gravite = toBoolean(result[1]);
+            Long count = result[2] != null ? ((Number) result[2]).longValue() : 0L;
 
             String typeLabel = getNotifiantLabel(type);
             String graviteLabel = (gravite != null && gravite) ? "Grave" : "Non grave";
@@ -127,8 +161,8 @@ public class StatisticsService {
         data.put("Autre situation grave", 0L);
 
         for (Object[] result : results) {
-            String criteres = (String) result[0];
-            Long count = (Long) result[1];
+            String criteres = result[0] != null ? result[0].toString() : null;
+            Long count = result[1] != null ? ((Number) result[1]).longValue() : 0L;
 
             if (criteres != null && !criteres.trim().isEmpty()) {
                 String[] criteresArray = criteres.split(",");
@@ -147,19 +181,37 @@ public class StatisticsService {
     }
 
     public Map<String, Object> getStatsByTypeProduitAndGravite() {
-        List<Object[]> results = produitSuspecteRepository.findStatsByTypeProduitAndGravite();
-
         Map<String, Map<String, Long>> data = new LinkedHashMap<>();
 
-        for (Object[] result : results) {
-            String typeProduit = (String) result[0];
-            Boolean gravite = (Boolean) result[1];
-            Long count = (Long) result[2];
+        // Cosmétiques — type produit depuis produit_suspecte
+        List<Object[]> cosmo = produitSuspecteRepository.findStatsByTypeProduitAndGravite();
+        for (Object[] r : cosmo) {
+            String typeProduit = r[0] != null ? r[0].toString() : "Non spécifié";
+            Boolean gravite = toBoolean(r[1]);
+            Long count = r[2] != null ? ((Number) r[2]).longValue() : 0L;
+            String label = gravite ? "Grave" : "Non grave";
+            data.putIfAbsent(typeProduit, new LinkedHashMap<>(Map.of("Grave", 0L, "Non grave", 0L)));
+            data.get(typeProduit).merge(label, count, Long::sum);
+        }
 
-            String graviteLabel = (gravite != null && gravite) ? "Grave" : "Non grave";
+        // Compléments alimentaires
+        String caType = "Complément alimentaire";
+        data.putIfAbsent(caType, new LinkedHashMap<>(Map.of("Grave", 0L, "Non grave", 0L)));
+        for (ComplementAlimentaire ca : complementAlimentaireRepository.findAll()) {
+            if (ca.getEffetIndesirable() == null) continue;
+            Boolean gravite = ca.getEffetIndesirable().getGravite();
+            String label = Boolean.TRUE.equals(gravite) ? "Grave" : "Non grave";
+            data.get(caType).merge(label, 1L, Long::sum);
+        }
 
-            data.putIfAbsent(typeProduit, new LinkedHashMap<>());
-            data.get(typeProduit).put(graviteLabel, count);
+        // Dispositifs médicaux
+        String dmType = "Dispositif médical";
+        data.putIfAbsent(dmType, new LinkedHashMap<>(Map.of("Grave", 0L, "Non grave", 0L)));
+        for (DispositifMedical dm : dispositifMedicalRepository.findAll()) {
+            List<EffetIndesirableDM> effets = effetIndesirableDMRepository.findByDispositifMedicalId(dm.getId());
+            boolean grave = effets.stream().anyMatch(e -> e.getGravite() != null && !e.getGravite().isBlank() && !"non".equalsIgnoreCase(e.getGravite()));
+            String label = grave ? "Grave" : "Non grave";
+            data.get(dmType).merge(label, 1L, Long::sum);
         }
 
         Map<String, Object> response = new HashMap<>();
@@ -173,8 +225,8 @@ public class StatisticsService {
         Map<String, Long> data = new LinkedHashMap<>();
 
         for (Object[] result : results) {
-            String statut = (String) result[0];
-            Long count = (Long) result[1];
+            String statut = result[0] != null ? result[0].toString() : "inconnu";
+            Long count = result[1] != null ? ((Number) result[1]).longValue() : 0L;
 
             String statutLabel = getStatutLabel(statut);
             data.put(statutLabel, count);
@@ -187,12 +239,12 @@ public class StatisticsService {
 
     public Map<String, Object> getAllStatistics() {
         Map<String, Object> allStats = new HashMap<>();
-        allStats.put("ageGravite", getStatsByAgeAndGravite().get("data"));
-        allStats.put("sexeGravite", getStatsBySexeAndGravite().get("data"));
-        allStats.put("notifiantGravite", getStatsByNotifiantAndGravite().get("data"));
-        allStats.put("criteresGravite", getStatsByCriteresGravite().get("data"));
-        allStats.put("typeProduitGravite", getStatsByTypeProduitAndGravite().get("data"));
-        allStats.put("classification", getStatsByClassification().get("data"));
+        try { allStats.put("ageGravite", getStatsByAgeAndGravite().get("data")); } catch (Exception e) { allStats.put("ageGravite", new HashMap<>()); System.err.println("ageGravite error: " + e.getMessage()); }
+        try { allStats.put("sexeGravite", getStatsBySexeAndGravite().get("data")); } catch (Exception e) { allStats.put("sexeGravite", new HashMap<>()); System.err.println("sexeGravite error: " + e.getMessage()); }
+        try { allStats.put("notifiantGravite", getStatsByNotifiantAndGravite().get("data")); } catch (Exception e) { allStats.put("notifiantGravite", new HashMap<>()); System.err.println("notifiantGravite error: " + e.getMessage()); }
+        try { allStats.put("criteresGravite", getStatsByCriteresGravite().get("data")); } catch (Exception e) { allStats.put("criteresGravite", new HashMap<>()); System.err.println("criteresGravite error: " + e.getMessage()); }
+        try { allStats.put("typeProduitGravite", getStatsByTypeProduitAndGravite().get("data")); } catch (Exception e) { allStats.put("typeProduitGravite", new HashMap<>()); System.err.println("typeProduitGravite error: " + e.getMessage()); }
+        try { allStats.put("classification", getStatsByClassification().get("data")); } catch (Exception e) { allStats.put("classification", new HashMap<>()); System.err.println("classification error: " + e.getMessage()); }
         return allStats;
     }
 
@@ -213,28 +265,28 @@ public class StatisticsService {
         Map<String, Long> cosmetiquesStatuts = new LinkedHashMap<>();
         List<Object[]> cosmetiquesStatutResults = declarationRepository.findStatsByStatut();
         for (Object[] result : cosmetiquesStatutResults) {
-            String statut = (String) result[0];
-            Long count = (Long) result[1];
+            String statut = result[0] != null ? result[0].toString() : "inconnu";
+            Long count = result[1] != null ? ((Number) result[1]).longValue() : 0L;
             cosmetiquesStatuts.put(getStatutLabel(statut), count);
         }
 
-        long complementsEnAttente = complementAlimentaireRepository.findByStatut("EN_ATTENTE").size();
-        long complementsEnCours = complementAlimentaireRepository.findByStatut("EN_COURS").size();
-        long complementsTraitee = complementAlimentaireRepository.findByStatut("TRAITEE").size();
+        long complementsNouveaux = complementAlimentaireRepository.countByStatut(DeclarationStatus.nouveau);
+        long complementsEnCours = complementAlimentaireRepository.countByStatut(DeclarationStatus.en_cours);
+        long complementsTraites = complementAlimentaireRepository.countByStatut(DeclarationStatus.traite);
 
         Map<String, Long> complementsStatuts = new LinkedHashMap<>();
-        complementsStatuts.put("En attente", complementsEnAttente);
+        complementsStatuts.put("Nouveau", complementsNouveaux);
         complementsStatuts.put("En cours", complementsEnCours);
-        complementsStatuts.put("Traité", complementsTraitee);
+        complementsStatuts.put("Traité", complementsTraites);
 
-        long dispositifsEnAttente = dispositifMedicalRepository.findByStatut("EN_ATTENTE").size();
+        long dispositifsNouveaux = dispositifMedicalRepository.findByStatut("EN_ATTENTE").size();
         long dispositifsEnCours = dispositifMedicalRepository.findByStatut("EN_COURS").size();
-        long dispositifsTraitee = dispositifMedicalRepository.findByStatut("TRAITEE").size();
+        long dispositifsTraites = dispositifMedicalRepository.findByStatut("TRAITEE").size();
 
         Map<String, Long> dispositifsStatuts = new LinkedHashMap<>();
-        dispositifsStatuts.put("En attente", dispositifsEnAttente);
+        dispositifsStatuts.put("Nouveau", dispositifsNouveaux);
         dispositifsStatuts.put("En cours", dispositifsEnCours);
-        dispositifsStatuts.put("Traité", dispositifsTraitee);
+        dispositifsStatuts.put("Traité", dispositifsTraites);
 
         globalStats.put("countByModule", countByModule);
         globalStats.put("cosmetiquesStatuts", cosmetiquesStatuts);
@@ -245,13 +297,41 @@ public class StatisticsService {
     }
 
     private String getAgeCategory(Integer age, String ageUnite) {
-        if (age == null) return "Non spécifié";
+        return getAgeCategory(age, ageUnite, null);
+    }
 
-        int ageInYears = age;
-        if ("mois".equalsIgnoreCase(ageUnite)) {
-            ageInYears = age / 12;
-        } else if ("jours".equalsIgnoreCase(ageUnite)) {
-            ageInYears = age / 365;
+    private String getAgeCategory(Integer age, String ageUnite, String dateNaissance) {
+        int ageInYears;
+
+        if (age != null) {
+            ageInYears = age;
+            if (ageUnite != null && "mois".equalsIgnoreCase(ageUnite)) {
+                ageInYears = age / 12;
+            } else if (ageUnite != null && ("jour".equalsIgnoreCase(ageUnite) || "jours".equalsIgnoreCase(ageUnite))) {
+                ageInYears = age / 365;
+            } else if (ageUnite != null && ("heure".equalsIgnoreCase(ageUnite) || "heures".equalsIgnoreCase(ageUnite))) {
+                ageInYears = 0;
+            }
+        } else if (dateNaissance != null && !dateNaissance.isBlank()) {
+            try {
+                java.time.LocalDate dob;
+                // Supporte formats: YYYY-MM-DD ou DD/MM/YYYY
+                if (dateNaissance.contains("-")) {
+                    String[] parts = dateNaissance.split("-");
+                    if (parts[0].length() == 4) {
+                        dob = java.time.LocalDate.parse(dateNaissance);
+                    } else {
+                        dob = java.time.LocalDate.of(Integer.parseInt(parts[2]), Integer.parseInt(parts[1]), Integer.parseInt(parts[0]));
+                    }
+                } else {
+                    dob = java.time.LocalDate.parse(dateNaissance);
+                }
+                ageInYears = java.time.Period.between(dob, java.time.LocalDate.now()).getYears();
+            } catch (Exception e) {
+                return "Non spécifié";
+            }
+        } else {
+            return "Non spécifié";
         }
 
         if (ageInYears <= 2) return "0-2 ans";
@@ -293,5 +373,12 @@ public class StatisticsService {
             default:
                 return statut;
         }
+    }
+
+    private boolean toBoolean(Object val) {
+        if (val == null) return false;
+        if (val instanceof Boolean) return (Boolean) val;
+        if (val instanceof Number) return ((Number) val).intValue() == 1;
+        return false;
     }
 }

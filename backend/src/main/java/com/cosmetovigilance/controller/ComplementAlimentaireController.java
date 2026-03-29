@@ -141,7 +141,7 @@ public class ComplementAlimentaireController {
             @PathVariable Long id,
             @RequestBody UpdateCommentaireAnmpsRequest request) {
         try {
-            complementAlimentaireService.updateCommentaireAnmps(id, request.getCommentaire());
+            complementAlimentaireService.updateCommentaireAnmps(id, request.getCommentaireAnmps());
             return ResponseEntity.ok(ApiResponse.<Void>builder()
                     .success(true)
                     .message("Commentaire mis à jour avec succès")

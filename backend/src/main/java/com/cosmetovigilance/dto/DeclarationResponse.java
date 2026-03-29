@@ -1,5 +1,6 @@
 package com.cosmetovigilance.dto;
 
+import com.cosmetovigilance.model.Attachment;
 import com.cosmetovigilance.model.DeclarationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,4 +30,5 @@ public class DeclarationResponse {
     private String commentaireAnmps;
     private String userId;
     private LocalDateTime createdAt;
+    private List<Attachment> attachments;
 }

@@ -33,7 +33,7 @@ public class DispositifMedicalController {
             @RequestBody DispositifMedicalRequest request,
             Authentication authentication) {
         try {
-            String userEmail = authentication.getName();
+            String userEmail = (authentication != null) ? authentication.getName() : null;
             DispositifMedicalResponse response = dispositifMedicalService.createDeclaration(request, userEmail);
             return ResponseEntity.ok(ApiResponse.<DispositifMedicalResponse>builder()
                     .success(true)

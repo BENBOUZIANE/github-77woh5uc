@@ -27,6 +27,7 @@ public class DeclarationService {
     private final UtilisateurRepository utilisateurRepository;
     private final ProfessionnelSanteRepository professionnelSanteRepository;
     private final RepresentantLegalRepository representantLegalRepository;
+    private final AttachmentRepository attachmentRepository;
 
     @Transactional
     public DeclarationResponse createDeclaration(DeclarationRequest request, String userEmail) {
@@ -247,7 +248,9 @@ public class DeclarationService {
         personneExposeeDto.setId(personneExposee.getId());
         personneExposeeDto.setType(personneExposee.getType());
         personneExposeeDto.setNomPrenom(personneExposee.getNomPrenom());
+        personneExposeeDto.setDateNaissance(personneExposee.getDateNaissance());
         personneExposeeDto.setAge(personneExposee.getAge());
+        personneExposeeDto.setAgeUnite(personneExposee.getAgeUnite());
         personneExposeeDto.setGrossesse(personneExposee.getGrossesse());
         personneExposeeDto.setMoisGrossesse(personneExposee.getMoisGrossesse());
         personneExposeeDto.setAllaitement(personneExposee.getAllaitement());
@@ -337,6 +340,8 @@ public class DeclarationService {
             }
         }
 
+        List<Attachment> attachments = attachmentRepository.findByDeclarationId(declaration.getId());
+
         return DeclarationResponse.builder()
                 .id(declaration.getId())
                 .statut(declaration.getStatut())
@@ -352,6 +357,7 @@ public class DeclarationService {
                 .commentaireAnmps(declaration.getCommentaireAnmps())
                 .userId(declaration.getUserId())
                 .createdAt(declaration.getCreatedAt())
+                .attachments(attachments)
                 .build();
     }
 

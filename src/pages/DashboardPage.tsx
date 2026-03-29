@@ -67,12 +67,20 @@ interface AdvancedStats {
   classification: any;
 }
 
+interface GlobalStats {
+  countByModule: Record<string, number>;
+  cosmetiquesStatuts: Record<string, number>;
+  complementsStatuts: Record<string, number>;
+  dispositifsStatuts: Record<string, number>;
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [stats, setStats] = useState<StatsByType>({});
   const [loading, setLoading] = useState(true);
   const [advancedStats, setAdvancedStats] = useState<AdvancedStats | null>(null);
+  const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
   const [totalStats, setTotalStats] = useState<StatsByStatus>({
     nouveau: 0,
     en_cours: 0,
@@ -129,6 +137,13 @@ export default function DashboardPage() {
         setAdvancedStats(advancedData);
       } catch (error) {
         console.error('Error fetching advanced statistics:', error);
+      }
+
+      try {
+        const globalData = await api.getGlobalStatistics();
+        setGlobalStats(globalData);
+      } catch (error) {
+        console.error('Error fetching global statistics:', error);
       }
     } catch (error) {
       // Erreur silencieuse
@@ -278,6 +293,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
+
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="flex items-center mb-6">
             <TrendingUp className="w-8 h-8 text-emerald-600 mr-3" />
@@ -399,25 +415,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-              <div className="flex items-center mb-6">
-                <PieChartIcon className="w-8 h-8 text-teal-600 mr-3" />
-                <h2 className="text-2xl font-bold text-slate-900">Répartition des déclarations selon leur classification</h2>
-              </div>
-              <div className="flex justify-center">
-                <PieChart
-                  data={Object.entries(advancedStats.classification).map(([label, value], index) => {
-                    const colors = ['#3b82f6', '#f59e0b', '#10b981', '#ef4444', '#64748b'];
-                    return {
-                      label,
-                      value: value as number,
-                      color: colors[index % colors.length]
-                    };
-                  })}
-                  size={400}
-                />
-              </div>
-            </div>
           </>
         )}
       </div>

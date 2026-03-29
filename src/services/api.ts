@@ -203,6 +203,14 @@ class ApiService {
 
     return this.handleResponse(response);
   }
+
+  async getGlobalStatistics() {
+    const response = await fetch(`${API_URL}/statistics/global`, {
+      headers: this.getAuthHeaders()
+    });
+
+    return this.handleResponse(response);
+  }
 }
 
 export const api = new ApiService();

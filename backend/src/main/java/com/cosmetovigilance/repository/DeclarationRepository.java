@@ -12,11 +12,11 @@ public interface DeclarationRepository extends JpaRepository<Declaration, String
     List<Declaration> findByUserId(String userId);
     List<Declaration> findByDeclarantId(String declarantId);
 
-    @Query(value = "SELECT pe.age, pe.age_unite, ei.gravite, COUNT(d.id) " +
+    @Query(value = "SELECT pe.age, pe.age_unite, ei.gravite, COUNT(d.id), pe.date_naissance " +
            "FROM declaration d " +
            "LEFT JOIN personne_exposee pe ON pe.id = d.personne_exposee_id " +
            "LEFT JOIN effet_indesirable ei ON ei.declaration_id = d.id " +
-           "GROUP BY pe.age, pe.age_unite, ei.gravite", nativeQuery = true)
+           "GROUP BY pe.age, pe.age_unite, ei.gravite, pe.date_naissance", nativeQuery = true)
     List<Object[]> findStatsByAgeAndGravite();
 
     @Query(value = "SELECT pe.sexe, ei.gravite, COUNT(d.id) " +

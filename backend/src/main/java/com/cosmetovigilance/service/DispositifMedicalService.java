@@ -33,8 +33,10 @@ public class DispositifMedicalService {
     public DispositifMedicalResponse createDeclaration(DispositifMedicalRequest request, String userEmail) {
         log.info("Creating dispositif medical declaration for user: {}", userEmail);
 
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = null;
+        if (userEmail != null && !userEmail.isEmpty()) {
+            user = userRepository.findByEmail(userEmail).orElse(null);
+        }
 
         DispositifMedical dispositifMedical = new DispositifMedical();
         dispositifMedical.setUser(user);

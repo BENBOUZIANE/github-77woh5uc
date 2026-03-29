@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/statistics")
-@CrossOrigin(origins = "*")
 @Tag(name = "Statistiques", description = "API pour les statistiques avancées du dashboard")
 public class StatisticsController {
 

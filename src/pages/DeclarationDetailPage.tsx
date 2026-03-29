@@ -35,13 +35,13 @@ interface DeclarationDetail {
     tel?: string;
   };
   personne_exposee: {
-    nom?: string;
-    prenom?: string;
+    nomPrenom?: string;
     age?: number;
+    ageUnite?: string;
+    dateNaissance?: string;
     sexe?: string;
     type?: string;
-    email?: string;
-    tel?: string;
+    ville?: string;
     grossesse?: boolean;
     mois_grossesse?: number;
     allaitement?: boolean;
@@ -142,6 +142,8 @@ export default function DeclarationDetailPage() {
           personne_exposee: {
             nomPrenom: apiData.personneExposee?.nomPrenom,
             age: apiData.personneExposee?.age,
+            ageUnite: apiData.personneExposee?.ageUnite,
+            dateNaissance: apiData.personneExposee?.dateNaissance,
             sexe: apiData.personneExposee?.sexe,
             type: apiData.personneExposee?.type,
             ville: apiData.personneExposee?.ville,
@@ -184,8 +186,15 @@ export default function DeclarationDetailPage() {
           allergies: apiData.personneExposee?.allergies ?? [],
           antecedents: apiData.personneExposee?.antecedents ?? [],
           medicaments: apiData.personneExposee?.medicaments ?? [],
-          // Attachments and utilisateur_type are not yet provided by backend in DeclarationResponse
-          attachments: [],
+          // Attachments from backend
+          attachments: (apiData.attachments ?? []).map((a: any) => ({
+            id: a.id,
+            file: a.file,
+            file_name: a.fileName,
+            file_type: a.fileType,
+            attachment_category: a.attachmentCategory,
+            created_at: a.createdAt,
+          })),
           utilisateur_type: apiData.utilisateurType ?? 'particulier',
           professionnel_sante: apiData.professionnelSante
             ? {
@@ -538,7 +547,13 @@ export default function DeclarationDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-500">Âge</p>
-                    <p className="text-slate-900">{declaration.personne_exposee.age} ans</p>
+                    <p className="text-slate-900">
+                      {declaration.personne_exposee.age
+                        ? `${declaration.personne_exposee.age} ${declaration.personne_exposee.ageUnite || 'ans'}`
+                        : declaration.personne_exposee.dateNaissance
+                          ? `Né(e) le ${new Date(declaration.personne_exposee.dateNaissance).toLocaleDateString('fr-FR')}`
+                          : 'Non renseigné'}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-500">Sexe</p>
