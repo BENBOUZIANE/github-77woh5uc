@@ -1,70 +1,141 @@
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\PersonneExposee.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\SecurityHeadersConfig.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\PriseChargeMedicaleDto.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\DeclarantDto.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\AntecedentsMedicalRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\security\JwtTokenProvider.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\util\AesEncryptionUtil.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\Attachment.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\UserDto.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\Declarant.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\RequestDecryptionFilter.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\DecryptDataSourcePasswordPostProcessor.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\BufferingResponseWrapper.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\security\JwtAuthenticationEntryPoint.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\AttachmentRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\OpenApiConfig.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\controller\DeclarationController.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\AuthResponse.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\User.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\MedicamentProduitSimultanement.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\service\CustomUserDetailsService.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\service\DeclarationService.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\PersonneExposeeRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\UpdateCommentaireAnmpsRequest.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\ProfessionnelSanteRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\EffetIndesirableRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\ApiResponseEncodingFilter.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\exception\GlobalExceptionHandler.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\UserRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\RepresentantLegal.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\Declaration.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\CosmetovigilanceApplication.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\PersonneExposeeDto.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\JasyptDecryptor.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\MedicamentProduitSimultanementRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\AllergiesConnuesRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\UpdateDeclarationStatusRequest.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\UtilisateurRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\EffetIndesirable.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\WebConfig.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\DeclarationResponse.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\service\AuthService.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\util\PasswordEncoderUtil.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\RegisterRequest.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\AntecedentsMedical.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\AllergiesConnues.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\ProfessionnelSanteDto.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\ProduitSuspecte.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\DeclarationRequest.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\RepresentantLegalRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\DeclarationRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\DeclarantRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\Utilisateur.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\ApiResponse.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\DeclarationStatus.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\ProduitSuspecteRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\RepresentantLegalDto.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\controller\AttachmentController.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\controller\AuthController.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\SecurityConfig.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\ProduitSuspecteDto.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\service\AttachmentService.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\util\EncryptPasswordUtil.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\EffetIndesirableDto.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\dto\LoginRequest.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\PriseChargeMedicale.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\repository\PriseChargeMedicaleRepository.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\security\JwtAuthenticationFilter.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\config\BufferingRequestWrapper.java
-F:\apps\Vigilances Sanitaires\project\backend\src\main\java\com\cosmetovigilance\model\ProfessionnelSante.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\controller\DeclarationController.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\EffetIndesirableCA.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\util\AesEncryptionUtil.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\PersonneExposeeCARepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\EffetIndesirableDMDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\service\ComplementAlimentaireService.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\service\CustomUserDetailsService.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\DispositifMedicalRequest.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\PersonneExposeeCADto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\AntecedentsMedicalDM.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\DispositifMedicalResponse.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\PriseChargeMedicaleDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\controller\AttachmentController.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\RepresentantLegalCADto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\AllergiesConnuesDM.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\ProfessionnelSanteRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\service\DispositifMedicalService.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\AllergiesConnuesCARepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\PersonneExposeeDMRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\Attachment.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\UserRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\AntecedentsMedicalRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\controller\ComplementAlimentaireController.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\RegisterRequest.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\EffetIndesirableDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\PriseChargeMedicale.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\UtilisateurRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\ProduitSuspecteDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\ProfessionnelSanteDM.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\controller\DispositifMedicalController.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\DeclarantDM.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\RepresentantLegalCARepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\MedicamentProduitSimultanementDMRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\DeclarationRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\PriseChargeMedicaleRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\RepresentantLegalDMRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\DeclarantCA.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\DeclarantDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\ComplementSuspecteRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\AllergiesConnues.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\PersonneExposeeCA.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\AllergiesConnuesRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\PersonneExposeeDMDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\ComplementSuspecte.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\DeclarationRequest.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\ProfessionnelSanteCA.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\MedicamentProduitSimultanementDMDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\PriseChargeMedicaleDMDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\DispositifSuspecteRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\PriseChargeMedicaleDM.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\controller\StatisticsController.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\UpdateDeclarationStatusRequest.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\EffetIndesirableDMRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\service\DeclarationService.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\RepresentantLegalRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\ApiResponse.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\AllergiesConnuesDMDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\ComplementAlimentaireRequest.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\DispositifSuspecte.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\ComplementAlimentaireResponse.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\MedicamentProduitSimultanementCARepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\security\JwtAuthenticationFilter.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\DeclarantCADto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\PriseChargeMedicaleCA.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\ProfessionnelSante.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\DeclarationStatus.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\ProfessionnelSanteCADto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\ComplementAlimentaireRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\controller\AuthController.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\AntecedentsMedical.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\ProfessionnelSanteDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\User.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\MedicamentProduitSimultanement.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\RepresentantLegalDMDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\MedicamentProduitSimultanementRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\LoginRequest.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\ProfessionnelSanteCARepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\PriseChargeMedicaleCADto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\DeclarantDMDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\Declaration.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\ApiResponseEncodingFilter.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\exception\GlobalExceptionHandler.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\service\AttachmentService.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\AntecedentsMedicalCARepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\DeclarantDMRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\DispositifMedicalRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\ProduitSuspecte.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\AntecedentsMedicalDMRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\DeclarantCARepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\SecurityConfig.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\WebConfig.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\AntecedentsMedicalCA.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\EffetIndesirableCARepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\AuthResponse.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\DispositifMedical.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\PersonneExposeeDM.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\util\PasswordEncoderUtil.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\ComplementSuspecteDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\AntecedentsMedicalDMDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\ProfessionnelSanteDMRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\service\StatisticsService.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\PriseChargeMedicaleCARepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\ComplementAlimentaire.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\security\JwtTokenProvider.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\EffetIndesirableDM.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\DecryptDataSourcePasswordPostProcessor.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\PriseChargeMedicaleDMRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\CosmetovigilanceApplication.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\BufferingResponseWrapper.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\EffetIndesirableRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\RepresentantLegalCA.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\SecurityHeadersConfig.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\AttachmentRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\DispositifSuspecteDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\Utilisateur.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\EffetIndesirableCADto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\OpenApiConfig.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\PersonneExposeeDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\ProfessionnelSanteDMDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\JasyptDecryptor.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\RequestDecryptionFilter.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\UpdateCommentaireAnmpsRequest.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\PersonneExposee.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\EffetIndesirable.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\MedicamentProduitSimultanementCA.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\Declarant.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\AllergiesConnuesDMRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\config\BufferingRequestWrapper.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\RepresentantLegalDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\MedicamentProduitSimultanementDM.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\service\AuthService.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\DeclarationResponse.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\AllergiesConnuesCA.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\PersonneExposeeRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\RepresentantLegal.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\security\JwtAuthenticationEntryPoint.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\util\EncryptPasswordUtil.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\dto\UserDto.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\ProduitSuspecteRepository.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\model\RepresentantLegalDM.java
+E:\Vig\project\backend\src\main\java\com\cosmetovigilance\repository\DeclarantRepository.java

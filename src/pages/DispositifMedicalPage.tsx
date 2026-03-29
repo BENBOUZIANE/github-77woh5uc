@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Beaker, Save, Upload, Image as ImageIcon, File, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { villesMaroc } from '../data/villesMaroc';
+import { validateTelMaroc } from '../utils/validation';
 
 interface FormData {
   utilisateurType: string;
@@ -74,7 +75,7 @@ export default function DispositifMedicalPage() {
   const [formData, setFormData] = useState<FormData>({
     utilisateurType: 'professionnel',
     declarant: { nom: '', prenom: '', email: '', tel: '' },
-    personneExposee: { type: 'patient', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: 'Année', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
+    personneExposee: { type: 'patient', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: '', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
     incident: { description: '', nombreDM: '', dateSurvenue: '', consequencesCliniques: '', structureSurvenue: '', adresseSurvenue: '' },
     dispositifSuspecte: { nomCommercial: '', marque: '', designation: '', reference: '', modele: '', numeroSerie: '', numeroLot: '', udi: '', versionLogiciel: '', nomFabricant: '', adresseFabricant: '', localisationActuelle: '', estImplantable: false },
     commentaire: ''
@@ -97,7 +98,7 @@ export default function DispositifMedicalPage() {
       { title: 'Personne Exposée', icon: '🧑' },
       { title: 'Incident/Risque', icon: '⚠️' },
       { title: 'Dispositif Médical', icon: '🩺' },
-      { title: 'Commentaires', icon: '💬' }
+      { title: 'Informations complémentaires', icon: '💬' }
     );
 
     return baseSections;
@@ -121,6 +122,7 @@ export default function DispositifMedicalPage() {
         if (!formData.declarant.nom.trim()) errors.declarantNom = 'Le nom est obligatoire';
         if (!formData.declarant.prenom.trim()) errors.declarantPrenom = 'Le prénom est obligatoire';
         if (!formData.declarant.tel.trim()) errors.declarantTel = 'Le téléphone est obligatoire';
+        else { const telErr = validateTelMaroc(formData.declarant.tel); if (telErr) errors.declarantTel = telErr; }
         if (formData.utilisateurType === 'autre' && !formData.utilisateurTypeAutre?.trim()) {
           errors.utilisateurTypeAutre = 'Veuillez préciser le type de notificateur';
         }
@@ -146,6 +148,9 @@ export default function DispositifMedicalPage() {
         if (!formData.personneExposee.ville) errors.personneVille = 'La ville est obligatoire';
         if (!formData.personneExposee.dateNaissance && !formData.personneExposee.age) {
           errors.dateNaissanceOuAge = 'La date de naissance ou l\'âge est obligatoire';
+        }
+        if (formData.personneExposee.age && !formData.personneExposee.ageUnite) {
+          errors.ageUnite = 'L\'unité de l\'âge est obligatoire';
         }
         if (formData.personneExposee.grossesse && !formData.personneExposee.moisGrossesse) {
           errors.moisGrossesse = 'Le mois de grossesse est obligatoire';
@@ -671,25 +676,23 @@ export default function DispositifMedicalPage() {
                     placeholder="jj"
                     min="1"
                     max="31"
-                    value={formData.personneExposee.dateNaissance?.split('-')[2] || ''}
+                    value={formData.personneExposee.dateNaissance?.split('-')[2]?.replace(/^0/, '') || ''}
                     onChange={(e) => {
-                      const parts = formData.personneExposee.dateNaissance?.split('-') || ['', '', ''];
-                      const day = e.target.value.padStart(2, '0');
-                      const newDate = `${parts[0] || ''}-${parts[1] || ''}-${day}`.replace(/^-+|-+$/g, '');
-                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: newDate } });
+                      const parts = (formData.personneExposee.dateNaissance || '--').split('-');
+                      const day = e.target.value ? e.target.value.padStart(2, '0') : '';
+                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: `${parts[0]}-${parts[1]}-${day}` } });
                     }}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <select
                     value={formData.personneExposee.dateNaissance?.split('-')[1] || ''}
                     onChange={(e) => {
-                      const parts = formData.personneExposee.dateNaissance?.split('-') || ['', '', ''];
-                      const newDate = `${parts[0] || ''}-${e.target.value}-${parts[2] || ''}`.replace(/^-+|-+$/g, '');
-                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: newDate } });
+                      const parts = (formData.personneExposee.dateNaissance || '--').split('-');
+                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: `${parts[0]}-${e.target.value}-${parts[2]}` } });
                     }}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">mois</option>
+                    <option value="">Mois</option>
                     <option value="01">Janvier</option>
                     <option value="02">Février</option>
                     <option value="03">Mars</option>
@@ -703,19 +706,19 @@ export default function DispositifMedicalPage() {
                     <option value="11">Novembre</option>
                     <option value="12">Décembre</option>
                   </select>
-                  <input
-                    type="number"
-                    placeholder="aaaa"
-                    min="1900"
-                    max={new Date().getFullYear()}
+                  <select
                     value={formData.personneExposee.dateNaissance?.split('-')[0] || ''}
                     onChange={(e) => {
-                      const parts = formData.personneExposee.dateNaissance?.split('-') || ['', '', ''];
-                      const newDate = `${e.target.value}-${parts[1] || ''}-${parts[2] || ''}`.replace(/^-+|-+$/g, '');
-                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: newDate } });
+                      const parts = (formData.personneExposee.dateNaissance || '--').split('-');
+                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: `${e.target.value}-${parts[1]}-${parts[2]}` } });
                     }}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                  >
+                    <option value="">Année</option>
+                    {Array.from({ length: new Date().getFullYear() - 1900 + 1 }, (_, i) => new Date().getFullYear() - i).map(y => (
+                      <option key={y} value={String(y)}>{y}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
@@ -732,10 +735,11 @@ export default function DispositifMedicalPage() {
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <select
-                  value={formData.personneExposee.ageUnite || 'Année'}
+                  value={formData.personneExposee.ageUnite || ''}
                   onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, ageUnite: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
+                  <option value="">-- Unité --</option>
                   <option value="Année">Année</option>
                   <option value="Mois">Mois</option>
                   <option value="Semaine">Semaine</option>
@@ -743,6 +747,9 @@ export default function DispositifMedicalPage() {
                   <option value="Heure">Heure</option>
                 </select>
               </div>
+              {validationErrors.ageUnite && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.ageUnite}</p>
+              )}
               {validationErrors.dateNaissanceOuAge && (
                 <p className="mt-1 text-sm text-red-600">{validationErrors.dateNaissanceOuAge}</p>
               )}
@@ -750,7 +757,7 @@ export default function DispositifMedicalPage() {
 
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
               <p className="text-sm text-slate-600 mb-2">
-                <span className="font-medium">Note:</span> La date de naissance complète ou l'âge doivent être saisis
+                <span className="font-medium">Note:</span> Saisissez soit la date de naissance ou l'âge en heure/mois ou année
               </p>
             </div>
 
@@ -1064,11 +1071,11 @@ export default function DispositifMedicalPage() {
       case 5:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Commentaires Additionnels</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations complémentaires</h2>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Commentaires ou informations complémentaires
+                Informations complémentaires
               </label>
               <textarea
                 value={formData.commentaire}

@@ -4,6 +4,7 @@ import { ArrowLeft, Sparkles, Save, Plus, X, Upload, Image as ImageIcon, File, L
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { villesMaroc } from '../data/villesMaroc';
+import { validateTelMaroc } from '../utils/validation';
 
 interface FormData {
   utilisateurType: string;
@@ -45,7 +46,9 @@ interface FormData {
     localisation: string;
     descriptionSymptomes: string;
     dateApparition: string;
-    delaiSurvenue: string;
+    delaiSurvenueHeures: string;
+    delaiSurvenueJours: string;
+    delaiSurvenuesMois: string;
     gravite: boolean;
     criteresGravite: string[];
     evolutionEffet: string;
@@ -65,6 +68,7 @@ interface FormData {
     numeroLot: string;
     zoneApplication: string;
     frequenceUtilisation: string;
+    frequenceUtilisationAutre: string;
     dateDebutUtilisation: string;
     arretUtilisation: string;
     reexpositionProduit: boolean;
@@ -82,13 +86,13 @@ export default function CosmetovigillancePage() {
   const [formData, setFormData] = useState<FormData>({
     utilisateurType: 'professionnel',
     declarant: { nom: '', prenom: '', email: '', tel: '' },
-    personneExposee: { type: 'patient', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: 'Année', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
+    personneExposee: { type: 'patient', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: '', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
     allergiesConnues: [],
     antecedentsMedicaux: [],
     medicamentsSimultanes: [],
-    effetIndesirable: { localisation: '', descriptionSymptomes: '', dateApparition: '', delaiSurvenue: '', gravite: false, criteresGravite: [], evolutionEffet: '' },
+    effetIndesirable: { localisation: '', descriptionSymptomes: '', dateApparition: '', delaiSurvenueHeures: '', delaiSurvenueJours: '', delaiSurvenuesMois: '', gravite: false, criteresGravite: [], evolutionEffet: '' },
     priseChargeMedicale: { consultationMedicale: false, diagnosticMedecin: '', mesuresPriseType: '', mesuresPriseAutre: '', examensRealise: '' },
-    produitSuspecte: { nomCommercial: '', marque: '', fabricant: '', typeProduit: '', numeroLot: '', zoneApplication: '', frequenceUtilisation: '', dateDebutUtilisation: '', arretUtilisation: '', reexpositionProduit: false, reapparitionEffetIndesirable: false },
+    produitSuspecte: { nomCommercial: '', marque: '', fabricant: '', typeProduit: '', numeroLot: '', zoneApplication: '', frequenceUtilisation: '', frequenceUtilisationAutre: '', dateDebutUtilisation: '', arretUtilisation: '', reexpositionProduit: false, reapparitionEffetIndesirable: false },
     commentaire: ''
   });
 
@@ -112,8 +116,8 @@ export default function CosmetovigillancePage() {
       { title: 'Personne Exposée', icon: '🧑' },
       { title: 'Effet Indésirable', icon: '⚠️' },
       { title: 'Prise en Charge', icon: '🏥' },
-      { title: 'Cosmétique Suspect', icon: '🧴' },
-      { title: 'Commentaires', icon: '💬' }
+      { title: 'Produit suspecté', icon: '🧴' },
+      { title: 'Informations complémentaires', icon: '💬' }
     );
 
     return baseSections;
@@ -137,6 +141,7 @@ export default function CosmetovigillancePage() {
         if (!formData.declarant.nom.trim()) errors.declarantNom = 'Le nom est obligatoire';
         if (!formData.declarant.prenom.trim()) errors.declarantPrenom = 'Le prénom est obligatoire';
         if (!formData.declarant.tel.trim()) errors.declarantTel = 'Le téléphone est obligatoire';
+        else { const telErr = validateTelMaroc(formData.declarant.tel); if (telErr) errors.declarantTel = telErr; }
         if (formData.utilisateurType === 'autre' && !formData.utilisateurTypeAutre?.trim()) {
           errors.utilisateurTypeAutre = 'Veuillez préciser le type de notificateur';
         }
@@ -163,6 +168,9 @@ export default function CosmetovigillancePage() {
         if (!formData.personneExposee.dateNaissance && !formData.personneExposee.age) {
           errors.dateNaissanceOuAge = 'La date de naissance ou l\'âge est obligatoire';
         }
+        if (formData.personneExposee.age && !formData.personneExposee.ageUnite) {
+          errors.ageUnite = 'L\'unité de l\'âge est obligatoire';
+        }
         if (formData.personneExposee.grossesse && !formData.personneExposee.moisGrossesse) {
           errors.moisGrossesse = 'Le mois de grossesse est obligatoire';
         }
@@ -172,7 +180,9 @@ export default function CosmetovigillancePage() {
         if (!formData.effetIndesirable.localisation.trim()) errors.localisation = 'La localisation est obligatoire';
         if (!formData.effetIndesirable.descriptionSymptomes.trim()) errors.descriptionSymptomes = 'La description est obligatoire';
         if (!formData.effetIndesirable.dateApparition) errors.dateApparition = 'La date d\'apparition est obligatoire';
-        if (!formData.effetIndesirable.delaiSurvenue.trim()) errors.delaiSurvenue = 'Le délai de survenue est obligatoire';
+        if (!formData.effetIndesirable.delaiSurvenueHeures.trim()) errors.delaiSurvenueHeures = 'Les heures sont obligatoires';
+        if (!formData.effetIndesirable.delaiSurvenueJours.trim()) errors.delaiSurvenueJours = 'Les jours sont obligatoires';
+        if (!formData.effetIndesirable.delaiSurvenuesMois.trim()) errors.delaiSurvenuesMois = 'Les mois sont obligatoires';
         if (!formData.effetIndesirable.evolutionEffet) errors.evolutionEffet = 'L\'évolution de l\'effet est obligatoire';
         if (formData.effetIndesirable.gravite && formData.effetIndesirable.criteresGravite.length === 0) {
           errors.criteresGravite = 'Veuillez sélectionner au moins un critère de gravité';
@@ -185,13 +195,13 @@ export default function CosmetovigillancePage() {
         }
         break;
 
-      case 5: // Cosmétique Suspect
+      case 5: // Produit suspecté
         if (!formData.produitSuspecte.nomCommercial.trim()) errors.nomCommercial = 'Le nom commercial est obligatoire';
         if (!formData.produitSuspecte.marque.trim()) errors.marque = 'La marque est obligatoire';
-        if (!formData.produitSuspecte.numeroLot.trim()) errors.numeroLot = 'Le numéro de lot est obligatoire';
         if (!formData.produitSuspecte.typeProduit) errors.typeProduit = 'Le type de produit est obligatoire';
         if (!formData.produitSuspecte.zoneApplication.trim()) errors.zoneApplication = 'La zone d\'application est obligatoire';
-        if (!formData.produitSuspecte.frequenceUtilisation.trim()) errors.frequenceUtilisation = 'La fréquence d\'utilisation est obligatoire';
+        if (!formData.produitSuspecte.frequenceUtilisation) errors.frequenceUtilisation = 'La fréquence d\'utilisation est obligatoire';
+        if (formData.produitSuspecte.frequenceUtilisation === 'autre' && !formData.produitSuspecte.frequenceUtilisationAutre.trim()) errors.frequenceUtilisationAutre = 'Veuillez préciser la fréquence';
         if (!formData.produitSuspecte.dateDebutUtilisation) errors.dateDebutUtilisation = 'La date de début est obligatoire';
         if (!formData.produitSuspecte.arretUtilisation) errors.arretUtilisation = 'Ce champ est obligatoire';
         break;
@@ -254,12 +264,12 @@ export default function CosmetovigillancePage() {
     caseNumber = 6;
     adjustedIndex--;
 
-    // Case 6: Cosmétique Suspect (toujours présent)
+    // Case 6: Produit suspecté (toujours présent)
     if (adjustedIndex === 0) return 6;
     caseNumber = 7;
     adjustedIndex--;
 
-    // Case 7: Commentaires (toujours présent)
+    // Case 7: Informations complémentaires (toujours présent)
     if (adjustedIndex === 0) return 7;
 
     return caseNumber;
@@ -337,7 +347,11 @@ export default function CosmetovigillancePage() {
               localisation: formData.effetIndesirable.localisation,
               descriptionSymptomes: formData.effetIndesirable.descriptionSymptomes,
               dateApparition: formData.effetIndesirable.dateApparition,
-              delaiSurvenue: formData.effetIndesirable.delaiSurvenue,
+              delaiSurvenue: [
+                formData.effetIndesirable.delaiSurvenueHeures ? `${formData.effetIndesirable.delaiSurvenueHeures} Heures` : '',
+                formData.effetIndesirable.delaiSurvenueJours ? `${formData.effetIndesirable.delaiSurvenueJours} Jours` : '',
+                formData.effetIndesirable.delaiSurvenuesMois ? `${formData.effetIndesirable.delaiSurvenuesMois} Mois` : '',
+              ].filter(Boolean).join(', '),
               gravite: formData.effetIndesirable.gravite,
               criteresGravite: formData.effetIndesirable.criteresGravite.join(', '),
               evolutionEffet: formData.effetIndesirable.evolutionEffet,
@@ -351,7 +365,9 @@ export default function CosmetovigillancePage() {
               typeProduit: formData.produitSuspecte.typeProduit,
               numeroLot: formData.produitSuspecte.numeroLot,
               zoneApplication: formData.produitSuspecte.zoneApplication,
-              frequenceUtilisation: formData.produitSuspecte.frequenceUtilisation,
+              frequenceUtilisation: formData.produitSuspecte.frequenceUtilisation === 'autre'
+                ? formData.produitSuspecte.frequenceUtilisationAutre
+                : formData.produitSuspecte.frequenceUtilisation,
               dateDebutUtilisation: formData.produitSuspecte.dateDebutUtilisation,
               arretUtilisation: formData.produitSuspecte.arretUtilisation || null,
               reexpositionProduit: formData.produitSuspecte.reexpositionProduit,
@@ -816,25 +832,23 @@ export default function CosmetovigillancePage() {
                     placeholder="jj"
                     min="1"
                     max="31"
-                    value={formData.personneExposee.dateNaissance?.split('-')[2] || ''}
+                    value={formData.personneExposee.dateNaissance?.split('-')[2]?.replace(/^0/, '') || ''}
                     onChange={(e) => {
-                      const parts = formData.personneExposee.dateNaissance?.split('-') || ['', '', ''];
-                      const day = e.target.value.padStart(2, '0');
-                      const newDate = `${parts[0] || ''}-${parts[1] || ''}-${day}`.replace(/^-+|-+$/g, '');
-                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: newDate } });
+                      const parts = (formData.personneExposee.dateNaissance || '--').split('-');
+                      const day = e.target.value ? e.target.value.padStart(2, '0') : '';
+                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: `${parts[0]}-${parts[1]}-${day}` } });
                     }}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                   <select
                     value={formData.personneExposee.dateNaissance?.split('-')[1] || ''}
                     onChange={(e) => {
-                      const parts = formData.personneExposee.dateNaissance?.split('-') || ['', '', ''];
-                      const newDate = `${parts[0] || ''}-${e.target.value}-${parts[2] || ''}`.replace(/^-+|-+$/g, '');
-                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: newDate } });
+                      const parts = (formData.personneExposee.dateNaissance || '--').split('-');
+                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: `${parts[0]}-${e.target.value}-${parts[2]}` } });
                     }}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   >
-                    <option value="">mois</option>
+                    <option value="">Mois</option>
                     <option value="01">Janvier</option>
                     <option value="02">Février</option>
                     <option value="03">Mars</option>
@@ -848,19 +862,19 @@ export default function CosmetovigillancePage() {
                     <option value="11">Novembre</option>
                     <option value="12">Décembre</option>
                   </select>
-                  <input
-                    type="number"
-                    placeholder="aaaa"
-                    min="1900"
-                    max={new Date().getFullYear()}
+                  <select
                     value={formData.personneExposee.dateNaissance?.split('-')[0] || ''}
                     onChange={(e) => {
-                      const parts = formData.personneExposee.dateNaissance?.split('-') || ['', '', ''];
-                      const newDate = `${e.target.value}-${parts[1] || ''}-${parts[2] || ''}`.replace(/^-+|-+$/g, '');
-                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: newDate } });
+                      const parts = (formData.personneExposee.dateNaissance || '--').split('-');
+                      setFormData({ ...formData, personneExposee: { ...formData.personneExposee, dateNaissance: `${e.target.value}-${parts[1]}-${parts[2]}` } });
                     }}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  />
+                  >
+                    <option value="">Année</option>
+                    {Array.from({ length: new Date().getFullYear() - 1900 + 1 }, (_, i) => new Date().getFullYear() - i).map(y => (
+                      <option key={y} value={String(y)}>{y}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
@@ -877,10 +891,11 @@ export default function CosmetovigillancePage() {
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
                 <select
-                  value={formData.personneExposee.ageUnite || 'Année'}
+                  value={formData.personneExposee.ageUnite || ''}
                   onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, ageUnite: e.target.value } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 >
+                  <option value="">-- Unité --</option>
                   <option value="Année">Année</option>
                   <option value="Mois">Mois</option>
                   <option value="Semaine">Semaine</option>
@@ -888,6 +903,9 @@ export default function CosmetovigillancePage() {
                   <option value="Heure">Heure</option>
                 </select>
               </div>
+              {validationErrors.ageUnite && (
+                <p className="mt-1 text-sm text-red-600">{validationErrors.ageUnite}</p>
+              )}
               {validationErrors.dateNaissanceOuAge && (
                 <p className="mt-1 text-sm text-red-600">{validationErrors.dateNaissanceOuAge}</p>
               )}
@@ -895,7 +913,7 @@ export default function CosmetovigillancePage() {
 
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
               <p className="text-sm text-slate-600 mb-2">
-                <span className="font-medium">Note:</span> La date de naissance complète ou l'âge doivent être saisis
+                <span className="font-medium">Note:</span> Saisissez soit la date de naissance ou l'âge en heure/mois ou année
               </p>
             </div>
 
@@ -944,8 +962,6 @@ export default function CosmetovigillancePage() {
             )}
 
             <div className="mt-8 pt-8 border-t-2 border-slate-200">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Antécédents Médicaux</h3>
-
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Allergies Connues</label>
@@ -1105,17 +1121,44 @@ export default function CosmetovigillancePage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Délai de survenue*</label>
-                <input
-                  type="text"
-                  value={formData.effetIndesirable.delaiSurvenue}
-                  onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, delaiSurvenue: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="Ex: 2 heures, 3 jours..."
-                  required
-                />
-                {validationErrors.delaiSurvenue && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.delaiSurvenue}</p>
-                )}
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.effetIndesirable.delaiSurvenueHeures}
+                      onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, delaiSurvenueHeures: e.target.value } })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="0"
+                    />
+                    <span className="text-xs text-slate-500 mt-1 block text-center">Heures</span>
+                    {validationErrors.delaiSurvenueHeures && <p className="mt-1 text-xs text-red-600">{validationErrors.delaiSurvenueHeures}</p>}
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.effetIndesirable.delaiSurvenueJours}
+                      onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, delaiSurvenueJours: e.target.value } })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="0"
+                    />
+                    <span className="text-xs text-slate-500 mt-1 block text-center">Jours</span>
+                    {validationErrors.delaiSurvenueJours && <p className="mt-1 text-xs text-red-600">{validationErrors.delaiSurvenueJours}</p>}
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.effetIndesirable.delaiSurvenuesMois}
+                      onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, delaiSurvenuesMois: e.target.value } })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="0"
+                    />
+                    <span className="text-xs text-slate-500 mt-1 block text-center">Mois</span>
+                    {validationErrors.delaiSurvenuesMois && <p className="mt-1 text-xs text-red-600">{validationErrors.delaiSurvenuesMois}</p>}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1274,7 +1317,7 @@ export default function CosmetovigillancePage() {
       case 5:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Cosmétique Suspect</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Produit suspecté</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -1327,7 +1370,7 @@ export default function CosmetovigillancePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Numéro de Lot*</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Numéro de Lot</label>
                 <input
                   type="text"
                   value={formData.produitSuspecte.numeroLot}
@@ -1355,14 +1398,32 @@ export default function CosmetovigillancePage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Fréquence d'Utilisation*</label>
-                <input
-                  type="text"
+                <select
                   value={formData.produitSuspecte.frequenceUtilisation}
-                  onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, frequenceUtilisation: e.target.value } })}
+                  onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, frequenceUtilisation: e.target.value, frequenceUtilisationAutre: '' } })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
+                >
+                  <option value="">-- Sélectionner --</option>
+                  <option value="Quotidienne">Quotidienne</option>
+                  <option value="Occasionnelle">Occasionnelle</option>
+                  <option value="autre">Autre</option>
+                </select>
                 {validationErrors.frequenceUtilisation && (
                   <p className="mt-1 text-sm text-red-600">{validationErrors.frequenceUtilisation}</p>
+                )}
+                {formData.produitSuspecte.frequenceUtilisation === 'autre' && (
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      value={formData.produitSuspecte.frequenceUtilisationAutre}
+                      onChange={(e) => setFormData({ ...formData, produitSuspecte: { ...formData.produitSuspecte, frequenceUtilisationAutre: e.target.value } })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="Précisez la fréquence..."
+                    />
+                    {validationErrors.frequenceUtilisationAutre && (
+                      <p className="mt-1 text-sm text-red-600">{validationErrors.frequenceUtilisationAutre}</p>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -1425,11 +1486,9 @@ export default function CosmetovigillancePage() {
       case 6:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Commentaires Additionnels</h2>
-
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Commentaires ou informations complémentaires
+                Informations complémentaires
               </label>
               <textarea
                 value={formData.commentaire}

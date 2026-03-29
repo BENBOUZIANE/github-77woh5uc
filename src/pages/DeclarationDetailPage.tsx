@@ -699,7 +699,7 @@ export default function DeclarationDetailPage() {
               <section>
                 <div className="flex items-center mb-4">
                   <Package className="w-6 h-6 text-amber-600 mr-2" />
-                  <h2 className="text-2xl font-bold text-slate-900">Cosmétique Suspect</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">Produit suspecté</h2>
                 </div>
                 <div className="bg-slate-50 rounded-lg p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -765,7 +765,7 @@ export default function DeclarationDetailPage() {
             <section>
               <div className="flex items-center mb-4">
                 <FileText className="w-6 h-6 text-slate-600 mr-2" />
-                <h2 className="text-2xl font-bold text-slate-900">Commentaires et Pièces Jointes</h2>
+                <h2 className="text-2xl font-bold text-slate-900">Informations complémentaires et Pièces Jointes</h2>
               </div>
                 <div className="bg-slate-50 rounded-lg p-6 space-y-6">
                   <div>
@@ -791,7 +791,7 @@ export default function DeclarationDetailPage() {
 
                   {declaration.commentaire && (
                     <div>
-                      <p className="text-sm font-medium text-slate-500 mb-2">Commentaires du déclarant</p>
+                      <p className="text-sm font-medium text-slate-500 mb-2">Informations complémentaires</p>
                       <p className="text-slate-900 whitespace-pre-wrap">{declaration.commentaire}</p>
                     </div>
                   )}
