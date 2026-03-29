@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ComplementSuspecteRepository extends JpaRepository<ComplementSuspecte, Long> {
-    @Query("SELECT c.formeGalenique, COUNT(c) FROM ComplementSuspecte c GROUP BY c.formeGalenique")
+    @Query("SELECT c.nomSpecialite, COUNT(c) FROM ComplementSuspecte c GROUP BY c.nomSpecialite")
     List<Object[]> countByFormeGaleniqueGrouped();
 }

@@ -145,7 +145,7 @@ public class DispositifMedicalService {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<DispositifMedical> declarations = dispositifMedicalRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
+        List<DispositifMedical> declarations = dispositifMedicalRepository.findByUserOrderByCreatedAtDesc(user);
         return declarations.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

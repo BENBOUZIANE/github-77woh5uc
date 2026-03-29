@@ -119,7 +119,7 @@ public class DispositifMedicalController {
             @PathVariable Long id,
             @RequestBody UpdateDeclarationStatusRequest request) {
         try {
-            DispositifMedicalResponse declaration = dispositifMedicalService.updateStatut(id, request.getStatut());
+            DispositifMedicalResponse declaration = dispositifMedicalService.updateStatut(id, request.getStatut().name());
             return ResponseEntity.ok(ApiResponse.<DispositifMedicalResponse>builder()
                     .success(true)
                     .message("Statut mis à jour avec succès")

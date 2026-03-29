@@ -5,6 +5,7 @@ import com.cosmetovigilance.model.*;
 import com.cosmetovigilance.repository.*;
 import com.cosmetovigilance.util.AesEncryptionUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,7 +37,9 @@ public class ComplementAlimentaireService {
     private final EffetIndesirableCARepository effetIndesirableCARepository;
     private final PriseChargeMedicaleCARepository priseChargeMedicaleCARepository;
     private final ComplementSuspecteRepository complementSuspecteRepository;
-    private final AesEncryptionUtil aesEncryptionUtil;
+
+    @Value("${app.encryption.key}")
+    private String encryptionKey;
 
     @Transactional
     public ComplementAlimentaireResponse createDeclaration(ComplementAlimentaireRequest request, User user, MultipartFile documentEnregistrement) throws Exception {
@@ -68,10 +71,10 @@ public class ComplementAlimentaireService {
         declarant.setComplementAlimentaire(complementAlimentaire);
         declarant.setUtilisateurType(request.getUtilisateurType());
         declarant.setUtilisateurTypeAutre(request.getUtilisateurTypeAutre());
-        declarant.setNom(aesEncryptionUtil.encrypt(request.getDeclarant().getNom()));
-        declarant.setPrenom(aesEncryptionUtil.encrypt(request.getDeclarant().getPrenom()));
-        declarant.setEmail(aesEncryptionUtil.encrypt(request.getDeclarant().getEmail()));
-        declarant.setTel(aesEncryptionUtil.encrypt(request.getDeclarant().getTel()));
+        declarant.setNom(AesEncryptionUtil.encrypt(request.getDeclarant().getNom(), encryptionKey));
+        declarant.setPrenom(AesEncryptionUtil.encrypt(request.getDeclarant().getPrenom(), encryptionKey));
+        declarant.setEmail(AesEncryptionUtil.encrypt(request.getDeclarant().getEmail(), encryptionKey));
+        declarant.setTel(AesEncryptionUtil.encrypt(request.getDeclarant().getTel(), encryptionKey));
         declarantCARepository.save(declarant);
     }
 
@@ -111,7 +114,7 @@ public class ComplementAlimentaireService {
         pe.setComplementAlimentaire(complementAlimentaire);
         PersonneExposeeCADto dto = request.getPersonneExposee();
         pe.setType(dto.getType());
-        pe.setNomPrenom(aesEncryptionUtil.encrypt(dto.getNomPrenom()));
+        pe.setNomPrenom(AesEncryptionUtil.encrypt(dto.getNomPrenom(), encryptionKey));
         pe.setDateNaissance(dto.getDateNaissance());
         pe.setAge(dto.getAge());
         pe.setAgeUnite(dto.getAgeUnite());
@@ -281,10 +284,10 @@ public class ComplementAlimentaireService {
     private DeclarantCADto toDeclarantDto(DeclarantCA declarant) throws Exception {
         if (declarant == null) return null;
         DeclarantCADto dto = new DeclarantCADto();
-        dto.setNom(aesEncryptionUtil.decrypt(declarant.getNom()));
-        dto.setPrenom(aesEncryptionUtil.decrypt(declarant.getPrenom()));
-        dto.setEmail(aesEncryptionUtil.decrypt(declarant.getEmail()));
-        dto.setTel(aesEncryptionUtil.decrypt(declarant.getTel()));
+        dto.setNom(AesEncryptionUtil.decrypt(declarant.getNom(), encryptionKey));
+        dto.setPrenom(AesEncryptionUtil.decrypt(declarant.getPrenom(), encryptionKey));
+        dto.setEmail(AesEncryptionUtil.decrypt(declarant.getEmail(), encryptionKey));
+        dto.setTel(AesEncryptionUtil.decrypt(declarant.getTel(), encryptionKey));
         return dto;
     }
 
@@ -312,7 +315,7 @@ public class ComplementAlimentaireService {
         if (pe == null) return null;
         PersonneExposeeCADto dto = new PersonneExposeeCADto();
         dto.setType(pe.getType());
-        dto.setNomPrenom(aesEncryptionUtil.decrypt(pe.getNomPrenom()));
+        dto.setNomPrenom(AesEncryptionUtil.decrypt(pe.getNomPrenom(), encryptionKey));
         dto.setDateNaissance(pe.getDateNaissance());
         dto.setAge(pe.getAge());
         dto.setAgeUnite(pe.getAgeUnite());

@@ -11,10 +11,9 @@ import java.util.List;
 public interface ProduitSuspecteRepository extends JpaRepository<ProduitSuspecte, String> {
     List<ProduitSuspecte> findByDeclarationId(String declarationId);
 
-    @Query("SELECT ps.typeProduit, ei.gravite, COUNT(ps.id) " +
-           "FROM ProduitSuspecte ps " +
-           "JOIN ps.declaration d " +
-           "LEFT JOIN EffetIndesirable ei ON ei.declaration.id = d.id " +
-           "GROUP BY ps.typeProduit, ei.gravite")
+    @Query(value = "SELECT ps.type_produit, ei.gravite, COUNT(ps.id) " +
+           "FROM produit_suspecte ps " +
+           "LEFT JOIN effet_indesirable ei ON ei.declaration_id = ps.declaration_id " +
+           "GROUP BY ps.type_produit, ei.gravite", nativeQuery = true)
     List<Object[]> findStatsByTypeProduitAndGravite();
 }

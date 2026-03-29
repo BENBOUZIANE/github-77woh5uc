@@ -21,7 +21,7 @@ public class ComplementAlimentaire {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statut")
-    private DeclarationStatus statut = DeclarationStatus.EN_ATTENTE;
+    private DeclarationStatus statut = DeclarationStatus.nouveau;
 
     @Column(name = "commentaire_anmps", columnDefinition = "TEXT")
     private String commentaireAnmps;
