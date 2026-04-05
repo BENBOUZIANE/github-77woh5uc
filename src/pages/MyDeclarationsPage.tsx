@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { apiDM } from '../services/apiDM';
+import { complementAlimentaireApi } from '../services/apiCA';
 import { ArrowLeft, FileText, Calendar, AlertCircle, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
 
 type DeclarationStatus = 'nouveau' | 'en_cours' | 'traite' | 'rejete' | 'cloture';
@@ -31,25 +33,21 @@ interface Declaration {
   effet_localisation?: string;
 }
 
-const productTypeConfig: Record<string, { title: string; view: string; color: string }> = {
+const productTypeConfig: Record<string, { title: string; color: string }> = {
   'cosmetovigilance': {
     title: 'Produits cosmétiques',
-    view: 'cosmetovigilance_declarations',
     color: 'from-emerald-500 to-teal-600'
   },
   'dispositifs-medicaux': {
     title: 'Dispositifs Médicaux',
-    view: 'cosmetovigilance_declarations',
     color: 'from-blue-500 to-cyan-600'
   },
   'diagnostic-in-vitro': {
     title: 'Diagnostic In Vitro',
-    view: 'cosmetovigilance_declarations',
     color: 'from-amber-500 to-orange-600'
   },
   'complement-alimentaire': {
     title: 'Complément Alimentaire',
-    view: 'cosmetovigilance_declarations',
     color: 'from-rose-500 to-pink-600'
   }
 };
@@ -70,27 +68,47 @@ export default function MyDeclarationsPage() {
     const fetchDeclarations = async () => {
       try {
         setLoading(true);
-        const data = await api.getDeclarations(type);
-        const mapped: Declaration[] = Array.isArray(data)
-          ? data.map((d: any) => ({
-              id: d.id,
-              created_at: d.createdAt ?? new Date().toISOString(),
-              statut: (d.statut ?? 'nouveau') as DeclarationStatus,
-              patient_nom_prenom: d.personneExposee?.nomPrenom,
-              produit_nom_commercial: d.produitsSuspectes?.[0]?.nomCommercial,
-              effet_localisation: d.effetsIndesirables?.[0]?.localisation,
-            }))
-          : [];
+        let rawData: any[] = [];
 
-        const priority = (s: DeclarationStatus) => {
-          if (s === 'nouveau') return 0;
-          if (s === 'en_cours') return 1;
-          return 2;
-        };
+        if (type === 'dispositifs-medicaux') {
+          rawData = await apiDM.getAllDeclarations();
+          const mapped: Declaration[] = rawData.map((d: any) => ({
+            id: String(d.id),
+            created_at: d.createdAt ?? new Date().toISOString(),
+            statut: (d.statut?.toLowerCase() ?? 'nouveau') as DeclarationStatus,
+            patient_nom_prenom: d.personneExposee ? `${d.personneExposee.nom || ''} ${d.personneExposee.prenom || ''}`.trim() : undefined,
+            produit_nom_commercial: d.dispositifsSuspectes?.[0]?.nomSpecialite,
+            effet_localisation: d.effetsIndesirables?.[0]?.localisation,
+          }));
+          rawData = mapped as any;
+        } else if (type === 'complement-alimentaire') {
+          rawData = await complementAlimentaireApi.getAllDeclarations();
+          const mapped: Declaration[] = rawData.map((d: any) => ({
+            id: String(d.id),
+            created_at: d.dateCreation ?? new Date().toISOString(),
+            statut: (d.statut?.toLowerCase() ?? 'nouveau') as DeclarationStatus,
+            patient_nom_prenom: d.personneExposee?.nomPrenom,
+            produit_nom_commercial: d.complementSuspecte?.nomSpecialite,
+            effet_localisation: d.effetIndesirable?.localisation,
+          }));
+          rawData = mapped as any;
+        } else {
+          // cosmetovigilance et autres
+          const data = await api.getDeclarations(type);
+          rawData = Array.isArray(data) ? data.map((d: any) => ({
+            id: d.id,
+            created_at: d.createdAt ?? new Date().toISOString(),
+            statut: (d.statut ?? 'nouveau') as DeclarationStatus,
+            patient_nom_prenom: d.personneExposee?.nomPrenom,
+            produit_nom_commercial: d.produitsSuspectes?.[0]?.nomCommercial,
+            effet_localisation: d.effetsIndesirables?.[0]?.localisation,
+          })) : [];
+        }
 
-        const sorted = [...mapped].sort((a, b) => {
-          const pa = priority(a.statut);
-          const pb = priority(b.statut);
+        const declarations = rawData as Declaration[];
+        const priority = (s: DeclarationStatus) => s === 'nouveau' ? 0 : s === 'en_cours' ? 1 : 2;
+        const sorted = [...declarations].sort((a, b) => {
+          const pa = priority(a.statut), pb = priority(b.statut);
           if (pa !== pb) return pa - pb;
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         });
@@ -230,7 +248,11 @@ export default function MyDeclarationsPage() {
                   {declarations.map((declaration) => (
                     <tr
                       key={declaration.id}
-                      onClick={() => navigate(`/declaration/${declaration.id}`)}
+                      onClick={() => {
+                        if (type === 'dispositifs-medicaux') navigate(`/declaration/dm/${declaration.id}`);
+                        else if (type === 'complement-alimentaire') navigate(`/declaration/ca/${declaration.id}`);
+                        else navigate(`/declaration/${declaration.id}`);
+                      }}
                       className="border-b border-slate-100 hover:bg-emerald-50 cursor-pointer transition-colors"
                     >
                       <td className="py-4 px-4 text-slate-900 font-medium">

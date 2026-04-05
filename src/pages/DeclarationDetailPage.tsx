@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { apiDM } from '../services/apiDM';
+import { complementAlimentaireApi } from '../services/apiCA';
 import { ArrowLeft, AlertCircle, User, Heart, Package, FileText, Calendar, Download, Image as ImageIcon, File, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
 
 type DeclarationStatus = 'nouveau' | 'en_cours' | 'traite' | 'rejete' | 'cloture';
@@ -100,6 +102,7 @@ interface DeclarationDetail {
 export default function DeclarationDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const { user } = useAuth();
   const [declaration, setDeclaration] = useState<DeclarationDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,6 +110,10 @@ export default function DeclarationDetailPage() {
   const [statusSaving, setStatusSaving] = useState(false);
   const [commentaireAnmps, setCommentaireAnmps] = useState('');
   const [commentaireSaving, setCommentaireSaving] = useState(false);
+
+  // Detect declaration type from URL path
+  const isDM = location.pathname.includes('/declaration/dm/');
+  const isCA = location.pathname.includes('/declaration/ca/');
 
   const getFileType = (filename: string): 'image' | 'pdf' | 'other' => {
     const ext = filename.toLowerCase().split('.').pop();
@@ -125,69 +132,192 @@ export default function DeclarationDetailPage() {
     const fetchDeclaration = async () => {
       try {
         setLoading(true);
-        const apiData: any = await api.getDeclarationById(id);
+        let apiData: any;
+
+        if (isDM) {
+          apiData = await apiDM.getDeclarationById(Number(id));
+          // Map DM response to DeclarationDetail
+          const declarationMapped: DeclarationDetail = {
+            id: String(apiData.id),
+            created_at: apiData.createdAt ?? new Date().toISOString(),
+            statut: (apiData.statut?.toLowerCase() ?? 'nouveau') as DeclarationStatus,
+            commentaire: apiData.commentaire ?? '',
+            commentaire_anmps: apiData.commentaireAnmps ?? '',
+            declarant: {
+              nom: apiData.declarant?.nom,
+              prenom: apiData.declarant?.prenom,
+              email: apiData.declarant?.email,
+              tel: apiData.declarant?.telephone,
+            },
+            personne_exposee: {
+              nomPrenom: `${apiData.personneExposee?.nom || ''} ${apiData.personneExposee?.prenom || ''}`.trim(),
+              age: apiData.personneExposee?.age,
+              ageUnite: apiData.personneExposee?.ageUnite,
+              dateNaissance: apiData.personneExposee?.dateNaissance,
+              sexe: apiData.personneExposee?.sexe,
+              type: 'patient',
+              ville: apiData.personneExposee?.ville,
+              grossesse: apiData.personneExposee?.grossesse,
+              allaitement: apiData.personneExposee?.allaitement,
+            },
+            effet_indesirable: apiData.effetsIndesirables?.[0] ? {
+              localisation: apiData.effetsIndesirables[0].localisation,
+              description_symptomes: apiData.effetsIndesirables[0].description,
+              date_apparition: apiData.effetsIndesirables[0].dateApparition,
+              delai_survenue: '',
+              gravite: !!apiData.effetsIndesirables[0].gravite,
+              criteres_gravite: apiData.effetsIndesirables[0].gravite,
+              evolution_effet: apiData.effetsIndesirables[0].evolution,
+            } : undefined,
+            produit_suspecte: apiData.dispositifsSuspectes?.[0] ? {
+              nom_commercial: apiData.dispositifsSuspectes[0].nomSpecialite,
+              numero_lot: apiData.dispositifsSuspectes[0].numeroLot,
+              marque: '',
+              fabricant: '',
+              type_produit: 'Dispositif médical',
+              frequence_utilisation: '',
+              date_debut_utilisation: apiData.dispositifsSuspectes[0].dateDebutPrise,
+              arret_utilisation: apiData.dispositifsSuspectes[0].dateArretPrise,
+            } : undefined,
+            prise_charge_medicale: apiData.priseChargeMedicale ? {
+              diagnostic: apiData.priseChargeMedicale.traitementMedical,
+              mesures_prise: apiData.priseChargeMedicale.hospitalisationRequise ? 'Hospitalisation' : '',
+              examens_realise: apiData.priseChargeMedicale.examensComplementaires,
+            } : undefined,
+            allergies: [],
+            antecedents: [],
+            medicaments: [],
+            attachments: [],
+            utilisateur_type: 'professionnel',
+          };
+          setDeclaration(declarationMapped);
+          setCommentaireAnmps(declarationMapped.commentaire_anmps);
+          return;
+        }
+
+        if (isCA) {
+          apiData = await complementAlimentaireApi.getDeclarationById(Number(id));
+          const declarationMapped: DeclarationDetail = {
+            id: String(apiData.id),
+            created_at: apiData.dateCreation ?? new Date().toISOString(),
+            statut: (apiData.statut?.toLowerCase() ?? 'nouveau') as DeclarationStatus,
+            commentaire: apiData.commentaire ?? '',
+            commentaire_anmps: apiData.commentaireAnmps ?? '',
+            declarant: {
+              nom: apiData.declarant?.nom,
+              prenom: apiData.declarant?.prenom,
+              email: apiData.declarant?.email,
+              tel: apiData.declarant?.tel,
+            },
+            personne_exposee: {
+              nomPrenom: apiData.personneExposee?.nomPrenom,
+              age: apiData.personneExposee?.age,
+              ageUnite: apiData.personneExposee?.ageUnite,
+              dateNaissance: apiData.personneExposee?.dateNaissance,
+              sexe: apiData.personneExposee?.sexe,
+              type: apiData.personneExposee?.type,
+              ville: apiData.personneExposee?.ville,
+              grossesse: apiData.personneExposee?.grossesse,
+              allaitement: apiData.personneExposee?.allaitement,
+            },
+            effet_indesirable: apiData.effetIndesirable ? {
+              localisation: apiData.effetIndesirable.localisation,
+              description_symptomes: apiData.effetIndesirable.descriptionSymptomes,
+              date_apparition: apiData.effetIndesirable.dateApparition,
+              delai_survenue: apiData.effetIndesirable.delaiSurvenue,
+              gravite: apiData.effetIndesirable.gravite,
+              criteres_gravite: apiData.effetIndesirable.criteresGravite?.join(', '),
+              evolution_effet: apiData.effetIndesirable.evolutionEffet,
+            } : undefined,
+            produit_suspecte: apiData.complementSuspecte ? {
+              nom_commercial: apiData.complementSuspecte.nomSpecialite,
+              numero_lot: apiData.complementSuspecte.numeroLot,
+              marque: '',
+              fabricant: '',
+              type_produit: 'Complément alimentaire',
+              frequence_utilisation: apiData.complementSuspecte.posologie,
+              date_debut_utilisation: apiData.complementSuspecte.dateDebutPrise,
+              arret_utilisation: apiData.complementSuspecte.dateArretPrise,
+            } : undefined,
+            prise_charge_medicale: apiData.priseChargeMedicale ? {
+              diagnostic: apiData.priseChargeMedicale.diagnosticMedecin,
+              mesures_prise: apiData.priseChargeMedicale.mesuresPriseType,
+              examens_realise: apiData.priseChargeMedicale.examensRealise,
+            } : undefined,
+            allergies: apiData.personneExposee?.allergiesConnues ?? [],
+            antecedents: apiData.personneExposee?.antecedentsMedicaux ?? [],
+            medicaments: apiData.personneExposee?.medicamentsSimultanes ?? [],
+            attachments: [],
+            utilisateur_type: apiData.declarant?.utilisateurType ?? 'particulier',
+          };
+          setDeclaration(declarationMapped);
+          setCommentaireAnmps(declarationMapped.commentaire_anmps);
+          return;
+        }
+
+        // Cosmétovigilance
+        const cosmoData: any = await api.getDeclarationById(id);
 
         const declarationMapped: DeclarationDetail = {
-          id: apiData.id,
-          created_at: apiData.createdAt ?? new Date().toISOString(),
-          statut: (apiData.statut ?? 'nouveau') as DeclarationStatus,
-          commentaire: apiData.commentaire ?? '',
-          commentaire_anmps: apiData.commentaireAnmps ?? '',
+          id: cosmoData.id,
+          created_at: cosmoData.createdAt ?? new Date().toISOString(),
+          statut: (cosmoData.statut ?? 'nouveau') as DeclarationStatus,
+          commentaire: cosmoData.commentaire ?? '',
+          commentaire_anmps: cosmoData.commentaireAnmps ?? '',
           declarant: {
-            nom: apiData.declarant?.nom,
-            prenom: apiData.declarant?.prenom,
-            email: apiData.declarant?.email,
-            tel: apiData.declarant?.tel,
+            nom: cosmoData.declarant?.nom,
+            prenom: cosmoData.declarant?.prenom,
+            email: cosmoData.declarant?.email,
+            tel: cosmoData.declarant?.tel,
           },
           personne_exposee: {
-            nomPrenom: apiData.personneExposee?.nomPrenom,
-            age: apiData.personneExposee?.age,
-            ageUnite: apiData.personneExposee?.ageUnite,
-            dateNaissance: apiData.personneExposee?.dateNaissance,
-            sexe: apiData.personneExposee?.sexe,
-            type: apiData.personneExposee?.type,
-            ville: apiData.personneExposee?.ville,
-            grossesse: apiData.personneExposee?.grossesse,
-            mois_grossesse: apiData.personneExposee?.moisGrossesse,
-            allaitement: apiData.personneExposee?.allaitement,
+            nomPrenom: cosmoData.personneExposee?.nomPrenom,
+            age: cosmoData.personneExposee?.age,
+            ageUnite: cosmoData.personneExposee?.ageUnite,
+            dateNaissance: cosmoData.personneExposee?.dateNaissance,
+            sexe: cosmoData.personneExposee?.sexe,
+            type: cosmoData.personneExposee?.type,
+            ville: cosmoData.personneExposee?.ville,
+            grossesse: cosmoData.personneExposee?.grossesse,
+            mois_grossesse: cosmoData.personneExposee?.moisGrossesse,
+            allaitement: cosmoData.personneExposee?.allaitement,
           },
-          effet_indesirable: apiData.effetsIndesirables && apiData.effetsIndesirables.length > 0
+          effet_indesirable: cosmoData.effetsIndesirables && cosmoData.effetsIndesirables.length > 0
             ? {
-                localisation: apiData.effetsIndesirables[0].localisation,
-                description_symptomes: apiData.effetsIndesirables[0].descriptionSymptomes,
-                date_apparition: apiData.effetsIndesirables[0].dateApparition,
-                delai_survenue: apiData.effetsIndesirables[0].delaiSurvenue,
-                gravite: apiData.effetsIndesirables[0].gravite,
-                criteres_gravite: apiData.effetsIndesirables[0].criteresGravite,
-                evolution_effet: apiData.effetsIndesirables[0].evolutionEffet,
+                localisation: cosmoData.effetsIndesirables[0].localisation,
+                description_symptomes: cosmoData.effetsIndesirables[0].descriptionSymptomes,
+                date_apparition: cosmoData.effetsIndesirables[0].dateApparition,
+                delai_survenue: cosmoData.effetsIndesirables[0].delaiSurvenue,
+                gravite: cosmoData.effetsIndesirables[0].gravite,
+                criteres_gravite: cosmoData.effetsIndesirables[0].criteresGravite,
+                evolution_effet: cosmoData.effetsIndesirables[0].evolutionEffet,
               }
             : undefined,
-          produit_suspecte: apiData.produitsSuspectes && apiData.produitsSuspectes.length > 0
+          produit_suspecte: cosmoData.produitsSuspectes && cosmoData.produitsSuspectes.length > 0
             ? {
-                nom_commercial: apiData.produitsSuspectes[0].nomCommercial,
-                marque: apiData.produitsSuspectes[0].marque,
-                fabricant: apiData.produitsSuspectes[0].fabricant,
-                type_produit: apiData.produitsSuspectes[0].typeProduit,
-                numero_lot: apiData.produitsSuspectes[0].numeroLot,
-                frequence_utilisation: apiData.produitsSuspectes[0].frequenceUtilisation,
-                date_debut_utilisation: apiData.produitsSuspectes[0].dateDebutUtilisation,
-                arret_utilisation: apiData.produitsSuspectes[0].arretUtilisation,
-                reexposition_produit: apiData.produitsSuspectes[0].reexpositionProduit,
-                reapparition_effet_indesirable: apiData.produitsSuspectes[0].reapparitionEffetIndesirable,
+                nom_commercial: cosmoData.produitsSuspectes[0].nomCommercial,
+                marque: cosmoData.produitsSuspectes[0].marque,
+                fabricant: cosmoData.produitsSuspectes[0].fabricant,
+                type_produit: cosmoData.produitsSuspectes[0].typeProduit,
+                numero_lot: cosmoData.produitsSuspectes[0].numeroLot,
+                frequence_utilisation: cosmoData.produitsSuspectes[0].frequenceUtilisation,
+                date_debut_utilisation: cosmoData.produitsSuspectes[0].dateDebutUtilisation,
+                arret_utilisation: cosmoData.produitsSuspectes[0].arretUtilisation,
+                reexposition_produit: cosmoData.produitsSuspectes[0].reexpositionProduit,
+                reapparition_effet_indesirable: cosmoData.produitsSuspectes[0].reapparitionEffetIndesirable,
               }
             : undefined,
-          prise_charge_medicale: apiData.prisesChargeMedicales && apiData.prisesChargeMedicales.length > 0
+          prise_charge_medicale: cosmoData.prisesChargeMedicales && cosmoData.prisesChargeMedicales.length > 0
             ? {
-                diagnostic: apiData.prisesChargeMedicales[0].diagnostic,
-                mesures_prise: apiData.prisesChargeMedicales[0].mesuresPrise,
-                examens_realise: apiData.prisesChargeMedicales[0].examensRealise,
+                diagnostic: cosmoData.prisesChargeMedicales[0].diagnostic,
+                mesures_prise: cosmoData.prisesChargeMedicales[0].mesuresPrise,
+                examens_realise: cosmoData.prisesChargeMedicales[0].examensRealise,
               }
             : undefined,
-          allergies: apiData.personneExposee?.allergies ?? [],
-          antecedents: apiData.personneExposee?.antecedents ?? [],
-          medicaments: apiData.personneExposee?.medicaments ?? [],
-          // Attachments from backend
-          attachments: (apiData.attachments ?? []).map((a: any) => ({
+          allergies: cosmoData.personneExposee?.allergies ?? [],
+          antecedents: cosmoData.personneExposee?.antecedents ?? [],
+          medicaments: cosmoData.personneExposee?.medicaments ?? [],
+          attachments: (cosmoData.attachments ?? []).map((a: any) => ({
             id: a.id,
             file: a.file,
             file_name: a.fileName,
@@ -195,20 +325,20 @@ export default function DeclarationDetailPage() {
             attachment_category: a.attachmentCategory,
             created_at: a.createdAt,
           })),
-          utilisateur_type: apiData.utilisateurType ?? 'particulier',
-          professionnel_sante: apiData.professionnelSante
+          utilisateur_type: cosmoData.utilisateurType ?? 'particulier',
+          professionnel_sante: cosmoData.professionnelSante
             ? {
-                profession: apiData.professionnelSante.profession,
-                structure: apiData.professionnelSante.structure,
-                ville: apiData.professionnelSante.ville,
+                profession: cosmoData.professionnelSante.profession,
+                structure: cosmoData.professionnelSante.structure,
+                ville: cosmoData.professionnelSante.ville,
               }
             : undefined,
-          representant_legal: apiData.representantLegal
+          representant_legal: cosmoData.representantLegal
             ? {
-                nom_etablissement: apiData.representantLegal.nomEtablissement,
-                numero_declaration_etablissement: apiData.representantLegal.numeroDeclarationEtablissement,
-                numero_document_enregistrement_produit: apiData.representantLegal.numeroDocumentEnregistrementProduit,
-                date_reception_notification: apiData.representantLegal.dateReceptionNotification,
+                nom_etablissement: cosmoData.representantLegal.nomEtablissement,
+                numero_declaration_etablissement: cosmoData.representantLegal.numeroDeclarationEtablissement,
+                numero_document_enregistrement_produit: cosmoData.representantLegal.numeroDocumentEnregistrementProduit,
+                date_reception_notification: cosmoData.representantLegal.dateReceptionNotification,
               }
             : undefined,
         };
@@ -231,9 +361,17 @@ export default function DeclarationDetailPage() {
     setDeclaration({ ...declaration, statut: newStatus });
     try {
       setStatusSaving(true);
-      const updated: any = await api.updateDeclarationStatus(declaration.id, newStatus);
-      const serverStatus = (updated?.statut ?? newStatus) as DeclarationStatus;
-      setDeclaration((curr) => (curr ? { ...curr, statut: serverStatus } : curr));
+      if (isCA) {
+        await complementAlimentaireApi.updateStatut(Number(declaration.id), newStatus);
+        setDeclaration((curr) => (curr ? { ...curr, statut: newStatus } : curr));
+      } else if (isDM) {
+        await apiDM.updateStatut(Number(declaration.id), newStatus);
+        setDeclaration((curr) => (curr ? { ...curr, statut: newStatus } : curr));
+      } else {
+        const updated: any = await api.updateDeclarationStatus(declaration.id, newStatus);
+        const serverStatus = (updated?.statut ?? newStatus) as DeclarationStatus;
+        setDeclaration((curr) => (curr ? { ...curr, statut: serverStatus } : curr));
+      }
     } catch (e: any) {
       setDeclaration((curr) => (curr ? { ...curr, statut: previous } : curr));
       setError(e?.message || 'Erreur lors de la mise à jour du statut');
@@ -247,8 +385,13 @@ export default function DeclarationDetailPage() {
     const previous = declaration.commentaire_anmps;
     try {
       setCommentaireSaving(true);
-      const updated: any = await api.updateCommentaireAnmps(declaration.id, commentaireAnmps);
-      setDeclaration((curr) => (curr ? { ...curr, commentaire_anmps: updated?.commentaireAnmps ?? commentaireAnmps } : curr));
+      if (isCA) {
+        await complementAlimentaireApi.updateCommentaireAnmps(Number(declaration.id), commentaireAnmps);
+        setDeclaration((curr) => (curr ? { ...curr, commentaire_anmps: commentaireAnmps } : curr));
+      } else {
+        const updated: any = await api.updateCommentaireAnmps(declaration.id, commentaireAnmps);
+        setDeclaration((curr) => (curr ? { ...curr, commentaire_anmps: updated?.commentaireAnmps ?? commentaireAnmps } : curr));
+      }
       alert('Commentaire AMMPS sauvegardé');
     } catch (e: any) {
       setCommentaireAnmps(previous);
@@ -342,13 +485,13 @@ export default function DeclarationDetailPage() {
         </button>
 
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-emerald-500 to-teal-600 px-8 py-6">
+          <div className={`bg-gradient-to-r ${isCA ? 'from-rose-500 to-pink-600' : isDM ? 'from-blue-500 to-cyan-600' : 'from-emerald-500 to-teal-600'} px-8 py-6`}>
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-white mb-2">
                   Déclaration #{declaration.id.slice(0, 8)}
                 </h1>
-                <div className="flex items-center text-emerald-100">
+                <div className={`flex items-center ${isCA ? 'text-rose-100' : isDM ? 'text-blue-100' : 'text-emerald-100'}`}>
                   <Calendar className="w-4 h-4 mr-2" />
                   {new Date(declaration.created_at).toLocaleDateString('fr-FR', {
                     year: 'numeric',

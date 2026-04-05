@@ -9,11 +9,20 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DispositifSuspecteDto {
-    private String nomSpecialite;
-    private String posologie;
+    private String nomCommercial;
+    private String marque;
+    private String designation;
+    private String reference;
+    private String modele;
+    private String numeroSerie;
     private String numeroLot;
-    private LocalDate dateDebutPrise;
-    private LocalDate dateArretPrise;
-    private String motifPrise;
-    private String lieuAchat;
+    private String udi;
+    private String versionLogiciel;
+    private String nomFabricant;
+    private String adresseFabricant;
+    private String localisationActuelle;
+    private Boolean estImplantable;
+    private LocalDate dateImplantation;
+    private LocalDate dateExplantation;
+    private LocalDate dateSurvenue;
 }

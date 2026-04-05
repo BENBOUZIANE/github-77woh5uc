@@ -158,7 +158,7 @@ declaration
 ├── user_id (FK → utilisateur)
 ├── numero_declaration (unique)
 ├── statut (EN_ATTENTE, EN_COURS, TRAITEE, REJETEE)
-├── type_declarant (consommateur, professionnel, etc.)
+├── type_declarant (utilisateur, professionnel, etc.)
 ├── commentaire_anmps
 └── date_declaration, date_traitement
 

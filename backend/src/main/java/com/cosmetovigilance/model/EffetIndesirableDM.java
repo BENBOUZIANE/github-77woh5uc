@@ -36,6 +36,18 @@ public class EffetIndesirableDM {
     @Column(name = "evolution", length = 100)
     private String evolution;
 
+    @Column(name = "nombre_dm", length = 50)
+    private String nombreDM;
+
+    @Column(name = "structure_survenue", length = 255)
+    private String structureSurvenue;
+
+    @Column(name = "adresse_survenue", columnDefinition = "TEXT")
+    private String adresseSurvenue;
+
+    @Column(name = "consequences_cliniques", columnDefinition = "TEXT")
+    private String consequencesCliniques;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/dispositif-medical")
+@RequestMapping("/dispositif-medical")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Matériovigilance", description = "API de gestion des déclarations de matériovigilance (dispositifs médicaux)")
@@ -72,8 +72,7 @@ public class DispositifMedicalController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Récupérer toutes les déclarations (Admin uniquement)")
+    @Operation(summary = "Récupérer toutes les déclarations")
     public ResponseEntity<ApiResponse<List<DispositifMedicalResponse>>> getAllDeclarations() {
         try {
             List<DispositifMedicalResponse> declarations = dispositifMedicalService.getAllDeclarations();
@@ -113,8 +112,7 @@ public class DispositifMedicalController {
     }
 
     @PutMapping("/{id}/statut")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Mettre à jour le statut d'une déclaration (Admin uniquement)")
+    @Operation(summary = "Mettre à jour le statut d'une déclaration")
     public ResponseEntity<ApiResponse<DispositifMedicalResponse>> updateStatut(
             @PathVariable Long id,
             @RequestBody UpdateDeclarationStatusRequest request) {
@@ -136,8 +134,7 @@ public class DispositifMedicalController {
     }
 
     @PutMapping("/{id}/commentaire-anmps")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Ajouter un commentaire ANMPS (Admin uniquement)")
+    @Operation(summary = "Ajouter un commentaire ANMPS")
     public ResponseEntity<ApiResponse<DispositifMedicalResponse>> updateCommentaireAnmps(
             @PathVariable Long id,
             @RequestBody UpdateCommentaireAnmpsRequest request) {

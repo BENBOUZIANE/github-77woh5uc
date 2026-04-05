@@ -46,7 +46,7 @@ public class ApiResponseEncodingFilter implements Filter {
         // Exclure les URLs Swagger/OpenAPI du chiffrement
         if (request instanceof jakarta.servlet.http.HttpServletRequest) {
             String uri = ((jakarta.servlet.http.HttpServletRequest) request).getRequestURI();
-            if (uri.contains("/api-docs") || uri.contains("/swagger-ui") || uri.contains("/swagger-resources") || uri.contains("/v3/api-docs") || uri.contains("/statistics") || uri.contains("/dispositif-medical") || uri.contains("/complements-alimentaires")) {
+            if (uri.contains("/api-docs") || uri.contains("/swagger-ui") || uri.contains("/swagger-resources") || uri.contains("/v3/api-docs") || uri.contains("/statistics") || uri.contains("/migration")) {
                 chain.doFilter(request, response);
                 return;
             }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Beaker, Save, Upload, Image as ImageIcon, File, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
+import { ArrowLeft, Beaker, Save, Upload, Image as ImageIcon, File, LayoutDashboard, LogIn, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { villesMaroc } from '../data/villesMaroc';
 import { validateTelMaroc } from '../utils/validation';
@@ -76,7 +76,7 @@ export default function DispositifMedicalPage() {
   const [formData, setFormData] = useState<FormData>({
     utilisateurType: 'professionnel',
     declarant: { nom: '', prenom: '', email: '', tel: '' },
-    personneExposee: { type: 'patient', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: '', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
+    personneExposee: { type: '', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: '', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
     incident: { description: '', nombreDM: '', dateSurvenue: '', consequencesCliniques: '', structureSurvenue: '', adresseSurvenue: '' },
     dispositifSuspecte: { nomCommercial: '', marque: '', designation: '', reference: '', modele: '', numeroSerie: '', numeroLot: '', udi: '', versionLogiciel: '', nomFabricant: '', adresseFabricant: '', localisationActuelle: '', estImplantable: false },
     commentaire: ''
@@ -92,7 +92,7 @@ export default function DispositifMedicalPage() {
     if (formData.utilisateurType === 'professionnel') {
       baseSections.push({ title: 'Professionnel de Santé', icon: '⚕️' });
     } else if (formData.utilisateurType === 'representant_legal') {
-      baseSections.push({ title: 'Représentant Légal', icon: '🏢' });
+      baseSections.push({ title: 'Responsable de la matériovigilance', icon: '🏢' });
     }
 
     baseSections.push(
@@ -145,6 +145,7 @@ export default function DispositifMedicalPage() {
         break;
 
       case 2:
+        if (!formData.personneExposee.type) errors.personneType = 'Le type de personne exposée est obligatoire';
         if (!formData.personneExposee.nomPrenom.trim()) errors.nomPrenom = 'Le nom et prénom sont obligatoires';
         if (!formData.personneExposee.ville) errors.personneVille = 'La ville est obligatoire';
         if (!formData.personneExposee.dateNaissance && !formData.personneExposee.age) {
@@ -263,10 +264,12 @@ export default function DispositifMedicalPage() {
           prenom: formData.declarant.prenom,
           email: formData.declarant.email,
           telephone: formData.declarant.tel,
+          qualiteDeclarant: formData.utilisateurType,
         },
         personneExposee: {
           nom: formData.personneExposee.nomPrenom?.split(' ')[0] || '',
           prenom: formData.personneExposee.nomPrenom?.split(' ').slice(1).join(' ') || '',
+          type: formData.personneExposee.type,
           dateNaissance: formData.personneExposee.dateNaissance || undefined,
           age: formData.personneExposee.age,
           ageUnite: formData.personneExposee.ageUnite,
@@ -275,14 +278,36 @@ export default function DispositifMedicalPage() {
           grossesse: formData.personneExposee.grossesse,
           allaitement: formData.personneExposee.allaitement,
         },
+        professionnelSante: formData.utilisateurType === 'professionnel' && formData.professionnelSante ? {
+          specialite: formData.professionnelSante.profession,
+          etablissement: formData.professionnelSante.structure,
+          ville: formData.professionnelSante.ville,
+        } : undefined,
         dispositifsSuspectes: [{
-          nomSpecialite: formData.dispositifSuspecte.nomCommercial,
+          nomCommercial: formData.dispositifSuspecte.nomCommercial,
+          marque: formData.dispositifSuspecte.marque,
+          designation: formData.dispositifSuspecte.designation,
+          reference: formData.dispositifSuspecte.reference,
+          modele: formData.dispositifSuspecte.modele,
+          numeroSerie: formData.dispositifSuspecte.numeroSerie,
           numeroLot: formData.dispositifSuspecte.numeroLot,
-          motifPrise: formData.incident.description,
+          udi: formData.dispositifSuspecte.udi,
+          versionLogiciel: formData.dispositifSuspecte.versionLogiciel,
+          nomFabricant: formData.dispositifSuspecte.nomFabricant,
+          adresseFabricant: formData.dispositifSuspecte.adresseFabricant,
+          localisationActuelle: formData.dispositifSuspecte.localisationActuelle,
+          estImplantable: formData.dispositifSuspecte.estImplantable,
+          dateImplantation: formData.dispositifSuspecte.dateImplantation || undefined,
+          dateExplantation: formData.dispositifSuspecte.dateExplantation || undefined,
+          dateSurvenue: formData.incident.dateSurvenue || undefined,
         }],
         effetsIndesirables: [{
-          description: formData.incident.consequencesCliniques,
-          dateApparition: formData.incident.dateSurvenue || undefined,
+          descriptionIncident: formData.incident.description,
+          nombreDM: formData.incident.nombreDM,
+          dateSurvenue: formData.incident.dateSurvenue || undefined,
+          consequencesCliniques: formData.incident.consequencesCliniques,
+          structureSurvenue: formData.incident.structureSurvenue,
+          adresseSurvenue: formData.incident.adresseSurvenue,
           gravite: '',
         }],
       };
@@ -303,7 +328,7 @@ export default function DispositifMedicalPage() {
       case 0:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations du Notificateur</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations sur le notificateur</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -468,7 +493,7 @@ export default function DispositifMedicalPage() {
         } else if (formData.utilisateurType === 'representant_legal') {
           return (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Représentant Légal</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Responsable de la matériovigilance au niveau de l’établissement détenteur du certificat d’enregistrement</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -518,7 +543,7 @@ export default function DispositifMedicalPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">N° du Document d'Enregistrement du Produit*</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">N° du certificat d’enregistrement du DM*</label>
                   <input
                     type="text"
                     value={formData.representantLegal?.numeroDocumentEnregistrementProduit || ''}
@@ -618,7 +643,7 @@ export default function DispositifMedicalPage() {
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
                 <p className="text-sm text-slate-700">
-                  <strong>Note:</strong> En tant que représentant légal d'un établissement, veuillez fournir toutes les informations relatives à la déclaration de l'établissement et du produit concerné.
+                  <strong>Note:</strong> En tant que responsable de la matériovigilance au niveau de l’établissement détenteur du certificat d’enregistrement d'un établissement, veuillez fournir toutes les informations relatives à la déclaration de l'établissement et du produit concerné.
                 </p>
               </div>
             </div>
@@ -639,12 +664,14 @@ export default function DispositifMedicalPage() {
                 <select
                   value={formData.personneExposee.type}
                   onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, type: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${validationErrors.personneType ? 'border-red-500' : 'border-slate-300'}`}
                 >
+                  <option value="">-- Sélectionnez un type --</option>
                   <option value="patient">Patient</option>
                   <option value="proche">Proche</option>
                   <option value="autre">Autre</option>
                 </select>
+                {validationErrors.personneType && <p className="mt-1 text-sm text-red-600">{validationErrors.personneType}</p>}
               </div>
 
               <div>
@@ -862,7 +889,7 @@ export default function DispositifMedicalPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Nombre de DM concernés</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nombre de dispositifs concernés</label>
                 <input
                   type="text"
                   value={formData.incident.nombreDM}

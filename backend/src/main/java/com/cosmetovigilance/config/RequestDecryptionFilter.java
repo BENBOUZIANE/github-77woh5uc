@@ -40,9 +40,10 @@ public class RequestDecryptionFilter implements Filter {
         String contentType = httpRequest.getContentType();
         String encryptionHeader = httpRequest.getHeader(ENCRYPTION_HEADER);
 
-        // Déchiffrer seulement les POST/PATCH JSON avec l'en-tête de chiffrement
+        // Déchiffrer seulement les POST/PATCH/PUT JSON avec l'en-tête de chiffrement
         boolean isPostOrPatch = "POST".equalsIgnoreCase(httpRequest.getMethod()) ||
-                               "PATCH".equalsIgnoreCase(httpRequest.getMethod());
+                               "PATCH".equalsIgnoreCase(httpRequest.getMethod()) ||
+                               "PUT".equalsIgnoreCase(httpRequest.getMethod());
         boolean isEncrypted = ENCRYPT_VALUE.equalsIgnoreCase(encryptionHeader);
         boolean isJson = contentType != null && contentType.contains("application/json");
 

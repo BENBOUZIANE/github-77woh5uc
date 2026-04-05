@@ -3,6 +3,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { LogOut, LogIn, LayoutDashboard, Sparkles, Beaker, Package, Shield, FileText, TrendingUp, BarChart3, PieChart as PieChartIcon, Users, AlertTriangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
+import { apiDM } from '../services/apiDM';
+import { complementAlimentaireApi } from '../services/apiCA';
 import PieChart from '../components/PieChart';
 import BarChart from '../components/BarChart';
 import StackedBarChart from '../components/StackedBarChart';
@@ -42,7 +44,8 @@ const declarationTypes = [
     color: 'from-rose-500 to-pink-600',
     bgColor: 'bg-rose-50',
     textColor: 'text-rose-700',
-    path: '/dashboard/complement-alimentaire'
+    path: '/dashboard/complement-alimentaire',
+    statsPath: '/statistics/complement-alimentaire'
   }
 ];
 
@@ -96,38 +99,53 @@ export default function DashboardPage() {
   const fetchStatistics = async () => {
     try {
       setLoading(true);
-      const data = await api.getDeclarations();
 
+      // Stats cosmétovigilance
+      const cosmoData = await api.getDeclarations();
       const statsByType: StatsByType = {};
-      const totals: StatsByStatus = {
-        nouveau: 0,
-        en_cours: 0,
-        traite: 0,
-        rejete: 0,
-        cloture: 0
-      };
+      const totals: StatsByStatus = { nouveau: 0, en_cours: 0, traite: 0, rejete: 0, cloture: 0 };
 
       declarationTypes.forEach(type => {
-        statsByType[type.id] = {
-          nouveau: 0,
-          en_cours: 0,
-          traite: 0,
-          rejete: 0,
-          cloture: 0
-        };
+        statsByType[type.id] = { nouveau: 0, en_cours: 0, traite: 0, rejete: 0, cloture: 0 };
       });
 
-      if (Array.isArray(data)) {
-        data.forEach((decl: any) => {
+      if (Array.isArray(cosmoData)) {
+        cosmoData.forEach((decl: any) => {
           const status = decl.statut?.toLowerCase() || 'nouveau';
-          const type = 'cosmetovigilance';
-
-          if (statsByType[type] && status in statsByType[type]) {
-            statsByType[type][status as keyof StatsByStatus]++;
+          if (status in totals) {
+            statsByType['cosmetovigilance'][status as keyof StatsByStatus]++;
             totals[status as keyof StatsByStatus]++;
           }
         });
       }
+
+      // Stats DM
+      try {
+        const dmData = await apiDM.getAllDeclarations();
+        if (Array.isArray(dmData)) {
+          dmData.forEach((decl: any) => {
+            const status = decl.statut?.toLowerCase() || 'nouveau';
+            if (status in totals) {
+              statsByType['dispositifs-medicaux'][status as keyof StatsByStatus]++;
+              totals[status as keyof StatsByStatus]++;
+            }
+          });
+        }
+      } catch { /* silencieux */ }
+
+      // Stats CA
+      try {
+        const caData = await complementAlimentaireApi.getAllDeclarations();
+        if (Array.isArray(caData)) {
+          caData.forEach((decl: any) => {
+            const status = decl.statut?.toLowerCase() || 'nouveau';
+            if (status in totals) {
+              statsByType['complement-alimentaire'][status as keyof StatsByStatus]++;
+              totals[status as keyof StatsByStatus]++;
+            }
+          });
+        }
+      } catch { /* silencieux */ }
 
       setStats(statsByType);
       setTotalStats(totals);
@@ -259,7 +277,7 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-bold text-slate-900">Statistiques globales</h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
               <p className="text-sm text-slate-600 mb-1">Total</p>
               <p className="text-3xl font-bold text-slate-900">
@@ -284,10 +302,16 @@ export default function DashboardPage() {
                 {loading ? '...' : totalStats.traite}
               </p>
             </div>
+            <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200">
+              <p className="text-sm text-red-700 mb-1">Rejeté</p>
+              <p className="text-3xl font-bold text-red-900">
+                {loading ? '...' : totalStats.rejete}
+              </p>
+            </div>
             <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
               <p className="text-sm text-slate-600 mb-1">Clôturé</p>
               <p className="text-3xl font-bold text-slate-900">
-                {loading ? '...' : totalStats.cloture + totalStats.rejete}
+                {loading ? '...' : totalStats.cloture}
               </p>
             </div>
           </div>

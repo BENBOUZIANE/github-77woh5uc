@@ -3,9 +3,7 @@ package com.cosmetovigilance.service;
 import com.cosmetovigilance.dto.*;
 import com.cosmetovigilance.model.*;
 import com.cosmetovigilance.repository.*;
-import com.cosmetovigilance.util.AesEncryptionUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,9 +36,6 @@ public class ComplementAlimentaireService {
     private final PriseChargeMedicaleCARepository priseChargeMedicaleCARepository;
     private final ComplementSuspecteRepository complementSuspecteRepository;
 
-    @Value("${app.encryption.key}")
-    private String encryptionKey;
-
     @Transactional
     public ComplementAlimentaireResponse createDeclaration(ComplementAlimentaireRequest request, User user, MultipartFile documentEnregistrement) throws Exception {
         ComplementAlimentaire complementAlimentaire = new ComplementAlimentaire();
@@ -71,10 +66,10 @@ public class ComplementAlimentaireService {
         declarant.setComplementAlimentaire(complementAlimentaire);
         declarant.setUtilisateurType(request.getUtilisateurType());
         declarant.setUtilisateurTypeAutre(request.getUtilisateurTypeAutre());
-        declarant.setNom(AesEncryptionUtil.encrypt(request.getDeclarant().getNom(), encryptionKey));
-        declarant.setPrenom(AesEncryptionUtil.encrypt(request.getDeclarant().getPrenom(), encryptionKey));
-        declarant.setEmail(AesEncryptionUtil.encrypt(request.getDeclarant().getEmail(), encryptionKey));
-        declarant.setTel(AesEncryptionUtil.encrypt(request.getDeclarant().getTel(), encryptionKey));
+        declarant.setNom(request.getDeclarant().getNom());
+        declarant.setPrenom(request.getDeclarant().getPrenom());
+        declarant.setEmail(request.getDeclarant().getEmail());
+        declarant.setTel(request.getDeclarant().getTel());
         declarantCARepository.save(declarant);
     }
 
@@ -114,7 +109,7 @@ public class ComplementAlimentaireService {
         pe.setComplementAlimentaire(complementAlimentaire);
         PersonneExposeeCADto dto = request.getPersonneExposee();
         pe.setType(dto.getType());
-        pe.setNomPrenom(AesEncryptionUtil.encrypt(dto.getNomPrenom(), encryptionKey));
+        pe.setNomPrenom(dto.getNomPrenom());
         pe.setDateNaissance(dto.getDateNaissance());
         pe.setAge(dto.getAge());
         pe.setAgeUnite(dto.getAgeUnite());
@@ -171,6 +166,7 @@ public class ComplementAlimentaireService {
     }
 
     private void savePriseChargeMedicale(PriseChargeMedicaleCADto dto, ComplementAlimentaire complementAlimentaire) {
+        if (dto == null) return;
         PriseChargeMedicaleCA pcm = new PriseChargeMedicaleCA();
         pcm.setComplementAlimentaire(complementAlimentaire);
         pcm.setConsultationMedicale(dto.getConsultationMedicale());
@@ -284,10 +280,10 @@ public class ComplementAlimentaireService {
     private DeclarantCADto toDeclarantDto(DeclarantCA declarant) throws Exception {
         if (declarant == null) return null;
         DeclarantCADto dto = new DeclarantCADto();
-        dto.setNom(AesEncryptionUtil.decrypt(declarant.getNom(), encryptionKey));
-        dto.setPrenom(AesEncryptionUtil.decrypt(declarant.getPrenom(), encryptionKey));
-        dto.setEmail(AesEncryptionUtil.decrypt(declarant.getEmail(), encryptionKey));
-        dto.setTel(AesEncryptionUtil.decrypt(declarant.getTel(), encryptionKey));
+        dto.setNom(declarant.getNom());
+        dto.setPrenom(declarant.getPrenom());
+        dto.setEmail(declarant.getEmail());
+        dto.setTel(declarant.getTel());
         return dto;
     }
 
@@ -315,7 +311,7 @@ public class ComplementAlimentaireService {
         if (pe == null) return null;
         PersonneExposeeCADto dto = new PersonneExposeeCADto();
         dto.setType(pe.getType());
-        dto.setNomPrenom(AesEncryptionUtil.decrypt(pe.getNomPrenom(), encryptionKey));
+        dto.setNomPrenom(pe.getNomPrenom());
         dto.setDateNaissance(pe.getDateNaissance());
         dto.setAge(pe.getAge());
         dto.setAgeUnite(pe.getAgeUnite());

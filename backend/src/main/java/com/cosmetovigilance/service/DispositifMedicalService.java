@@ -41,7 +41,7 @@ public class DispositifMedicalService {
         DispositifMedical dispositifMedical = new DispositifMedical();
         dispositifMedical.setUser(user);
         dispositifMedical.setCommentaire(request.getCommentaire());
-        dispositifMedical.setStatut("EN_ATTENTE");
+        dispositifMedical.setStatut("nouveau");
 
         if (request.getDeclarant() != null) {
             DeclarantDM declarant = mapToDeclarant(request.getDeclarant());
@@ -105,13 +105,22 @@ public class DispositifMedicalService {
             for (DispositifSuspecteDto dispositifDto : request.getDispositifsSuspectes()) {
                 DispositifSuspecte dispositifSuspecte = new DispositifSuspecte();
                 dispositifSuspecte.setDispositifMedicalId(dispositifMedicalId);
-                dispositifSuspecte.setNomSpecialite(dispositifDto.getNomSpecialite());
-                dispositifSuspecte.setPosologie(dispositifDto.getPosologie());
+                dispositifSuspecte.setNomSpecialite(dispositifDto.getNomCommercial());
+                dispositifSuspecte.setMarque(dispositifDto.getMarque());
+                dispositifSuspecte.setDesignation(dispositifDto.getDesignation());
+                dispositifSuspecte.setReference(dispositifDto.getReference());
+                dispositifSuspecte.setModele(dispositifDto.getModele());
+                dispositifSuspecte.setNumeroSerie(dispositifDto.getNumeroSerie());
                 dispositifSuspecte.setNumeroLot(dispositifDto.getNumeroLot());
-                dispositifSuspecte.setDateDebutPrise(dispositifDto.getDateDebutPrise());
-                dispositifSuspecte.setDateArretPrise(dispositifDto.getDateArretPrise());
-                dispositifSuspecte.setMotifPrise(dispositifDto.getMotifPrise());
-                dispositifSuspecte.setLieuAchat(dispositifDto.getLieuAchat());
+                dispositifSuspecte.setUdi(dispositifDto.getUdi());
+                dispositifSuspecte.setVersionLogiciel(dispositifDto.getVersionLogiciel());
+                dispositifSuspecte.setNomFabricant(dispositifDto.getNomFabricant());
+                dispositifSuspecte.setAdresseFabricant(dispositifDto.getAdresseFabricant());
+                dispositifSuspecte.setLocalisationActuelle(dispositifDto.getLocalisationActuelle());
+                dispositifSuspecte.setEstImplantable(dispositifDto.getEstImplantable());
+                dispositifSuspecte.setDateImplantation(dispositifDto.getDateImplantation());
+                dispositifSuspecte.setDateExplantation(dispositifDto.getDateExplantation());
+                dispositifSuspecte.setDateDebutPrise(dispositifDto.getDateSurvenue());
                 dispositifSuspecteRepository.save(dispositifSuspecte);
             }
         }
@@ -120,11 +129,13 @@ public class DispositifMedicalService {
             for (EffetIndesirableDMDto effetDto : request.getEffetsIndesirables()) {
                 EffetIndesirableDM effet = new EffetIndesirableDM();
                 effet.setDispositifMedicalId(dispositifMedicalId);
-                effet.setDescription(effetDto.getDescription());
-                effet.setLocalisation(effetDto.getLocalisation());
-                effet.setDateApparition(effetDto.getDateApparition());
+                effet.setDescription(effetDto.getDescriptionIncident());
+                effet.setNombreDM(effetDto.getNombreDM());
+                effet.setDateApparition(effetDto.getDateSurvenue());
+                effet.setConsequencesCliniques(effetDto.getConsequencesCliniques());
+                effet.setStructureSurvenue(effetDto.getStructureSurvenue());
+                effet.setAdresseSurvenue(effetDto.getAdresseSurvenue());
                 effet.setGravite(effetDto.getGravite());
-                effet.setEvolution(effetDto.getEvolution());
                 effetIndesirableDMRepository.save(effet);
             }
         }
@@ -202,6 +213,7 @@ public class DispositifMedicalService {
         PersonneExposeeDM personne = new PersonneExposeeDM();
         personne.setNom(dto.getNom());
         personne.setPrenom(dto.getPrenom());
+        personne.setType(dto.getType());
         personne.setDateNaissance(dto.getDateNaissance());
         personne.setAge(dto.getAge());
         personne.setAgeUnite(dto.getAgeUnite());
@@ -305,6 +317,7 @@ public class DispositifMedicalService {
         return new PersonneExposeeDMDto(
                 personne.getNom(),
                 personne.getPrenom(),
+                personne.getType(),
                 personne.getDateNaissance(),
                 personne.getAge(),
                 personne.getAgeUnite(),
@@ -323,22 +336,43 @@ public class DispositifMedicalService {
 
     private DispositifSuspecteDto mapDispositifSuspecteToDto(DispositifSuspecte dispositif) {
         return new DispositifSuspecteDto(
-                dispositif.getNomSpecialite(),
-                dispositif.getPosologie(),
+                dispositif.getNomSpecialite(),   // nomCommercial
+                dispositif.getMarque(),
+                dispositif.getDesignation(),
+                dispositif.getReference(),
+                dispositif.getModele(),
+                dispositif.getNumeroSerie(),
                 dispositif.getNumeroLot(),
-                dispositif.getDateDebutPrise(),
-                dispositif.getDateArretPrise(),
-                dispositif.getMotifPrise(),
-                dispositif.getLieuAchat()
+                dispositif.getUdi(),
+                dispositif.getVersionLogiciel(),
+                dispositif.getNomFabricant(),
+                dispositif.getAdresseFabricant(),
+                dispositif.getLocalisationActuelle(),
+                dispositif.getEstImplantable(),
+                dispositif.getDateImplantation(),
+                dispositif.getDateExplantation(),
+                dispositif.getDateDebutPrise()   // dateSurvenue
         );
     }
 
     private EffetIndesirableDMDto mapEffetIndesirableToDto(EffetIndesirableDM effet) {
+        // Fallback : si les nouveaux champs sont null, utiliser les anciens champs legacy
+        String descriptionIncident = effet.getDescription() != null ? effet.getDescription() : effet.getLocalisation();
+        String consequencesCliniques = effet.getConsequencesCliniques() != null ? effet.getConsequencesCliniques() : effet.getEvolution();
+        String structureSurvenue = effet.getStructureSurvenue();
+        String adresseSurvenue = effet.getAdresseSurvenue();
+
         return new EffetIndesirableDMDto(
+                descriptionIncident,
+                effet.getNombreDM(),
+                effet.getDateApparition(),
+                consequencesCliniques,
+                structureSurvenue,
+                adresseSurvenue,
+                effet.getGravite(),
                 effet.getDescription(),
                 effet.getLocalisation(),
                 effet.getDateApparition(),
-                effet.getGravite(),
                 effet.getEvolution()
         );
     }

@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/complements-alimentaires")
+@RequestMapping("/complements-alimentaires")
 @RequiredArgsConstructor
 @Tag(name = "Compléments Alimentaires", description = "API de gestion des déclarations de compléments alimentaires")
 public class ComplementAlimentaireController {
@@ -28,15 +28,19 @@ public class ComplementAlimentaireController {
     private final CustomUserDetailsService userDetailsService;
 
     @PostMapping
-    @SecurityRequirement(name = "Bearer Authentication")
     @Operation(summary = "Créer une nouvelle déclaration de complément alimentaire")
     public ResponseEntity<ApiResponse<ComplementAlimentaireResponse>> createDeclaration(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "Authorization", required = false) String token,
             @RequestPart("data") ComplementAlimentaireRequest request,
             @RequestPart(value = "documentEnregistrement", required = false) MultipartFile documentEnregistrement) {
         try {
-            String username = jwtTokenProvider.getUsernameFromToken(token.substring(7));
-            User user = (User) userDetailsService.loadUserByUsername(username);
+            User user = null;
+            if (token != null && token.startsWith("Bearer ")) {
+                try {
+                    String username = jwtTokenProvider.getUsernameFromToken(token.substring(7));
+                    user = (User) userDetailsService.loadUserByUsername(username);
+                } catch (Exception ignored) {}
+            }
             ComplementAlimentaireResponse response = complementAlimentaireService.createDeclaration(request, user, documentEnregistrement);
             return ResponseEntity.ok(ApiResponse.<ComplementAlimentaireResponse>builder()
                     .success(true)
@@ -74,9 +78,8 @@ public class ComplementAlimentaireController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ANMPS')")
     @SecurityRequirement(name = "Bearer Authentication")
-    @Operation(summary = "Obtenir toutes les déclarations (ANMPS seulement)")
+    @Operation(summary = "Obtenir toutes les déclarations")
     public ResponseEntity<ApiResponse<List<ComplementAlimentaireResponse>>> getAllDeclarations() {
         try {
             List<ComplementAlimentaireResponse> declarations = complementAlimentaireService.getAllDeclarations();
@@ -113,9 +116,8 @@ public class ComplementAlimentaireController {
     }
 
     @PutMapping("/{id}/statut")
-    @PreAuthorize("hasRole('ANMPS')")
     @SecurityRequirement(name = "Bearer Authentication")
-    @Operation(summary = "Mettre à jour le statut d'une déclaration (ANMPS seulement)")
+    @Operation(summary = "Mettre à jour le statut d'une déclaration")
     public ResponseEntity<ApiResponse<Void>> updateStatut(
             @PathVariable Long id,
             @RequestBody UpdateDeclarationStatusRequest request) {
@@ -134,9 +136,8 @@ public class ComplementAlimentaireController {
     }
 
     @PutMapping("/{id}/commentaire-anmps")
-    @PreAuthorize("hasRole('ANMPS')")
     @SecurityRequirement(name = "Bearer Authentication")
-    @Operation(summary = "Mettre à jour le commentaire ANMPS d'une déclaration (ANMPS seulement)")
+    @Operation(summary = "Mettre à jour le commentaire ANMPS d'une déclaration")
     public ResponseEntity<ApiResponse<Void>> updateCommentaireAnmps(
             @PathVariable Long id,
             @RequestBody UpdateCommentaireAnmpsRequest request) {

@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import MyDeclarationsPage from './pages/MyDeclarationsPage';
 import DeclarationDetailPage from './pages/DeclarationDetailPage';
+import DispositifMedicalDetailPage from './pages/DispositifMedicalDetailPage';
 
 function App() {
   return (
@@ -39,6 +40,22 @@ function App() {
             />
             <Route
               path="/declaration/:id"
+              element={
+                <ProtectedRoute>
+                  <DeclarationDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/declaration/dm/:id"
+              element={
+                <ProtectedRoute>
+                  <DispositifMedicalDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/declaration/ca/:id"
               element={
                 <ProtectedRoute>
                   <DeclarationDetailPage />

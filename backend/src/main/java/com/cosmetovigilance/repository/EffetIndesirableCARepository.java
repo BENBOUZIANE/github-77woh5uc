@@ -13,4 +13,7 @@ public interface EffetIndesirableCARepository extends JpaRepository<EffetIndesir
     List<Object[]> countByEvolutionEffetGrouped();
 
     long countByGraviteTrue();
+
+    @Query("SELECT e.criteresGravite, COUNT(e) FROM EffetIndesirableCA e WHERE e.gravite = true GROUP BY e.criteresGravite")
+    List<Object[]> countByCriteresGraviteGrouped();
 }

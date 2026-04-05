@@ -86,7 +86,7 @@ export default function CosmetovigillancePage() {
   const [formData, setFormData] = useState<FormData>({
     utilisateurType: 'professionnel',
     declarant: { nom: '', prenom: '', email: '', tel: '' },
-    personneExposee: { type: 'patient', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: '', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
+    personneExposee: { type: '', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: '', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
     allergiesConnues: [],
     antecedentsMedicaux: [],
     medicamentsSimultanes: [],
@@ -163,6 +163,7 @@ export default function CosmetovigillancePage() {
         break;
 
       case 2: // Personne Exposée (avec antécédents intégrés)
+        if (!formData.personneExposee.type) errors.personneType = 'Le type de personne exposée est obligatoire';
         if (!formData.personneExposee.nomPrenom.trim()) errors.nomPrenom = 'Le nom et prénom sont obligatoires';
         if (!formData.personneExposee.ville) errors.personneVille = 'La ville est obligatoire';
         if (!formData.personneExposee.dateNaissance && !formData.personneExposee.age) {
@@ -425,7 +426,7 @@ export default function CosmetovigillancePage() {
       case 0:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations du Notificateur</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations sur le notificateur </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -762,12 +763,14 @@ export default function CosmetovigillancePage() {
                 <select
                   value={formData.personneExposee.type}
                   onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, type: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${validationErrors.personneType ? 'border-red-500' : 'border-slate-300'}`}
                 >
+                  <option value="">-- Sélectionnez un type --</option>
                   <option value="patient">Patient</option>
                   <option value="proche">Proche</option>
                   <option value="autre">Autre</option>
                 </select>
+                {validationErrors.personneType && <p className="mt-1 text-sm text-red-600">{validationErrors.personneType}</p>}
               </div>
 
               <div>

@@ -25,6 +25,9 @@ public class PersonneExposeeDM {
     @Column(name = "prenom", length = 100)
     private String prenom;
 
+    @Column(name = "type_personne", length = 50)
+    private String type;
+
     @Column(name = "date_naissance")
     private LocalDate dateNaissance;
 

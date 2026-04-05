@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './api';
+import { createEncryptedPayload, decryptData } from '../utils/encryption';
 
 export interface DispositifMedicalRequest {
   commentaire?: string;
@@ -127,126 +128,137 @@ export const apiDM = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Request-Encrypted': 'true',
         ...(token && { 'Authorization': `Bearer ${token}` }),
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(createEncryptedPayload(data)),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create declaration');
+    const text = await response.text();
+    let result: any;
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed?.encrypted === true && parsed?.data) {
+        result = decryptData(parsed.data);
+      } else {
+        result = parsed;
+      }
+    } catch {
+      throw new Error('Erreur lors du traitement de la réponse');
     }
 
-    const result = await response.json();
-    return result.data;
+    if (!response.ok || result?.success === false) {
+      throw new Error(result?.message || 'Failed to create declaration');
+    }
+
+    return (result as any)?.data ?? result;
   },
 
   getMyDeclarations: async (): Promise<DispositifMedicalResponse[]> => {
     const token = localStorage.getItem('access_token');
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
+    if (!token) throw new Error('No authentication token found');
 
     const response = await fetch(`${API_BASE_URL}/dispositif-medical/my-declarations`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch declarations');
-    }
+    const text = await response.text();
+    let result: any;
+    try {
+      const parsed = JSON.parse(text);
+      result = parsed?.encrypted === true && parsed?.data ? decryptData(parsed.data) : parsed;
+    } catch { throw new Error('Erreur lors du traitement de la réponse'); }
 
-    const result = await response.json();
-    return result.data;
+    if (!response.ok) throw new Error('Failed to fetch declarations');
+    return (result as any)?.data ?? result;
   },
 
   getAllDeclarations: async (): Promise<DispositifMedicalResponse[]> => {
     const token = localStorage.getItem('access_token');
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
 
     const response = await fetch(`${API_BASE_URL}/dispositif-medical`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        ...(token && { 'Authorization': `Bearer ${token}` }),
       },
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch all declarations');
+    const text = await response.text();
+    let result: any;
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed?.encrypted === true && parsed?.data) {
+        result = decryptData(parsed.data);
+      } else {
+        result = parsed;
+      }
+    } catch {
+      throw new Error('Erreur lors du traitement de la réponse');
     }
 
-    const result = await response.json();
-    return result.data;
+    if (!response.ok) throw new Error('Failed to fetch all declarations');
+    return (result as any)?.data ?? result;
   },
 
   getDeclarationById: async (id: number): Promise<DispositifMedicalResponse> => {
     const token = localStorage.getItem('access_token');
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
 
     const response = await fetch(`${API_BASE_URL}/dispositif-medical/${id}`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { ...(token && { 'Authorization': `Bearer ${token}` }) },
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch declaration');
-    }
+    const text = await response.text();
+    let result: any;
+    try {
+      const parsed = JSON.parse(text);
+      result = parsed?.encrypted === true && parsed?.data ? decryptData(parsed.data) : parsed;
+    } catch { throw new Error('Erreur lors du traitement de la réponse'); }
 
-    const result = await response.json();
-    return result.data;
+    if (!response.ok) throw new Error('Failed to fetch declaration');
+    return (result as any)?.data ?? result;
   },
 
   updateStatut: async (id: number, statut: string): Promise<DispositifMedicalResponse> => {
     const token = localStorage.getItem('access_token');
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
+    if (!token) throw new Error('No authentication token found');
 
     const response = await fetch(`${API_BASE_URL}/dispositif-medical/${id}/statut`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ statut }),
+      headers: { 'Content-Type': 'application/json', 'X-Request-Encrypted': 'true', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(createEncryptedPayload({ statut })),
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to update status');
-    }
+    const text = await response.text();
+    let result: any;
+    try {
+      const parsed = JSON.parse(text);
+      result = parsed?.encrypted === true && parsed?.data ? decryptData(parsed.data) : parsed;
+    } catch { throw new Error('Erreur lors du traitement de la réponse'); }
 
-    const result = await response.json();
-    return result.data;
+    if (!response.ok) throw new Error('Failed to update status');
+    return (result as any)?.data ?? result;
   },
 
   updateCommentaireAnmps: async (id: number, commentaireAnmps: string): Promise<DispositifMedicalResponse> => {
     const token = localStorage.getItem('access_token');
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
+    if (!token) throw new Error('No authentication token found');
 
     const response = await fetch(`${API_BASE_URL}/dispositif-medical/${id}/commentaire-anmps`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ commentaireAnmps }),
+      headers: { 'Content-Type': 'application/json', 'X-Request-Encrypted': 'true', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(createEncryptedPayload({ commentaireAnmps })),
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to update comment');
-    }
+    const text = await response.text();
+    let result: any;
+    try {
+      const parsed = JSON.parse(text);
+      result = parsed?.encrypted === true && parsed?.data ? decryptData(parsed.data) : parsed;
+    } catch { throw new Error('Erreur lors du traitement de la réponse'); }
 
-    const result = await response.json();
-    return result.data;
+    if (!response.ok) throw new Error('Failed to update comment');
+    return (result as any)?.data ?? result;
   },
 };

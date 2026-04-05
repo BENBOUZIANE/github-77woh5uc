@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pill, Save, Plus, X, Upload, LogIn, LogOut, LayoutDashboard } from 'lucide-react';
+import { ArrowLeft, Pill, Save, Plus, X, Upload, LogIn, LogOut, LayoutDashboard, File, Image as ImageIcon } from 'lucide-react';
 import { complementAlimentaireApi } from '../services/apiCA';
 import { useAuth } from '../contexts/AuthContext';
 import { villesMaroc } from '../data/villesMaroc';
@@ -52,7 +52,9 @@ interface FormData {
     criteresGravite: string[];
     evolutionEffet: string;
     reexposition?: boolean;
+    reexpositionLequel?: string;
     reapparition?: boolean;
+    reapparitionDescription?: string;
   };
   complementsSuspectes: {
     nomSpecialite: string;
@@ -75,11 +77,11 @@ export default function ComplementAlimentairePage() {
   const [formData, setFormData] = useState<FormData>({
     utilisateurType: 'professionnel',
     declarant: { nom: '', prenom: '', email: '', tel: '' },
-    personneExposee: { type: 'patient', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: '', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
+    personneExposee: { type: '', nomPrenom: '', dateNaissance: '', age: undefined, ageUnite: '', grossesse: false, allaitement: false, sexe: 'F', ville: '' },
     allergiesConnues: [],
     antecedentsMedicaux: [],
     medicamentsSimultanes: [],
-    effetIndesirable: { descriptionSymptomes: '', dateApparition: '', delaiSurvenueHeures: '', delaiSurvenueJours: '', delaiSurvenuesMois: '', gravite: false, criteresGravite: [], evolutionEffet: '', reexposition: false, reapparition: false },
+    effetIndesirable: { descriptionSymptomes: '', dateApparition: '', delaiSurvenueHeures: '', delaiSurvenueJours: '', delaiSurvenuesMois: '', gravite: false, criteresGravite: [], evolutionEffet: '', reexposition: false, reexpositionLequel: '', reapparition: false, reapparitionDescription: '' },
     complementsSuspectes: [],
     commentaire: ''
   });
@@ -88,6 +90,7 @@ export default function ComplementAlimentairePage() {
   const [newAntecedent, setNewAntecedent] = useState('');
   const [newMedicament, setNewMedicament] = useState('');
   const [documentEnregistrement, setDocumentEnregistrement] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [currentComplement, setCurrentComplement] = useState({
     nomSpecialite: '',
@@ -113,7 +116,7 @@ export default function ComplementAlimentairePage() {
     baseSections.push(
       { title: 'Personne Exposée', icon: '🧑' },
       { title: 'Effet Indésirable', icon: '⚠️' },
-      { title: 'Complément Suspect', icon: '💊' },
+      { title: 'Complément Suspecté', icon: '💊' },
       { title: 'Informations complémentaires', icon: '💬' }
     );
 
@@ -124,7 +127,7 @@ export default function ComplementAlimentairePage() {
 
   const getSectionCaseNumber = (sectionIndex: number): number => {
     if (sectionIndex === 0) return 0;
-    if (formData.utilisateurType === 'consommateur' || formData.utilisateurType === 'autre') {
+    if (formData.utilisateurType === 'utilisateur' || formData.utilisateurType === 'autre') {
       return sectionIndex + 1;
     }
     return sectionIndex;
@@ -161,6 +164,7 @@ export default function ComplementAlimentairePage() {
         break;
 
       case 2:
+        if (!formData.personneExposee.type) errors.personneType = 'Le type de personne exposée est obligatoire';
         if (!formData.personneExposee.nomPrenom.trim()) errors.nomPrenom = 'Le nom et prénom sont obligatoires';
         if (!formData.personneExposee.ville) errors.personneVille = 'La ville est obligatoire';
         if (!formData.personneExposee.dateNaissance && !formData.personneExposee.age) {
@@ -175,7 +179,6 @@ export default function ComplementAlimentairePage() {
         break;
 
       case 3:
-        if (!formData.effetIndesirable.localisation.trim()) errors.localisation = 'La localisation est obligatoire';
         if (!formData.effetIndesirable.descriptionSymptomes.trim()) errors.descriptionSymptomes = 'La description est obligatoire';
         if (!formData.effetIndesirable.dateApparition) errors.dateApparition = 'La date d\'apparition est obligatoire';
         if (!formData.effetIndesirable.delaiSurvenueHeures.trim()) errors.delaiSurvenueHeures = 'Les heures sont obligatoires';
@@ -194,11 +197,9 @@ export default function ComplementAlimentairePage() {
         break;
 
       case 5:
-        if (!formData.complementSuspecte.nomCommercial.trim()) errors.nomCommercial = 'Le nom commercial est obligatoire';
-        if (!formData.complementSuspecte.marque.trim()) errors.marque = 'La marque est obligatoire';
-        if (!formData.complementSuspecte.formeGalenique) errors.formeGalenique = 'La forme galénique est obligatoire';
-        if (!formData.complementSuspecte.frequenceUtilisation) errors.frequenceUtilisation = 'La fréquence d\'utilisation est obligatoire';
-        if (!formData.complementSuspecte.dateDebutUtilisation) errors.dateDebutUtilisation = 'La date de début d\'utilisation est obligatoire';
+        if (!formData.complementsSuspectes || formData.complementsSuspectes.length === 0) {
+          errors.complementSuspecte = 'Veuillez ajouter au moins un complément alimentaire suspecté';
+        }
         break;
     }
 
@@ -233,14 +234,38 @@ export default function ComplementAlimentairePage() {
     setList(list.filter((_, i) => i !== index));
   };
 
+  const handleDocumentEnregistrementSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type === 'application/pdf' && file.size <= 10485760) {
+        setDocumentEnregistrement(file);
+      } else {
+        alert('Veuillez sélectionner un fichier PDF de moins de 10MB.');
+      }
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const validFiles = files.filter(file => {
+        const isValid = file.type.startsWith('image/') || file.type === 'application/pdf';
+        const isUnder10MB = file.size <= 10485760;
+        return isValid && isUnder10MB;
+      });
+      if (validFiles.length !== files.length) {
+        alert('Certains fichiers ont été ignorés. Seuls les images et PDF de moins de 10MB sont acceptés.');
+      }
+      setSelectedFiles(prev => [...prev, ...validFiles]);
+    }
+  };
+
+  const removeSelectedFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async () => {
     if (!validateSection(currentSection)) {
-      return;
-    }
-
-    if (!user) {
-      alert('Vous devez être connecté pour soumettre une déclaration');
-      navigate('/login');
       return;
     }
 
@@ -256,8 +281,18 @@ export default function ComplementAlimentairePage() {
             formData.effetIndesirable.delaiSurvenuesMois ? `${formData.effetIndesirable.delaiSurvenuesMois} Mois` : '',
           ].filter(Boolean).join(', '),
         },
+        // Le backend attend complementSuspecte (objet), on prend le premier du tableau
+        complementSuspecte: formData.complementsSuspectes[0] ?? null,
       };
-      await complementAlimentaireApi.createDeclaration(payload, documentEnregistrement || undefined);
+      const declaration = await complementAlimentaireApi.createDeclaration(payload, documentEnregistrement || undefined);
+      // Upload des pièces jointes
+      if (selectedFiles.length > 0 && declaration?.id) {
+        for (const file of selectedFiles) {
+          try {
+            await complementAlimentaireApi.uploadAttachment(file, String(declaration.id));
+          } catch { /* silencieux */ }
+        }
+      }
       alert('Déclaration soumise avec succès!');
       navigate('/dashboard');
     } catch (error: any) {
@@ -274,7 +309,7 @@ export default function ComplementAlimentairePage() {
       case 0:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations du Notificateur</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations sur le notificateur </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -338,7 +373,7 @@ export default function ComplementAlimentairePage() {
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="professionnel">Professionnel de santé</option>
-                <option value="consommateur">Consommateur</option>
+                <option value="utilisateur">Utilisateur</option>
                 <option value="representant_legal">Représentant légal de l'établissement</option>
                 <option value="autre">Autre</option>
               </select>
@@ -510,26 +545,48 @@ export default function ComplementAlimentairePage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Document d'enregistrement (PDF)*</label>
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center px-4 py-2 bg-white border-2 border-emerald-500 text-emerald-600 rounded-lg cursor-pointer hover:bg-emerald-50 transition-colors">
-                    <Upload className="w-5 h-5 mr-2" />
-                    Choisir un fichier
+                <div className="space-y-4">
+                  <label className={`flex items-center justify-center w-full px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer bg-white hover:bg-slate-50 transition-colors ${validationErrors.documentEnregistrement ? 'border-red-500' : 'border-slate-300'}`}>
+                    <div className="text-center">
+                      <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                      <p className="text-sm text-slate-600">
+                        <span className="font-medium text-emerald-600">Cliquez pour sélectionner</span> un fichier PDF
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">PDF uniquement - Max 10MB</p>
+                    </div>
                     <input
                       type="file"
-                      accept=".pdf"
-                      onChange={(e) => setDocumentEnregistrement(e.target.files?.[0] || null)}
+                      accept="application/pdf"
+                      onChange={handleDocumentEnregistrementSelect}
                       className="hidden"
                     />
                   </label>
+                  {validationErrors.documentEnregistrement && (
+                    <p className="text-sm text-red-600">{validationErrors.documentEnregistrement}</p>
+                  )}
                   {documentEnregistrement && (
-                    <span className="text-sm text-slate-600">{documentEnregistrement.name}</span>
+                    <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg p-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <File className="w-5 h-5 text-red-500 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-900 truncate">{documentEnregistrement.name}</p>
+                          <p className="text-xs text-slate-500">{(documentEnregistrement.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setDocumentEnregistrement(null)} type="button"
+                        className="p-1 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0">
+                        <X className="w-5 h-5 text-slate-400" />
+                      </button>
+                    </div>
                   )}
                 </div>
-                {validationErrors.documentEnregistrement && (
-                  <p className="mt-1 text-sm text-red-600">{validationErrors.documentEnregistrement}</p>
-                )}
               </div>
-            </div>
+               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+                <p className="text-sm text-slate-700">
+                  <strong>Note:</strong> En tant que représentant légal d'un établissement, veuillez fournir toutes les informations relatives à la déclaration de l'établissement et du produit concerné.
+                </p>
+              </div>
+            </div>            
           );
         }
         return null;
@@ -537,7 +594,7 @@ export default function ComplementAlimentairePage() {
       case 2:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations de la Personne Exposée</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations sur l’utilisateur</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -545,12 +602,14 @@ export default function ComplementAlimentairePage() {
                 <select
                   value={formData.personneExposee.type}
                   onChange={(e) => setFormData({ ...formData, personneExposee: { ...formData.personneExposee, type: e.target.value } })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${validationErrors.personneType ? 'border-red-500' : 'border-slate-300'}`}
                 >
+                  <option value="">-- Sélectionnez un type --</option>
                   <option value="patient">Patient</option>
                   <option value="proche">Proche</option>
                   <option value="autre">Autre</option>
                 </select>
+                {validationErrors.personneType && <p className="mt-1 text-sm text-red-600">{validationErrors.personneType}</p>}
               </div>
 
               <div>
@@ -855,10 +914,10 @@ export default function ComplementAlimentairePage() {
       case 3:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Effet Indésirable</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Description de(s) l’évènement(s) indésirable(s) </h2>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Description des symptômes observés*</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Description des symptômes*</label>
               <textarea
                 value={formData.effetIndesirable.descriptionSymptomes}
                 onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, descriptionSymptomes: e.target.value } })}
@@ -939,7 +998,7 @@ export default function ComplementAlimentairePage() {
                   onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, gravite: e.target.checked } })}
                   className="w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
                 />
-                <span className="ml-2 text-sm font-medium text-slate-700">Effet grave</span>
+                <span className="ml-2 text-sm font-medium text-slate-700">Gravité de l’évènement indésirable </span>
               </label>
 
               {formData.effetIndesirable.gravite && (
@@ -994,22 +1053,48 @@ export default function ComplementAlimentairePage() {
                 <input
                   type="checkbox"
                   checked={formData.effetIndesirable.reexposition || false}
-                  onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, reexposition: e.target.checked, reapparition: e.target.checked ? formData.effetIndesirable.reapparition : false } })}
+                  onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, reexposition: e.target.checked, reexpositionLequel: '', reapparition: e.target.checked ? formData.effetIndesirable.reapparition : false, reapparitionDescription: '' } })}
                   className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
                 />
                 <span className="ml-2 text-sm font-medium text-slate-700">Complément alimentaire réadministré</span>
               </label>
 
               {formData.effetIndesirable.reexposition && (
-                <label className="flex items-center ml-6">
-                  <input
-                    type="checkbox"
-                    checked={formData.effetIndesirable.reapparition || false}
-                    onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, reapparition: e.target.checked } })}
-                    className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
-                  />
-                  <span className="ml-2 text-sm text-slate-700">Réapparition de l'évènement indésirable</span>
-                </label>
+                <div className="ml-6 space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Lequel</label>
+                    <input
+                      type="text"
+                      value={formData.effetIndesirable.reexpositionLequel || ''}
+                      onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, reexpositionLequel: e.target.value } })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="Précisez le complément réadministré"
+                    />
+                  </div>
+
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.effetIndesirable.reapparition || false}
+                      onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, reapparition: e.target.checked, reapparitionDescription: '' } })}
+                      className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
+                    />
+                    <span className="ml-2 text-sm text-slate-700">Réapparition de l'évènement indésirable</span>
+                  </label>
+
+                  {formData.effetIndesirable.reapparition && (
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Décrivez</label>
+                      <textarea
+                        value={formData.effetIndesirable.reapparitionDescription || ''}
+                        onChange={(e) => setFormData({ ...formData, effetIndesirable: { ...formData.effetIndesirable, reapparitionDescription: e.target.value } })}
+                        rows={5}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                        placeholder="Décrivez la réapparition de l'évènement indésirable..."
+                      />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -1056,7 +1141,7 @@ export default function ComplementAlimentairePage() {
 
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Compléments Alimentaires Suspectés</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Informations sur le complément alimentaire suspecté </h2>
 
             {formData.complementsSuspectes.length > 0 && (
               <div className="mb-6">
@@ -1214,7 +1299,7 @@ export default function ComplementAlimentairePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Lieu d'achat**</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Lieu d'achat</label>
                     <select
                       value={currentComplement.lieuAchat}
                       onChange={(e) => setCurrentComplement({ ...currentComplement, lieuAchat: e.target.value })}
@@ -1244,6 +1329,9 @@ export default function ComplementAlimentairePage() {
                 Vous devez ajouter au moins un complément alimentaire suspecté.
               </p>
             )}
+            {validationErrors.complementSuspecte && (
+              <p className="mt-1 text-sm text-red-600">{validationErrors.complementSuspecte}</p>
+            )}
           </div>
         );
 
@@ -1265,11 +1353,48 @@ export default function ComplementAlimentairePage() {
               />
             </div>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <p className="text-sm text-amber-800">
-                <span className="font-medium">Note importante :</span> Assurez-vous que toutes les informations fournies sont exactes et complètes. Cette déclaration sera examinée par l'ANMPS.
-              </p>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Pièces Jointes</label>
+              <div className="space-y-4">
+                <label className="flex items-center justify-center w-full px-4 py-8 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer bg-white hover:bg-slate-50 transition-colors">
+                  <div className="text-center">
+                    <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <p className="text-sm text-slate-600">
+                      <span className="font-medium text-emerald-600">Cliquez pour sélectionner</span> ou glissez-déposez
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">Images (JPG, PNG, GIF) ou PDF - Max 10MB par fichier</p>
+                  </div>
+                  <input type="file" multiple accept="image/*,application/pdf" onChange={handleFileSelect} className="hidden" />
+                </label>
+                {selectedFiles.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-slate-700">Fichiers sélectionnés ({selectedFiles.length})</p>
+                    <div className="space-y-2">
+                      {selectedFiles.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between bg-white border border-slate-200 rounded-lg p-3">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            {file.type.startsWith('image/') ? (
+                              <ImageIcon className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                            ) : (
+                              <File className="w-5 h-5 text-red-500 flex-shrink-0" />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-slate-900 truncate">{file.name}</p>
+                              <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            </div>
+                          </div>
+                          <button onClick={() => removeSelectedFile(index)} type="button"
+                            className="p-1 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0">
+                            <X className="w-5 h-5 text-slate-400" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
+
           </div>
         );
 

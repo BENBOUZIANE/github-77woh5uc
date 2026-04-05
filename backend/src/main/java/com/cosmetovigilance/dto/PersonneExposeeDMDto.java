@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class PersonneExposeeDMDto {
     private String nom;
     private String prenom;
+    private String type;
     private LocalDate dateNaissance;
     private Integer age;
     private String ageUnite;
